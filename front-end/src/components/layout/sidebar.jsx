@@ -37,7 +37,7 @@ const Sidebar = ({ role = "admin" }) => {
   const links = role === "waiter" ? waiterLinks : adminLinks;
 
   return (
-    <aside className="w-64 min-h-screen bg-gradient-to-b from-blue-50 to-white border-r border-gray-200 shadow-lg">
+    <aside className="w-64 h-screen bg-gradient-to-b from-blue-50 to-white border-r border-gray-200 shadow-lg flex flex-col">
       <div className="p-6 border-b border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -48,7 +48,7 @@ const Sidebar = ({ role = "admin" }) => {
         <p className="text-sm text-gray-500 mt-1">Digital Menu System</p>
       </div>
 
-      <nav className="p-4">
+      <nav className="p-4 flex-1 overflow-y-auto">
         <ul className="space-y-2">
           {links.map((link) => {
             const Icon = link.icon;
@@ -81,7 +81,7 @@ const Sidebar = ({ role = "admin" }) => {
         </ul>
       </nav>
 
-      <div className="absolute bottom-4 left-4 right-4">
+      <div className="p-4 border-t border-gray-200">
         <div className="bg-gray-50 rounded-lg p-3 text-center">
           <p className="text-xs text-gray-500">Logged in as {role}</p>
         </div>
