@@ -1,11 +1,18 @@
-import React from 'react'
-import Button from './global-component/ui/button'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-export default function App() {
+import MenuManagement from './pages/admin/MenuManagement';
+
+// Sample menu items for display
+ export default function App() {
   return (
-    <div>
-      <h1 className='text-blue-900'>MenuGo Digital Menu</h1>
-      <Button className='btn-primary' label="Click me" onClick={() => console.log("Clicked!")} />
-    </div>
-  )
+    
+      <div className="min-h-screen bg-gray-50">
+        <Routes>
+          <Route path="/" element={<MenuManagement />} />
+          <Route path="/admin/menu" element={<MenuManagement />} />
+        </Routes>
+      </div>
+    
+  );
 }
