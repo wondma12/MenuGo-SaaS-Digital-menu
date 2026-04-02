@@ -4,9 +4,8 @@ import OrdersList from "../../components/waiter/orderlist";
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
 
-  // Mock data - replace with actual API call
   useEffect(() => {
-    // This should be replaced with your actual API call
+    
     const mockOrders = [
       {
         id: 1,
@@ -28,7 +27,7 @@ export default function OrdersPage() {
             price: "4.99",
             description: "Golden crispy french fries with sea salt",
             image:
-              "https://images.unsplash.com/photo-1576107232684-1279f3909599?w=64&h=64&fit=crop&crop=center",
+              "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJpdGVzfGVufDB8fDB8fHww",
           },
         ],
       },
@@ -51,7 +50,7 @@ export default function OrdersPage() {
             price: "6.99",
             description: "Toasted bread with garlic butter and herbs",
             image:
-              "https://images.unsplash.com/photo-1588195538326-5ff2bb5d0834?w=64&h=64&fit=crop&crop=center",
+              "https://plus.unsplash.com/premium_photo-1711752902734-a36167479983?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YnJlYWQlMjB0b2FzdGVkfGVufDB8fDB8fHww",
           },
         ],
       },

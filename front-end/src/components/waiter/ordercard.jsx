@@ -91,14 +91,14 @@ const OrderCard = ({ order, onApprove, onReject, onUpdate }) => {
           {order.status === "Pending" && (
             <div className="flex gap-2">
               <button
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-green-600 px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
                 onClick={() => onApprove(order.id)}
               >
                 <Check className="w-4 h-4" />
                 Approve
               </button>
               <button
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+                className="flex-1 bg-gray-100 hover:bg-gray-300 text-red-600 px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
                 onClick={() => onReject(order.id)}
               >
                 <X className="w-4 h-4" />

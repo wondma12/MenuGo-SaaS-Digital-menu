@@ -20,12 +20,10 @@ const Sidebar = ({ role = "admin" }) => {
   const adminLinks = [
     { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Menu", path: "/admin/menu", icon: UtensilsCrossed },
-    { name: "Categories", path: "/admin/categories", icon: FolderOpen },
     { name: "Orders", path: "/admin/orders", icon: ClipboardList },
     { name: "Staff", path: "/admin/staff", icon: Users },
     { name: "Appearance", path: "/admin/appearance", icon: Palette },
     { name: "QR Code", path: "/admin/qr", icon: QrCode },
-    { name: "Analytics", path: "/admin/analytics", icon: BarChart3 },
     { name: "Settings", path: "/admin/settings", icon: Settings },
   ];
 

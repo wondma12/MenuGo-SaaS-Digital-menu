@@ -22,7 +22,9 @@ function App() {
         <Route
           path="/admin/dashboard"
           element={
-            <AdminLayout role="admin"/>
+            <AdminLayout role="admin">
+              <div>Admin Dashboard Content</div>
+            </AdminLayout>
           }
         />
         {/* WAITER ROUTES */}
@@ -34,7 +36,7 @@ function App() {
             </AdminLayout>
           }
         />
-      </Routes> 
+      </Routes>
     </Router>
   );
 }

@@ -33,7 +33,7 @@ const OrdersList = ({ orders, handlers }) => {
         {orders.map((order) => (
           <div
             key={order.id}
-            className="transform transition-all duration-200 hover:scale-105"
+            className="transform transition-all duration-200 hover:scale-101"
           >
             <OrderCard
               order={order}
