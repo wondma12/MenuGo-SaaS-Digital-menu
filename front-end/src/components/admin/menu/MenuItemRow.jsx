@@ -1,84 +1,74 @@
-import React, { useState } from 'react';
-import { Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
-// import Button from '../../../global-component/ui/Button';
-import AvailabilityToggle from './AvailabilityToggle';
+import React from "react";
+import Button from "../../ui/Button";
+import AvailabilityToggle from "./AvailabilityToggle";
+import { Edit2, Trash2 } from "lucide-react";
 
 const MenuItemRow = ({ item, onEdit, onDelete, onToggleAvailability }) => {
-  const [showDetails, setShowDetails] = useState(false);
-
   return (
-    <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-      {/* Item Image & Name */}
-      <td className="px-6 py-4">
-        <div className="flex items-center gap-3">
+    <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-all duration-200">
+      <div className="flex items-center gap-4 flex-1">
+        {/* Image */}
+        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
           {item.image ? (
             <img 
               src={item.image} 
-              alt={item.name}
-              className="h-12 w-12 rounded-lg object-cover"
+              alt={item.name} 
+              className="w-full h-full object-cover"
+              onError={(e) => { e.target.style.display = 'none'; }}
             />
           ) : (
-            <div className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center">
-              <span className="text-xs text-gray-500">No img</span>
+            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+              No img
             </div>
           )}
-          <div>
-            <div className="font-medium text-gray-900">{item.name}</div>
-            <div className="text-sm text-gray-500 line-clamp-1">{item.description}</div>
+        </div>
+
+        {/* Info */}
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-semibold text-gray-900">{item.name}</h3>
+            {!item.available && (
+              <span className="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded-full">
+                Unavailable
+              </span>
+            )}
+            {item.isPopular && (
+              <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-600 rounded-full">
+                ★ Popular
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-gray-500 mb-1 line-clamp-1">{item.description}</p>
+          <div className="flex items-center gap-3 text-sm">
+            <span className="text-gray-900 font-semibold">${item.price.toFixed(2)}</span>
+            <span className="text-gray-400">•</span>
+            <span className="text-gray-600 capitalize">{item.category}</span>
           </div>
         </div>
-      </td>
-      
-      {/* Category */}
-      <td className="px-6 py-4">
-        <span className="inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-          {item.category}
-        </span>
-      </td>
-      
-      {/* Price */}
-      <td className="px-6 py-4">
-        <span className="font-semibold text-gray-900">${parseFloat(item.price).toFixed(2)}</span>
-      </td>
-      
-      {/* Status */}
-      <td className="px-6 py-4">
-        <AvailabilityToggle 
-          isAvailable={item.isAvailable}
-          onToggle={() => onToggleAvailability(item.id, item.isAvailable)}
-        />
-        <span className="ml-2 text-xs text-gray-500">
-          {item.isAvailable ? 'Available' : 'Out of stock'}
-        </span>
-      </td>
-      
+      </div>
+
       {/* Actions */}
-      <td className="px-6 py-4 text-right">
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-            title="View Details"
-          >
-            <Eye className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => onEdit(item)}
-            className="rounded-lg p-2 text-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-            title="Edit Item"
-          >
-            <Edit2 className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => onDelete(item.id)}
-            className="rounded-lg p-2 text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
-            title="Delete Item"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        </div>
-      </td>
-    </tr>
+      <div className="flex items-center gap-3 ml-4">
+        <AvailabilityToggle 
+          isAvailable={item.available} 
+          onToggle={() => onToggleAvailability(item.id)}
+        />
+        <button
+          onClick={() => onEdit(item)}
+          className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+          title="Edit item"
+        >
+          <Edit2 size={18} />
+        </button>
+        <button
+          onClick={() => onDelete(item.id)}
+          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+          title="Delete item"
+        >
+          <Trash2 size={18} />
+        </button>
+      </div>
+    </div>
   );
 };
 

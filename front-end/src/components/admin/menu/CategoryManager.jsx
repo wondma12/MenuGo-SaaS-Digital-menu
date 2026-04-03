@@ -1,182 +1,158 @@
-import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, X, Check } from 'lucide-react';
-import Button from '../../ui/button';
-import Input from '../../ui/input';
+import React, { useState } from "react";
+import Card from "../../ui/Card";
+import Button from "../../ui/Button";
+import Input from "../../ui/Input";
+import Modal from "../../ui/Modal";
+import { Plus, Trash2, Edit2, GripVertical } from "lucide-react";
 
-const CategoryManager = ({ categories, onClose, onUpdateCategories }) => {
-  const [categoryList, setCategoryList] = useState([...categories]);
-  const [newCategory, setNewCategory] = useState('');
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [editValue, setEditValue] = useState('');
-  const [error, setError] = useState('');
+const CategoryManager = ({ categories, onAddCategory, onEditCategory, onDeleteCategory }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryValue, setCategoryValue] = useState("");
+  const [categoryIcon, setCategoryIcon] = useState("");
 
-  const handleAddCategory = () => {
-    if (!newCategory.trim()) {
-      setError('Category name cannot be empty');
-      return;
+  const handleSubmit = () => {
+    if (!categoryName.trim() || !categoryValue.trim()) return;
+    
+    if (editingCategory) {
+      onEditCategory(editingCategory.value, { 
+        label: categoryName, 
+        value: categoryValue,
+        icon: categoryIcon 
+      });
+    } else {
+      onAddCategory({ 
+        label: categoryName, 
+        value: categoryValue,
+        icon: categoryIcon 
+      });
     }
     
-    if (categoryList.includes(newCategory.trim())) {
-      setError('Category already exists');
-      return;
-    }
-    
-    setCategoryList([...categoryList, newCategory.trim()]);
-    setNewCategory('');
-    setError('');
+    resetForm();
+    setIsModalOpen(false);
   };
 
-  const handleDeleteCategory = (index) => {
-    const categoryToDelete = categoryList[index];
-    if (window.confirm(`Delete category "${categoryToDelete}"? Items in this category will need to be reassigned.`)) {
-      const updated = categoryList.filter((_, i) => i !== index);
-      setCategoryList(updated);
-    }
+  const resetForm = () => {
+    setEditingCategory(null);
+    setCategoryName("");
+    setCategoryValue("");
+    setCategoryIcon("");
   };
 
-  const handleStartEdit = (index, category) => {
-    setEditingIndex(index);
-    setEditValue(category);
+  const openEditModal = (category) => {
+    setEditingCategory(category);
+    setCategoryName(category.label);
+    setCategoryValue(category.value);
+    setCategoryIcon(category.icon || "");
+    setIsModalOpen(true);
   };
 
-  const handleSaveEdit = () => {
-    if (!editValue.trim()) {
-      setError('Category name cannot be empty');
-      return;
-    }
-    
-    if (categoryList.includes(editValue.trim()) && categoryList[editingIndex] !== editValue.trim()) {
-      setError('Category already exists');
-      return;
-    }
-    
-    const updated = [...categoryList];
-    updated[editingIndex] = editValue.trim();
-    setCategoryList(updated);
-    setEditingIndex(null);
-    setEditValue('');
-    setError('');
-  };
-
-  const handleCancelEdit = () => {
-    setEditingIndex(null);
-    setEditValue('');
-    setError('');
-  };
-
-  const handleSaveAll = () => {
-    onUpdateCategories(categoryList);
-    onClose();
+  const openAddModal = () => {
+    resetForm();
+    setIsModalOpen(true);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-md rounded-lg bg-white shadow-xl">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b p-4">
-          <h2 className="text-xl font-bold text-gray-900">Manage Categories</h2>
-          <button onClick={onClose} className="rounded-full p-1 hover:bg-gray-100">
-            <X className="h-5 w-5 text-gray-500" />
-          </button>
+    <>
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900">Categories</h3>
+          <p className="text-sm text-gray-500">Manage your menu categories</p>
         </div>
+        <Button 
+          label="Add Category" 
+          variant="secondary" 
+          onClick={openAddModal} 
+          icon={Plus} 
+          size="sm" 
+        />
+      </div>
 
-        {/* Body */}
-        <div className="p-4">
-          {/* Add New Category */}
-          <div className="mb-6">
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Add New Category
-            </label>
-            <div className="flex gap-2">
-              <Input
-                placeholder="e.g., Appetizers"
-                value={newCategory}
-                onChange={(e) => {
-                  setNewCategory(e.target.value);
-                  setError('');
-                }}
-                className="flex-1"
-                onKeyPress={(e) => e.key === 'Enter' && handleAddCategory()}
-              />
-              <Button
-                label="Add"
-                onClick={handleAddCategory}
-                variant="primary"
-                icon={<Plus className="h-4 w-4" />}
-              />
-            </div>
-            {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      <div className="space-y-2 max-h-96 overflow-y-auto">
+        {categories.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            No categories yet. Click "Add Category" to create one.
           </div>
-
-          {/* Categories List */}
-          <div className="max-h-80 space-y-2 overflow-y-auto">
-            <p className="mb-2 text-sm font-medium text-gray-700">
-              Current Categories ({categoryList.length})
-            </p>
-            
-            {categoryList.length === 0 ? (
-              <div className="rounded-lg bg-gray-50 p-4 text-center text-gray-500">
-                No categories yet. Add your first category above.
-              </div>
-            ) : (
-              categoryList.map((category, index) => (
-                <div key={index} className="flex items-center justify-between rounded-lg border p-3">
-                  {editingIndex === index ? (
-                    <div className="flex flex-1 gap-2">
-                      <Input
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        className="flex-1"
-                        autoFocus
-                        onKeyPress={(e) => e.key === 'Enter' && handleSaveEdit()}
-                      />
-                      <button
-                        onClick={handleSaveEdit}
-                        className="rounded-lg bg-green-500 p-2 text-white hover:bg-green-600"
-                      >
-                        <Check className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={handleCancelEdit}
-                        className="rounded-lg bg-gray-300 p-2 text-gray-700 hover:bg-gray-400"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <span className="text-gray-700">{category}</span>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleStartEdit(index, category)}
-                          className="rounded p-1 text-blue-500 hover:bg-blue-50"
-                          title="Edit category"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteCategory(index)}
-                          className="rounded p-1 text-red-500 hover:bg-red-50"
-                          title="Delete category"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </>
+        ) : (
+          categories.map((category) => (
+            <div 
+              key={category.value} 
+              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
+            >
+              <div className="flex items-center gap-3 flex-1">
+                <GripVertical size={16} className="text-gray-400 cursor-move" />
+                <div>
+                  <p className="font-medium text-gray-900">{category.label}</p>
+                  <p className="text-xs text-gray-500">Slug: {category.value}</p>
+                  {category.icon && (
+                    <p className="text-xs text-gray-400">Icon: {category.icon}</p>
                   )}
                 </div>
-              ))
-            )}
+              </div>
+              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() => openEditModal(category)}
+                  className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                  title="Edit category"
+                >
+                  <Edit2 size={16} />
+                </button>
+                <button
+                  onClick={() => onDeleteCategory(category.value)}
+                  className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Delete category"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Category Count */}
+      <div className="mt-4 pt-4 border-t">
+        <p className="text-sm text-gray-500">
+          Total Categories: <span className="font-semibold text-gray-900">{categories.length}</span>
+        </p>
+      </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingCategory ? "Edit Category" : "Add New Category"}
+        onConfirm={handleSubmit}
+        confirmLabel={editingCategory ? "Update Category" : "Add Category"}
+      >
+        <div className="space-y-4">
+          <Input
+            label="Category Name"
+            placeholder="e.g., Main Course"
+            value={categoryName}
+            onChange={(e) => setCategoryName(e.target.value)}
+            required
+          />
+          <Input
+            label="Category Slug"
+            placeholder="e.g., main-course (used in URLs)"
+            value={categoryValue}
+            onChange={(e) => setCategoryValue(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+            required
+          />
+          <Input
+            label="Category Icon (optional)"
+            placeholder="e.g., pizza, salad, coffee"
+            value={categoryIcon}
+            onChange={(e) => setCategoryIcon(e.target.value)}
+          />
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <p className="text-xs text-gray-500">Preview URL:</p>
+            <p className="text-xs font-mono text-gray-700">/menu/category/{categoryValue || "category-slug"}</p>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="flex justify-end gap-3 border-t p-4">
-          <Button label="Cancel" onClick={onClose} variant="secondary" />
-          <Button label="Save Changes" onClick={handleSaveAll} variant="primary" />
-        </div>
-      </div>
-    </div>
+      </Modal>
+    </>
   );
 };
 

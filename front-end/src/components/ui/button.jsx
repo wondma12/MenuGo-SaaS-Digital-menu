@@ -1,4 +1,3 @@
-// components/ui/Button.jsx
 import React from "react";
 
 const variantStyles = {
@@ -7,20 +6,15 @@ const variantStyles = {
   danger: "bg-red-500 text-white hover:bg-red-600",
 };
 
-const Button = ({
-  label,
-  onClick,
-  type = "button",
-  variant = "primary",
-  className = "",
-}) => {
+const Button = ({ label, children, onClick, type = "button", variant = "primary", className = "" }) => {
+  const styles = variantStyles[variant] ?? variantStyles.primary;
   return (
     <button
       type={type}
       onClick={onClick}
-      className={`px-4 py-2 rounded-lg transition duration-200 ${variantStyles[variant]} ${className}`}
+      className={`px-4 py-2 rounded-lg transition duration-200 ${styles} ${className}`}
     >
-      {label}
+      {label ?? children}
     </button>
   );
 };

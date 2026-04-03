@@ -1,47 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import Button from '../../ui/button';
-import Input from '../../ui/input';
-import ImageUpload from './ImageUpload';
+import React, { useState } from "react";
+import Input from "../../ui/Input";
+import Button from "../../ui/Button";
+import Select from "../../ui/Select";
+import ImageUpload from "./ImageUpload";
+import { AlertCircle } from "lucide-react";
 
-const MenuForm = ({ onSubmit, initialData, categories, onCancel, isEditing = false }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: categories[0] || '',
-    image: '',
-    isAvailable: true
-  });
+const MenuForm = ({ initialData, onSubmit, onCancel, categories }) => {
+  const [formData, setFormData] = useState(
+    initialData || {
+      name: "",
+      description: "",
+      price: "",
+      category: categories[0]?.value || "",
+      image: "",
+      available: true,
+      isPopular: false,
+      preparationTime: "15",
+      calories: "",
+    }
+  );
 
   const [errors, setErrors] = useState({});
-
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        name: initialData.name || '',
-        description: initialData.description || '',
-        price: initialData.price || '',
-        category: initialData.category || categories[0] || '',
-        image: initialData.image || '',
-        isAvailable: initialData.isAvailable !== undefined ? initialData.isAvailable : true
-      });
-    }
-  }, [initialData, categories]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'Item name is required';
-    }
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
-    }
-    if (!formData.price || formData.price <= 0) {
-      newErrors.price = 'Valid price is required';
-    }
-    if (!formData.category) {
-      newErrors.category = 'Category is required';
+    if (!formData.name.trim()) newErrors.name = "Item name is required";
+    if (formData.name.length < 2) newErrors.name = "Name must be at least 2 characters";
+    if (!formData.description.trim()) newErrors.description = "Description is required";
+    if (formData.description.length < 10) newErrors.description = "Description must be at least 10 characters";
+    if (!formData.price || formData.price <= 0) newErrors.price = "Valid price is required";
+    if (formData.price > 1000) newErrors.price = "Price seems too high";
+    if (!formData.category) newErrors.category = "Category is required";
+    if (formData.preparationTime && (formData.preparationTime < 0 || formData.preparationTime > 120)) {
+      newErrors.preparationTime = "Preparation time must be between 0-120 minutes";
     }
     
     setErrors(newErrors);
@@ -49,132 +41,174 @@ const MenuForm = ({ onSubmit, initialData, categories, onCancel, isEditing = fal
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
+    const { name, value, type, checked } = e.target;
+    setFormData({ 
+      ...formData, 
+      [name]: type === "checkbox" ? checked : value 
+    });
+    if (errors[name]) setErrors({ ...errors, [name]: "" });
   };
 
-  const handleImageUpload = (imageUrl) => {
-    setFormData(prev => ({ ...prev, image: imageUrl }));
+  const handleImageUpload = (imageData) => {
+    setFormData({ ...formData, image: imageData });
   };
 
-  const handleSubmit = (e) => {
+  const handleImageRemove = () => {
+    setFormData({ ...formData, image: "" });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      onSubmit({
-        ...formData,
-        price: parseFloat(formData.price)
+      setIsSubmitting(true);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      onSubmit({ 
+        ...formData, 
+        price: parseFloat(formData.price),
+        preparationTime: parseInt(formData.preparationTime),
+        calories: formData.calories ? parseInt(formData.calories) : null
       });
+      setIsSubmitting(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Item Name */}
-      <div>
+      {/* Basic Information */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-gray-900 pb-2 border-b">Basic Information</h3>
+        
         <Input
-          label="Item Name *"
+          label="Item Name"
           name="name"
           placeholder="e.g., Margherita Pizza"
           value={formData.name}
           onChange={handleChange}
-          className={errors.name ? 'border-red-500' : ''}
+          required
+          error={errors.name}
         />
-        {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
-      </div>
 
-      {/* Description */}
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700">
-          Description *
-        </label>
-        <textarea
-          name="description"
-          placeholder="Describe your menu item..."
-          value={formData.description}
-          onChange={handleChange}
-          rows="3"
-          className={`w-full rounded-lg border p-3 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-            errors.description ? 'border-red-500' : 'border-gray-300'
-          }`}
-        />
-        {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description}</p>}
-      </div>
-
-      {/* Price and Category Row */}
-      <div className="grid grid-cols-2 gap-4">
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Description <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            name="description"
+            rows="3"
+            placeholder="Describe your menu item with details about ingredients, taste, etc..."
+            value={formData.description}
+            onChange={handleChange}
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black resize-none ${
+              errors.description ? "border-red-500" : "border-gray-300"
+            }`}
+          />
+          {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+          <p className="text-xs text-gray-400 mt-1">{formData.description.length}/500 characters</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Price *"
+            label="Price ($)"
             name="price"
             type="number"
             step="0.01"
             placeholder="0.00"
             value={formData.price}
             onChange={handleChange}
-            className={errors.price ? 'border-red-500' : ''}
+            required
+            error={errors.price}
           />
-          {errors.price && <p className="mt-1 text-xs text-red-500">{errors.price}</p>}
+          <Input
+            label="Preparation Time (minutes)"
+            name="preparationTime"
+            type="number"
+            placeholder="15"
+            value={formData.preparationTime}
+            onChange={handleChange}
+            error={errors.preparationTime}
+          />
         </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Category *
-          </label>
-          <select
+        <div className="grid grid-cols-2 gap-4">
+          <Select
+            label="Category"
             name="category"
+            options={categories}
             value={formData.category}
             onChange={handleChange}
-            className={`w-full rounded-lg border p-2 focus:border-blue-500 focus:outline-none ${
-              errors.category ? 'border-red-500' : 'border-gray-300'
-            }`}
-          >
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-          {errors.category && <p className="mt-1 text-xs text-red-500">{errors.category}</p>}
+            error={errors.category}
+          />
+          <Input
+            label="Calories (optional)"
+            name="calories"
+            type="number"
+            placeholder="e.g., 450"
+            value={formData.calories}
+            onChange={handleChange}
+          />
         </div>
       </div>
 
-      {/* Image Upload */}
-      <ImageUpload 
-        onImageUpload={handleImageUpload}
-        currentImage={formData.image}
-      />
+      {/* Media & Options */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-gray-900 pb-2 border-b">Media & Options</h3>
+        
+        <ImageUpload
+          currentImage={formData.image}
+          onImageUpload={handleImageUpload}
+          onImageRemove={handleImageRemove}
+          label="Item Image"
+        />
 
-      {/* Availability Toggle */}
-      <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-        <span className="text-sm font-medium text-gray-700">Available for ordering</span>
-        <button
-          type="button"
-          onClick={() => setFormData(prev => ({ ...prev, isAvailable: !prev.isAvailable }))}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            formData.isAvailable ? 'bg-green-500' : 'bg-gray-300'
-          }`}
-        >
-          <span
-            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-              formData.isAvailable ? 'translate-x-6' : 'translate-x-1'
-            }`}
-          />
-        </button>
+        <div className="flex items-center gap-6">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              name="available"
+              checked={formData.available}
+              onChange={handleChange}
+              className="w-4 h-4 rounded border-gray-300 focus:ring-black"
+            />
+            <span className="text-sm text-gray-700">Item Available</span>
+          </label>
+          
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              name="isPopular"
+              checked={formData.isPopular}
+              onChange={handleChange}
+              className="w-4 h-4 rounded border-gray-300 focus:ring-black"
+            />
+            <span className="text-sm text-gray-700">Mark as Popular</span>
+          </label>
+        </div>
       </div>
 
-      {/* Form Actions */}
-      <div className="flex justify-end gap-3 pt-4 border-t">
-        <Button
-          label="Cancel"
-          onClick={onCancel}
-          variant="secondary"
-          type="button"
+      {/* Info Note */}
+      <div className="bg-blue-50 rounded-lg p-3 flex items-start gap-2">
+        <AlertCircle size={16} className="text-blue-600 mt-0.5" />
+        <p className="text-xs text-blue-700">
+          Changes to menu items will be reflected immediately on the customer menu page.
+        </p>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-3 pt-4 border-t">
+        <Button 
+          label={isSubmitting ? "Saving..." : "Save Item"} 
+          type="submit" 
+          variant="primary" 
+          className="flex-1"
+          disabled={isSubmitting}
         />
-        <Button
-          label={isEditing ? 'Update Item' : 'Add Item'}
-          type="submit"
-          variant="primary"
+        <Button 
+          label="Cancel" 
+          variant="secondary" 
+          onClick={onCancel} 
+          className="flex-1"
+          disabled={isSubmitting}
         />
       </div>
     </form>
