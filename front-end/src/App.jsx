@@ -10,6 +10,7 @@ import {
 // Layout
 import AdminLayout from "./components/layout/AdminLayout";
 import OrdersPage from "./pages/waiter/OrdersPage";
+import MenuPage from "./pages/admin/MenuManagement";
 
 function App() {
   return (
@@ -24,6 +25,14 @@ function App() {
           element={
             <AdminLayout role="admin">
               <div>Admin Dashboard Content</div>
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/admin/menu"
+          element={
+            <AdminLayout role="admin">
+              <MenuPage />
             </AdminLayout>
           }
         />

@@ -1,5 +1,4 @@
-// Mock API service for menu management
-// This simulates backend API calls for development
+
 
 import { mockMenuItems, mockCategories } from '../utils/mockMenuData';
 
