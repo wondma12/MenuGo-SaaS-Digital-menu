@@ -14,17 +14,17 @@ import {
   Clock,
 } from "lucide-react";
 
-const Sidebar = ({ role = "admin" }) => {
+const Sidebar = ({ role = "Restaurant_admin" }) => {
   const location = useLocation();
 
   const adminLinks = [
-    { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "Menu", path: "/admin/menu", icon: FolderOpen },
-    { name: "Orders", path: "/admin/orders", icon: ClipboardList },
-    { name: "Staff", path: "/admin/staff", icon: Users },
-    { name: "Appearance", path: "/admin/appearance", icon: Palette },
-    { name: "QR Code", path: "/admin/qr", icon: QrCode },
-    { name: "Settings", path: "/admin/settings", icon: Settings },
+    { name: "Dashboard", path: "/Restaurant_admin/dashboard", icon: LayoutDashboard },
+    { name: "Menu", path: "/Restaurant_admin/menu", icon: FolderOpen },
+    { name: "Orders", path: "/Restaurant_admin/orders", icon: ClipboardList },
+    { name: "Staff", path: "/Restaurant_admin/staff", icon: Users },
+    { name: "Appearance", path: "/Restaurant_admin/appearance", icon: Palette },
+    { name: "QR Code", path: "/Restaurant_admin/qr", icon: QrCode },
+    { name: "Settings", path: "/Restaurant_admin/settings", icon: Settings },
   ];
 
   const waiterLinks = [
