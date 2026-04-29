@@ -14,13 +14,13 @@ import Login from "./pages/auth/login/Login";
 import Signup from "./pages/auth/signup/Signup";
 // Admin Pages
 import OrdersPage from "./pages/waiter/OrdersPage";
-import DashboardPage from "./pages/admin/Dashboard";
-import MenuManagementPage from "./pages/admin/MenuManagement";
-import AdminOrders from "./pages/admin/Orders";
-import StaffManagement from "./pages/admin/StaffManagement";
-import Appearance from "./pages/admin/Appearance";
-import Settings from "./pages/admin/Settings";
-import QRCode from "./pages/admin/QRCode";
+import DashboardPage from "./pages/Restaurant_admin/Dashboard";
+import MenuManagementPage from "./pages/Restaurant_admin/MenuManagement";
+import Restaurant_adminOrders from "./pages/Restaurant_admin/Orders";
+import StaffManagement from "./pages/Restaurant_admin/StaffManagement";
+import Appearance from "./pages/Restaurant_admin/Appearance";
+import Settings from "./pages/Restaurant_admin/Settings";
+import QRCode from "./pages/Restaurant_admin/QRCode";
 
 function App() {
   return (
@@ -33,59 +33,59 @@ function App() {
         {/* Redirect root */}
         <Route path="/" element={<Navigate to="/auth/login" />} />
 
-        {/* ADMIN ROUTES */}
+        {/* Restaurant_admin ROUTES */}
         <Route
-          path="/admin/dashboard"
+          path="/Restaurant_admin/dashboard"
           element={
-            <AdminLayout role="admin">
+            <AdminLayout role="Restaurant_admin">
               <DashboardPage />
             </AdminLayout>
           }
         />
         <Route
-          path="/admin/orders"
+          path="/Restaurant_admin/orders"
           element={
-            <AdminLayout role="admin">
-              <AdminOrders />
+            <AdminLayout role="Restaurant_admin">
+              <Restaurant_adminOrders />
             </AdminLayout>
           }
         />
         <Route
-          path="/admin/menu"
+          path="/Restaurant_admin/menu"
           element={
-            <AdminLayout role="admin">
+            <AdminLayout role="Restaurant_admin">
               <MenuManagementPage />
             </AdminLayout>
           }
         />
         <Route
-          path="/admin/staff"
+          path="/Restaurant_admin/staff"
           element={
-            <AdminLayout role="admin">
+            <AdminLayout role="Restaurant_admin">
               <StaffManagement />
             </AdminLayout>
           }
         />
         <Route
-          path="/admin/appearance"
+          path="/Restaurant_admin/appearance"
           element={
-            <AdminLayout role="admin">
+            <AdminLayout role="Restaurant_admin">
               <Appearance />
             </AdminLayout>
           }
         />
         <Route
-          path="/admin/qr"
+          path="/Restaurant_admin/qr"
           element={
-            <AdminLayout role="admin">
+            <AdminLayout role="Restaurant_admin">
               <QRCode />
             </AdminLayout>
           }
         />
         <Route
-          path="/admin/settings"
+          path="/Restaurant_admin/settings"
           element={
-            <AdminLayout role="admin">
+            <AdminLayout role="Restaurant_admin">
               <Settings />
             </AdminLayout>
           }

@@ -54,17 +54,23 @@ const Login = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Email Address
           </label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <div
+            className={`flex items-center border rounded-xl focus-within:ring-2 focus-within:ring-black ${
+              errors.email ? "border-red-500" : "border-gray-300"
+            }`}
+          >
+            <Mail className="text-gray-400 w-5 h-5 ml-3 flex-shrink-0" />
             <Input
               type="email"
               placeholder="Enter your email"
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
-              error={errors.email}
-              className="pl-10 rounded-xl"
+              className="border-0 rounded-none focus:ring-0 focus:outline-none flex-1"
             />
           </div>
+          {errors.email && (
+            <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+          )}
         </div>
 
         {/* Password Field */}
@@ -72,20 +78,23 @@ const Login = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Password
           </label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <div
+            className={`flex items-center border rounded-xl focus-within:ring-2 focus-within:ring-black ${
+              errors.password ? "border-red-500" : "border-gray-300"
+            }`}
+          >
+            <Lock className="text-gray-400 w-5 h-5 ml-3 flex-shrink-0" />
             <Input
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
               value={formData.password}
               onChange={(e) => handleChange("password", e.target.value)}
-              error={errors.password}
-              className="pl-10 pr-10 rounded-xl"
+              className="border-0 rounded-none focus:ring-0 focus:outline-none flex-1"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 transition-colors mr-3 flex-shrink-0"
             >
               {showPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -94,6 +103,9 @@ const Login = () => {
               )}
             </button>
           </div>
+          {errors.password && (
+            <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+          )}
         </div>
 
         {/* Remember Me & Forgot Password */}
@@ -116,7 +128,7 @@ const Login = () => {
         {/* Submit Button */}
         <Button
           type="submit"
-          className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+          className="w-full rounded-xl bg-gradient-to-r from-balck to-black hover:from-grey-100 hover:to-grey-100"
           disabled={isLoading}
         >
           {isLoading ? "Signing in..." : "Sign In"}
