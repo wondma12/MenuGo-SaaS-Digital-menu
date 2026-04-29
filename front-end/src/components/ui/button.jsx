@@ -1,4 +1,3 @@
-// components/ui/Button.jsx
 import React from "react";
 
 const variantStyles = {
@@ -9,18 +8,20 @@ const variantStyles = {
 
 const Button = ({
   label,
+  children,
   onClick,
   type = "button",
   variant = "primary",
   className = "",
 }) => {
+  const styles = variantStyles[variant] ?? variantStyles.primary;
   return (
     <button
       type={type}
       onClick={onClick}
-      className={`px-4 py-2 rounded-lg transition duration-200 ${variantStyles[variant]} ${className}`}
+      className={`px-4 py-2.5 rounded-lg transition duration-200 whitespace-nowrap ${styles} ${className}`}
     >
-      {label}
+      {label ?? children}
     </button>
   );
 };
