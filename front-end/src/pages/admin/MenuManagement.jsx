@@ -1,156 +1,209 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Download } from 'lucide-react';
-import Button from '../../components/ui/button';
-import Card from '../../components/ui/card';
-import Input from '../../components/ui/input';
-import MenuItemList from '../../components/admin/menu/MenuItemList';
-import MenuFormModal from '../../components/admin/menu/MenuFormModal';
-import CategoryManager from '../../components/admin/menu/CategoryManager';
-import MenuStatsBar from '../../components/admin/menu/MenuStatsBar';
-import EmptyMenuState from '../../components/admin/menu/EmptyMenuState';
-import { useMenu } from '../../hooks/useMenu';
+import React, { useEffect, useMemo, useState } from "react";
+import { Plus, Search, SlidersHorizontal } from "lucide-react";
+import Button from "../../components/ui/button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Card from "../../components/ui/card";
+import CreateMenuItemModal from "../../components/admin/menu/CreateMenuItemModal";
+import MenuItemList from "../../components/admin/menu/MenuItemList";
+import menuService from "../../services/menuService";
+import { useDebounce } from "../../hooks/useDebounce";
 
 const MenuManagement = () => {
-  const { 
-    menuItems, 
-    categories, 
-    loading, 
-    addMenuItem, 
-    updateMenuItem, 
-    deleteMenuItem,
-    updateAvailability,
-    getMenuStats 
-  } = useMenu();
-
+  const [items, setItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
 
-  const stats = getMenuStats();
+  const debouncedSearchTerm = useDebounce(searchTerm, 200);
 
-  const handleAddItem = () => {
-    setEditingItem(null);
-    setIsModalOpen(true);
-  };
+  const loadData = async () => {
+    const [menuResponse, categoriesResponse] = await Promise.all([
+      menuService.getMenuItems(),
+      menuService.getCategories(),
+    ]);
 
-  const handleEditItem = (item) => {
-    setEditingItem(item);
-    setIsModalOpen(true);
-  };
-
-  const handleSaveItem = (itemData) => {
-    if (editingItem) {
-      updateMenuItem(editingItem.id, itemData);
-    } else {
-      addMenuItem(itemData);
+    if (menuResponse.success) {
+      setItems(menuResponse.data);
     }
+    if (categoriesResponse.success) {
+      setCategories(categoriesResponse.data);
+      if (!categoryFilter && categoriesResponse.data.length) {
+        setCategoryFilter(categoriesResponse.data[0]);
+      }
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const openModal = (item = null) => {
+    setSelectedItem(item);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
     setIsModalOpen(false);
+    setSelectedItem(null);
   };
 
-  const handleDeleteItem = (id) => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
-      deleteMenuItem(id);
+  const handleSaveItem = async (payload) => {
+    setIsSaving(true);
+    const response = selectedItem
+      ? await menuService.updateMenuItem(selectedItem.id, payload)
+      : await menuService.createMenuItem(payload);
+
+    if (response.success) {
+      await loadData();
+      setStatusMessage(
+        selectedItem ? "Menu item updated." : "Menu item created.",
+      );
+      closeModal();
+    } else {
+      setStatusMessage(response.error || "Failed to save item.");
+    }
+    setIsSaving(false);
+  };
+
+  const handleDeleteItem = async (id) => {
+    const response = await menuService.deleteMenuItem(id);
+    if (response.success) {
+      setItems((current) => current.filter((item) => item.id !== id));
+      setStatusMessage("Menu item removed.");
+    } else {
+      setStatusMessage(response.error || "Failed to delete item.");
     }
   };
 
-  const handleToggleAvailability = (id, currentStatus) => {
-    updateAvailability(id, !currentStatus);
+  const handleToggleAvailability = async (id) => {
+    const item = items.find((item) => item.id === id);
+    if (!item) {
+      setStatusMessage("Menu item not found.");
+      return;
+    }
+
+    const response = await menuService.updateAvailability(
+      id,
+      !item.isAvailable,
+    );
+    if (response.success) {
+      setItems((current) =>
+        current.map((item) =>
+          item.id === id ? { ...item, isAvailable: !item.isAvailable } : item,
+        ),
+      );
+      setStatusMessage("Availability updated.");
+    } else {
+      setStatusMessage(response.error || "Failed to update availability.");
+    }
   };
 
-  const filteredItems = menuItems.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          item.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const handleClearFilter = () => {
+    setSearchTerm("");
+    setCategoryFilter("");
+  };
+
+  const filteredCategoryOptions = useMemo(
+    () => [
+      { label: "All categories", value: "" },
+      ...categories.map((category) => ({ label: category, value: category })),
+    ],
+    [categories],
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      {/* Header Section */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Menu Management</h1>
-        <p className="mt-2 text-gray-600">Manage your restaurant's menu items, categories, and availability</p>
-      </div>
-
-      {/* Stats Section */}
-      <MenuStatsBar stats={stats} />
-
-      {/* Actions Bar */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-1 gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <Input
-              placeholder="Search menu items..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none"
-          >
-            <option value="all">All Categories</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
+    <div className="space-y-6">
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">
+            Menu management
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">
+            Manage your menu items, availability, and categories from one place.
+          </p>
         </div>
-
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3 sm:flex-nowrap sm:items-center">
+          <Button onClick={() => openModal()} className="flex items-center">
+            <Plus size={18} className="mr-2 flex-shrink-0" /> Add menu item
+          </Button>
           <Button
-            label="Manage Categories"
-            onClick={() => setShowCategoryManager(true)}
             variant="secondary"
-          />
-          <Button
-            label="Add Menu Item"
-            onClick={handleAddItem}
-            variant="primary"
-            icon={<Plus className="h-4 w-4" />}
-          />
+            onClick={handleClearFilter}
+            className="flex items-center"
+          >
+            <SlidersHorizontal size={16} className="mr-2 flex-shrink-0" /> Reset
+            filters
+          </Button>
         </div>
       </div>
 
-      {/* Menu Items List */}
-      <Card className="overflow-hidden">
-        {loading ? (
-          <div className="flex h-64 items-center justify-center">
-            <div className="text-gray-500">Loading menu items...</div>
+      <Card>
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex-1 min-w-0">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Search
+            </label>
+            <div className="relative rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
+              <Search
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 shrink-0"
+              />
+              <Input
+                className="pl-9"
+                placeholder="Search menu items"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
           </div>
-        ) : filteredItems.length === 0 ? (
-          <EmptyMenuState onAddItem={handleAddItem} />
-        ) : (
-          <MenuItemList
-            items={filteredItems}
-            onEdit={handleEditItem}
-            onDelete={handleDeleteItem}
-            onToggleAvailability={handleToggleAvailability}
-          />
-        )}
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:w-auto lg:flex lg:items-end lg:gap-4">
+            <div className="lg:w-48">
+              <Select
+                label="Category"
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                options={filteredCategoryOptions}
+              />
+            </div>
+            <div className="lg:pb-2.5">
+              <p className="text-sm text-slate-500">
+                Showing {items.length} items
+              </p>
+            </div>
+          </div>
+        </div>
       </Card>
 
-      {/* Add/Edit Modal */}
-      <MenuFormModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveItem}
-        editingItem={editingItem}
-        categories={categories}
+      {statusMessage ? (
+        <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+          {statusMessage}
+        </div>
+      ) : null}
+
+      <MenuItemList
+        items={items}
+        onEdit={openModal}
+        onDelete={handleDeleteItem}
+        onToggleAvailability={handleToggleAvailability}
+        searchTerm={debouncedSearchTerm}
+        categoryFilter={categoryFilter}
       />
 
-      {/* Category Manager Modal */}
-      {showCategoryManager && (
-        <CategoryManager
-          categories={categories}
-          onClose={() => setShowCategoryManager(false)}
-        />
-      )}
+      <CreateMenuItemModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onSave={handleSaveItem}
+        categories={categories}
+        menuItem={selectedItem}
+        isSaving={isSaving}
+      />
     </div>
   );
 };

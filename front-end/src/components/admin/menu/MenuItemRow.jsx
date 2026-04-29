@@ -1,80 +1,69 @@
-import React, { useState } from 'react';
-import { Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
-// import Button from '../../../global-component/ui/Button';
-import AvailabilityToggle from './AvailabilityToggle';
+import React from "react";
+import { Edit, Trash2, CheckCircle2, XCircle } from "lucide-react";
 
 const MenuItemRow = ({ item, onEdit, onDelete, onToggleAvailability }) => {
-  const [showDetails, setShowDetails] = useState(false);
-
   return (
-    <tr className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-      {/* Item Image & Name */}
-      <td className="px-6 py-4">
+    <tr className="hover:bg-gray-50 transition-colors">
+      <td className="px-4 py-3">
         <div className="flex items-center gap-3">
           {item.image ? (
-            <img 
-              src={item.image} 
+            <img
+              src={item.image}
               alt={item.name}
-              className="h-12 w-12 rounded-lg object-cover"
+              className="w-11 h-11 rounded-2xl object-cover border border-slate-200"
             />
           ) : (
-            <div className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center">
-              <span className="text-xs text-gray-500">No img</span>
+            <div className="w-11 h-11 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500">
+              {item.name.charAt(0).toUpperCase()}
             </div>
           )}
           <div>
-            <div className="font-medium text-gray-900">{item.name}</div>
-            <div className="text-sm text-gray-500 line-clamp-1">{item.description}</div>
+            <p className="font-medium text-gray-900">{item.name}</p>
+            <p className="text-xs text-gray-500">{item.description}</p>
           </div>
         </div>
       </td>
-      
-      {/* Category */}
-      <td className="px-6 py-4">
-        <span className="inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-          {item.category}
-        </span>
+      <td className="px-4 py-3 text-gray-700">${item.price.toFixed(2)}</td>
+      <td className="px-4 py-3 text-gray-700">{item.category}</td>
+      <td className="px-4 py-3 text-gray-700">{item.calories} kcal</td>
+      <td className="px-4 py-3">
+        <button
+          onClick={() => onToggleAvailability(item.id)}
+          className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors ${
+            item.isAvailable
+              ? "bg-green-100 text-green-800 hover:bg-green-200"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          {item.isAvailable ? (
+            <CheckCircle2 size={14} />
+          ) : (
+            <XCircle size={14} />
+          )}
+          {item.isAvailable ? "Available" : "Unavailable"}
+        </button>
       </td>
-      
-      {/* Price */}
-      <td className="px-6 py-4">
-        <span className="font-semibold text-gray-900">${parseFloat(item.price).toFixed(2)}</span>
+      <td className="px-4 py-3 text-gray-500">
+        {item.isPopular ? "Yes" : "No"}
       </td>
-      
-      {/* Status */}
-      <td className="px-6 py-4">
-        <AvailabilityToggle 
-          isAvailable={item.isAvailable}
-          onToggle={() => onToggleAvailability(item.id, item.isAvailable)}
-        />
-        <span className="ml-2 text-xs text-gray-500">
-          {item.isAvailable ? 'Available' : 'Out of stock'}
-        </span>
+      <td className="px-4 py-3 text-sm text-gray-500">
+        {new Date(item.updatedAt).toLocaleDateString()}
       </td>
-      
-      {/* Actions */}
-      <td className="px-6 py-4 text-right">
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-            title="View Details"
-          >
-            <Eye className="h-4 w-4" />
-          </button>
+      <td className="px-4 py-3">
+        <div className="flex gap-2">
           <button
             onClick={() => onEdit(item)}
-            className="rounded-lg p-2 text-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-            title="Edit Item"
+            className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+            title="Edit item"
           >
-            <Edit2 className="h-4 w-4" />
+            <Edit size={16} />
           </button>
           <button
             onClick={() => onDelete(item.id)}
-            className="rounded-lg p-2 text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
-            title="Delete Item"
+            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+            title="Remove item"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 size={16} />
           </button>
         </div>
       </td>

@@ -19,7 +19,7 @@ const Sidebar = ({ role = "admin" }) => {
 
   const adminLinks = [
     { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "Menu", path: "/admin/menu", icon: UtensilsCrossed },
+    { name: "Menu", path: "/admin/menu", icon: FolderOpen },
     { name: "Orders", path: "/admin/orders", icon: ClipboardList },
     { name: "Staff", path: "/admin/staff", icon: Users },
     { name: "Appearance", path: "/admin/appearance", icon: Palette },
@@ -30,6 +30,7 @@ const Sidebar = ({ role = "admin" }) => {
   const waiterLinks = [
     { name: "Orders", path: "/waiter/orders", icon: ClipboardList },
     { name: "Active Orders", path: "/waiter/active", icon: Clock },
+    { name: "Order For customer", path: "/waiter/forcustomer", icon: Users },
   ];
 
   const links = role === "waiter" ? waiterLinks : adminLinks;

@@ -9,22 +9,44 @@ import {
 
 // Layout
 import AdminLayout from "./components/layout/AdminLayout";
+// Auth Pages
+import Login from "./pages/auth/login/Login";
+import Signup from "./pages/auth/signup/Signup";
+// Admin Pages
 import OrdersPage from "./pages/waiter/OrdersPage";
-import MenuPage from "./pages/admin/MenuManagement";
+import DashboardPage from "./pages/admin/Dashboard";
+import MenuManagementPage from "./pages/admin/MenuManagement";
+import AdminOrders from "./pages/admin/Orders";
+import StaffManagement from "./pages/admin/StaffManagement";
+import Appearance from "./pages/admin/Appearance";
+import Settings from "./pages/admin/Settings";
+import QRCode from "./pages/admin/QRCode";
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* AUTH ROUTES */}
+        <Route path="/auth/login" element={<Login />} />
+        <Route path="/auth/signup" element={<Signup />} />
+
         {/* Redirect root */}
-        <Route path="/" element={<Navigate to="/admin/dashboard" />} />
+        <Route path="/" element={<Navigate to="/auth/login" />} />
 
         {/* ADMIN ROUTES */}
         <Route
           path="/admin/dashboard"
           element={
             <AdminLayout role="admin">
-              <div>Admin Dashboard Content</div>
+              <DashboardPage />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/admin/orders"
+          element={
+            <AdminLayout role="admin">
+              <AdminOrders />
             </AdminLayout>
           }
         />
@@ -32,7 +54,39 @@ function App() {
           path="/admin/menu"
           element={
             <AdminLayout role="admin">
-              <MenuPage />
+              <MenuManagementPage />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/admin/staff"
+          element={
+            <AdminLayout role="admin">
+              <StaffManagement />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/admin/appearance"
+          element={
+            <AdminLayout role="admin">
+              <Appearance />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/admin/qr"
+          element={
+            <AdminLayout role="admin">
+              <QRCode />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/admin/settings"
+          element={
+            <AdminLayout role="admin">
+              <Settings />
             </AdminLayout>
           }
         />

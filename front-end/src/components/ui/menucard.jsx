@@ -1,20 +1,17 @@
 import React from "react";
-import { ChevronRight } from "lucide-react";
-import Button from "./button";
+import Button from "./Button";
 
 const MenuCard = ({ image, title, description, price, category, onOrder }) => {
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md">
-      {/* Image Section */}
       <div className="relative h-48 w-full overflow-hidden">
         <img
-          src={image}
+          src={image || "https://via.placeholder.com/300x200"}
           alt={title}
           className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
         />
       </div>
 
-      {/* Content Section */}
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
@@ -24,7 +21,6 @@ const MenuCard = ({ image, title, description, price, category, onOrder }) => {
         <p className="mb-4 line-clamp-2 text-sm text-gray-500">{description}</p>
 
         <div className="mt-auto flex flex-col gap-3">
-          {/* Category Tag */}
           <div>
             <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-600 ring-1 ring-inset ring-red-500/10">
               {category}
