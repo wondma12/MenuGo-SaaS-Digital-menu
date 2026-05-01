@@ -1,69 +1,54 @@
-import React from "react";
-import { Edit, Trash2, CheckCircle2, XCircle } from "lucide-react";
+// src/components/admin/menu/MenuItemRow.jsx
+import React from 'react';
 
-const MenuItemRow = ({ item, onEdit, onDelete, onToggleAvailability }) => {
+const MenuItemRow = ({ item, onEdit, onDelete }) => {
+  const isAvailable = item.available;
+
   return (
-    <tr className="hover:bg-gray-50 transition-colors">
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-3">
-          {item.image ? (
-            <img
-              src={item.image}
-              alt={item.name}
-              className="w-11 h-11 rounded-2xl object-cover border border-slate-200"
-            />
-          ) : (
-            <div className="w-11 h-11 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500">
-              {item.name.charAt(0).toUpperCase()}
-            </div>
-          )}
-          <div>
-            <p className="font-medium text-gray-900">{item.name}</p>
-            <p className="text-xs text-gray-500">{item.description}</p>
-          </div>
+    <tr className={`hover:bg-neutral-50 transition-colors group ${!isAvailable ? 'opacity-60' : ''}`}>
+      <td className="px-6 py-4">
+        <img 
+          className={`w-12 h-12 rounded-lg object-cover border border-neutral-200 ${!isAvailable ? 'grayscale' : ''}`}
+          src={item.imageUrl}
+          alt={item.name}
+          onError={(e) => {
+            e.target.src = 'https://via.placeholder.com/48x48?text=No+Image';
+          }}
+        />
+      </td>
+      <td className="px-6 py-4">
+        <div className="font-h3 text-h3 text-black">{item.name}</div>
+        <div className="text-xs text-secondary">{item.description}</div>
+      </td>
+      <td className="px-6 py-4">
+        <span className="bg-surface-container px-3 py-1 rounded-full text-label-caps text-black uppercase text-xs">
+          {item.category}
+        </span>
+      </td>
+      <td className="px-6 py-4 font-body-md text-black">${item.price.toFixed(2)}</td>
+      <td className="px-6 py-4">
+        <div className="flex items-center space-x-2">
+          <div className={`w-2 h-2 rounded-full ${isAvailable ? 'bg-black' : 'bg-neutral-300'}`}></div>
+          <span className={`text-body-sm font-medium ${!isAvailable ? 'text-neutral-400' : ''}`}>
+            {isAvailable ? 'Available' : 'Unavailable'}
+          </span>
         </div>
       </td>
-      <td className="px-4 py-3 text-gray-700">${item.price.toFixed(2)}</td>
-      <td className="px-4 py-3 text-gray-700">{item.category}</td>
-      <td className="px-4 py-3 text-gray-700">{item.calories} kcal</td>
-      <td className="px-4 py-3">
-        <button
-          onClick={() => onToggleAvailability(item.id)}
-          className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors ${
-            item.isAvailable
-              ? "bg-green-100 text-green-800 hover:bg-green-200"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-          }`}
-        >
-          {item.isAvailable ? (
-            <CheckCircle2 size={14} />
-          ) : (
-            <XCircle size={14} />
-          )}
-          {item.isAvailable ? "Available" : "Unavailable"}
-        </button>
-      </td>
-      <td className="px-4 py-3 text-gray-500">
-        {item.isPopular ? "Yes" : "No"}
-      </td>
-      <td className="px-4 py-3 text-sm text-gray-500">
-        {new Date(item.updatedAt).toLocaleDateString()}
-      </td>
-      <td className="px-4 py-3">
-        <div className="flex gap-2">
-          <button
+      <td className="px-6 py-4 text-right">
+        <div className="flex justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button 
+            className="p-2 hover:bg-neutral-100 rounded-sm transition-colors"
             onClick={() => onEdit(item)}
-            className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-            title="Edit item"
+            title="Edit"
           >
-            <Edit size={16} />
+            <span className="material-symbols-outlined text-[20px] text-black">edit</span>
           </button>
-          <button
+          <button 
+            className="p-2 hover:bg-neutral-100 rounded-sm transition-colors"
             onClick={() => onDelete(item.id)}
-            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-            title="Remove item"
+            title="Delete"
           >
-            <Trash2 size={16} />
+            <span className="material-symbols-outlined text-[20px] text-error">delete</span>
           </button>
         </div>
       </td>

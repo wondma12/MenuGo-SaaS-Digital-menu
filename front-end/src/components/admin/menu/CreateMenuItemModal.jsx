@@ -1,305 +1,212 @@
-import React, { useEffect, useState } from "react";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
-import Modal from "../../ui/Modal";
-import Input from "../../ui/Input";
-import Select from "../../ui/Select";
-import Button from "../../ui/button";
+// src/components/admin/menu/CreateMenuItemModal.jsx
+import React, { useState, useEffect } from 'react';
 
-const initialFormState = {
-  name: "",
-  description: "",
-  price: "",
-  category: "",
-  isAvailable: true,
-  isPopular: false,
-  calories: "",
-  image: "",
-};
+const CreateMenuItemModal = ({ isOpen, onClose, onSave, initialData }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    category: 'Main Course',
+    price: '',
+    available: true,
+    imageUrl: ''
+  });
 
-const CreateMenuItemModal = ({
-  isOpen,
-  onClose,
-  onSave,
-  categories,
-  menuItem,
-  isSaving,
-}) => {
-  const [formValues, setFormValues] = useState(initialFormState);
-  const [errors, setErrors] = useState({});
-  const [imagePreview, setImagePreview] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
+  const categories = ['Main Course', 'Desserts', 'Starters', 'Pasta', 'Beverages'];
 
   useEffect(() => {
-    if (menuItem) {
-      setFormValues({
-        name: menuItem.name || "",
-        description: menuItem.description || "",
-        price: menuItem.price?.toString() || "",
-        category: menuItem.category || categories[0] || "",
-        isAvailable: menuItem.isAvailable ?? true,
-        isPopular: menuItem.isPopular ?? false,
-        calories: menuItem.calories?.toString() || "",
-        image: menuItem.image || "",
+    if (initialData) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFormData({
+        name: initialData.name,
+        description: initialData.description,
+        category: initialData.category,
+        price: initialData.price.toString(),
+        available: initialData.available,
+        imageUrl: initialData.imageUrl || ''
       });
-      setImagePreview(menuItem.image || null);
-      setErrors({});
     } else {
-      setFormValues({
-        ...initialFormState,
-        category: categories[0] || "",
+      setFormData({
+        name: '',
+        description: '',
+        category: 'Main Course',
+        price: '',
+        available: true,
+        imageUrl: ''
       });
-      setImagePreview(null);
-      setErrors({});
     }
-  }, [menuItem, categories, isOpen]);
+  }, [initialData, isOpen]);
 
-  const validate = () => {
-    const validationErrors = {};
-
-    if (!formValues.name.trim()) {
-      validationErrors.name = "Item name is required.";
-    }
-    if (!formValues.description.trim()) {
-      validationErrors.description = "Description is required.";
-    }
-    if (
-      !formValues.price ||
-      Number.isNaN(Number(formValues.price)) ||
-      Number(formValues.price) <= 0
-    ) {
-      validationErrors.price = "Enter a valid price.";
-    }
-    if (!formValues.category) {
-      validationErrors.category = "Category is required.";
-    }
-    if (
-      !formValues.calories ||
-      Number.isNaN(Number(formValues.calories)) ||
-      Number(formValues.calories) <= 0
-    ) {
-      validationErrors.calories = "Enter calories.";
-    }
-
-    setErrors(validationErrors);
-    return Object.keys(validationErrors).length === 0;
-  };
-
-  const handleChange = (field, value) => {
-    setFormValues((current) => ({
-      ...current,
-      [field]: value,
-    }));
-    setErrors((current) => ({
-      ...current,
-      [field]: undefined,
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
-  const handleImageUpload = (file) => {
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result;
-        setImagePreview(base64String);
-        handleChange("image", base64String);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleDrop = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith("image/")) {
-      handleImageUpload(file);
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleFileInputChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleImageUpload(file);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setImagePreview(null);
-    handleChange("image", "");
-  };
-
-  const handleSubmit = () => {
-    if (!validate()) {
+    
+    // Validation
+    if (!formData.name.trim()) {
+      alert('Please enter an item name');
       return;
     }
+    if (!formData.price || parseFloat(formData.price) <= 0) {
+      alert('Please enter a valid price');
+      return;
+    }
+    if (!formData.description.trim()) {
+      alert('Please enter a description');
+      return;
+    }
+    const newItem = {
+      ...formData,
+      price: parseFloat(formData.price),
+      imageUrl: formData.imageUrl || 'https://via.placeholder.com/48x48?text=New+Item'
+    };
 
-    onSave({
-      ...formValues,
-      price: Number(formValues.price),
-      calories: Number(formValues.calories),
-    });
+    onSave(newItem);
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Modal
-      title={menuItem ? "Edit menu item" : "Add menu item"}
-      isOpen={isOpen}
-      onClose={onClose}
-      footer={
-        <div className="flex items-center justify-end gap-2">
-          <Button variant="secondary" onClick={onClose} disabled={isSaving}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save item"}
-          </Button>
-        </div>
-      }
-    >
-      <div className="grid gap-5">
-        {/* Image Upload Section */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Item Image
-          </label>
-          {imagePreview ? (
-            <div className="relative group">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="w-full h-48 object-cover rounded-2xl border-2 border-slate-200"
-              />
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          ) : (
-            <div
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              className={`relative border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
-                isDragging
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-slate-300 hover:border-slate-400 bg-slate-50 hover:bg-slate-100"
-              }`}
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose}></div>
+      
+      {/* Modal */}
+      <div className="relative min-h-screen flex items-center justify-center p-4">
+        <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full transform transition-all">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-neutral-200">
+            <h2 className="font-h2 text-h2 text-black">
+              {initialData ? 'Edit Menu Item' : 'Create New Menu Item'}
+            </h2>
+            <button 
+              onClick={onClose}
+              className="p-1 hover:bg-neutral-100 rounded-sm transition-colors"
             >
+              <span className="material-symbols-outlined text-black">close</span>
+            </button>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <div>
+              <label className="block font-label-caps text-label-caps text-secondary mb-2">
+                Item Name *
+              </label>
               <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileInputChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:border-black focus:ring-0 transition-colors font-body-md"
+                placeholder="e.g., Wagyu Ribeye"
+                required
               />
-              <div className="flex flex-col items-center gap-3">
-                <div className="p-3 bg-blue-100 rounded-full">
-                  <Upload className="text-blue-600" size={24} />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-700">
-                    Click to upload or drag and drop
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    PNG, JPG, GIF up to 5MB
-                  </p>
-                </div>
+            </div>
+
+            <div>
+              <label className="block font-label-caps text-label-caps text-secondary mb-2">
+                Description *
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows="3"
+                className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:border-black focus:ring-0 transition-colors font-body-md resize-none"
+                placeholder="e.g., A5 Grade, Truffle Butter"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block font-label-caps text-label-caps text-secondary mb-2">
+                  Category *
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:border-black focus:ring-0 transition-colors font-body-md"
+                >
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-label-caps text-label-caps text-secondary mb-2">
+                  Price ($) *
+                </label>
+                <input
+                  type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  step="0.01"
+                  min="0"
+                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:border-black focus:ring-0 transition-colors font-body-md"
+                  placeholder="0.00"
+                  required
+                />
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Form Fields */}
-        <div className="grid gap-4">
-          <Input
-            label="Name"
-            value={formValues.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-            error={errors.name}
-            className="rounded-xl"
-          />
-          <Input
-            label="Description"
-            textarea
-            value={formValues.description}
-            onChange={(e) => handleChange("description", e.target.value)}
-            error={errors.description}
-            className="rounded-xl"
-            rows={3}
-          />
-          <div className="grid md:grid-cols-2 gap-4">
-            <Input
-              label="Price ($)"
-              value={formValues.price}
-              type="number"
-              onChange={(e) => handleChange("price", e.target.value)}
-              error={errors.price}
-              className="rounded-xl"
-            />
-            <Input
-              label="Calories"
-              value={formValues.calories}
-              type="number"
-              onChange={(e) => handleChange("calories", e.target.value)}
-              error={errors.calories}
-              className="rounded-xl"
-            />
-          </div>
-          <Select
-            label="Category"
-            value={formValues.category}
-            onChange={(e) => handleChange("category", e.target.value)}
-            options={categories.map((category) => ({
-              label: category,
-              value: category,
-            }))}
-            error={errors.category}
-            className="rounded-xl"
-          />
-        </div>
+            <div>
+              <label className="block font-label-caps text-label-caps text-secondary mb-2">
+                Image URL
+              </label>
+              <input
+                type="url"
+                name="imageUrl"
+                value={formData.imageUrl}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:border-black focus:ring-0 transition-colors font-body-md"
+                placeholder="https://example.com/image.jpg"
+              />
+              <p className="text-xs text-secondary mt-1">Leave empty to use a placeholder image</p>
+            </div>
 
-        {/* Toggle Switches */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors">
-            <span className="text-sm font-medium text-gray-700">Available</span>
-            <div className="relative">
+            <div className="flex items-center space-x-3">
               <input
                 type="checkbox"
-                checked={formValues.isAvailable}
-                onChange={(e) => handleChange("isAvailable", e.target.checked)}
-                className="sr-only peer"
+                name="available"
+                checked={formData.available}
+                onChange={handleChange}
+                className="w-4 h-4 text-black border-neutral-300 rounded focus:ring-black"
               />
-              <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+              <label className="font-body-md text-black">
+                Available for ordering
+              </label>
             </div>
-          </label>
-          <label className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors">
-            <span className="text-sm font-medium text-gray-700">
-              Popular Item
-            </span>
-            <div className="relative">
-              <input
-                type="checkbox"
-                checked={formValues.isPopular}
-                onChange={(e) => handleChange("isPopular", e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+
+            {/* Actions */}
+            <div className="flex space-x-3 pt-4 border-t border-neutral-200">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-2 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors font-button text-button"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:opacity-90 transition-colors font-button text-button"
+              >
+                {initialData ? 'Save Changes' : 'Create Item'}
+              </button>
             </div>
-          </label>
+          </form>
         </div>
       </div>
-    </Modal>
+    </div>
   );
 };
 

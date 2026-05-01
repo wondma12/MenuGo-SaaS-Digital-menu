@@ -18,9 +18,9 @@ import DashboardPage from "./pages/Restaurant_admin/Dashboard";
 import MenuManagementPage from "./pages/Restaurant_admin/MenuManagement";
 import Restaurant_adminOrders from "./pages/Restaurant_admin/Orders";
 import StaffManagement from "./pages/Restaurant_admin/StaffManagement";
-import Appearance from "./pages/Restaurant_admin/Appearance";
+// import Appearance from "./pages/Restaurant_admin/Appearance";
 import Settings from "./pages/Restaurant_admin/Settings";
-import QRCode from "./pages/Restaurant_admin/QRCode";
+// import QRCode from "./pages/Restaurant_admin/QRCode";
 
 function App() {
   return (
@@ -66,22 +66,8 @@ function App() {
             </AdminLayout>
           }
         />
-        <Route
-          path="/Restaurant_admin/appearance"
-          element={
-            <AdminLayout role="Restaurant_admin">
-              <Appearance />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/Restaurant_admin/qr"
-          element={
-            <AdminLayout role="Restaurant_admin">
-              <QRCode />
-            </AdminLayout>
-          }
-        />
+      
+      
         <Route
           path="/Restaurant_admin/settings"
           element={

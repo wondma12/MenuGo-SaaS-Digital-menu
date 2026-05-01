@@ -1,46 +1,31 @@
-import React from "react";
+// src/components/admin/Staff/StaffStats.jsx
+import React from 'react';
 
 const StaffStats = ({ stats }) => {
-  const statCards = [
-    { title: "Total Staff", value: stats.totalStaff, color: "blue", icon: "👥" },
-    { title: "Active", value: stats.activeStaff, color: "green", icon: "✅" },
-    { title: "Inactive", value: stats.inactiveStaff, color: "red", icon: "⭕" },
-    { title: "Waiters", value: stats.waiters, color: "green", icon: "👨‍🍳" },
-    { title: "Kitchen", value: stats.kitchen, color: "orange", icon: "🍳" },
-    { title: "Managers", value: stats.managers, color: "blue", icon: "👔" },
-    { title: "On Shift", value: stats.onShift, color: "purple", icon: "🕒" },
+  const statItems = [
+    { label: 'Total Staff', value: stats.totalStaff },
+    { label: 'Active Now', value: stats.activeNow, dot: true },
+    { label: 'Admins', value: stats.admins },
+    { label: 'Waitstaff', value: stats.waitstaff },
   ];
 
-  const colorClasses = {
-    blue: "border-blue-500",
-    green: "border-green-500",
-    red: "border-red-500",
-    orange: "border-orange-500",
-    purple: "border-purple-500",
-  };
-
-  const textColorClasses = {
-    blue: "text-blue-600",
-    green: "text-green-600",
-    red: "text-red-600",
-    orange: "text-orange-600",
-    purple: "text-purple-600",
-  };
-
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-      {statCards.map((stat, index) => (
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-10 h-24  mb-2">
+      
+      {statItems.map((item, idx) => (
         <div
-          key={index}
-          className={`bg-white rounded-lg p-4 shadow-sm border-l-4 ${colorClasses[stat.color]}`}
+          key={idx}
+          className="bg-white p-lg  border border-neutral-200 rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.04)]"
         >
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-500">{stat.title}</p>
-            <span className="text-lg">{stat.icon}</span>
-          </div>
-          <p className={`text-2xl font-bold mt-1 ${textColorClasses[stat.color]}`}>
-            {stat.value}
-          </p>
+          <p className="font-label-caps font-display text-h1 mt-2 text-label-caps text-secondary mb-2 uppercase">{item.label}</p>
+          {item.dot ? (
+            <div className="flex items-baseline gap-2">
+              <p className="font-h1 text-h1">{item.value}</p>
+              <span className="w-2 h-2 rounded-full bg-black mb-1"></span>
+            </div>
+          ) : (
+            <p className="font-h1 text-h1">{item.value}</p>
+          )}
         </div>
       ))}
     </div>

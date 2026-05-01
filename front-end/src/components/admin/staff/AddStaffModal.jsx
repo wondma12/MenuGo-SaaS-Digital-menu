@@ -1,20 +1,14 @@
-import React, { useState, useEffect } from "react";
-import Modal from "../../ui/Modal";
-import Input from "../../ui/Input";
-import Select from "../../ui/Select";
-import Button from "../../ui/button";
-import { User, Mail, Phone, Briefcase, Clock } from "lucide-react";
+// src/components/admin/Staff/AddStaffModal.jsx
+import React, { useState, useEffect } from 'react'
 
 const AddStaffModal = ({ isOpen, onClose, onSubmit, editingStaff }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    role: "waiter",
-    shift: "Morning",
-  });
-
-  const [errors, setErrors] = useState({});
+    name: '',
+    email: '',
+    role: 'Waiter',
+    status: 'Offline',
+    joinDate: '',
+  })
 
   useEffect(() => {
     if (editingStaff) {
@@ -22,111 +16,143 @@ const AddStaffModal = ({ isOpen, onClose, onSubmit, editingStaff }) => {
       setFormData({
         name: editingStaff.name,
         email: editingStaff.email,
-        phone: editingStaff.phone,
         role: editingStaff.role,
-        shift: editingStaff.shift,
-      });
+        status: editingStaff.status,
+        joinDate: editingStaff.joinDate,
+      })
     } else {
       setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        role: "waiter",
-        shift: "Morning",
-      });
+        name: '',
+        email: '',
+        role: 'Waiter',
+        status: 'Offline',
+        joinDate: '',
+      })
     }
-  }, [editingStaff, isOpen]);
+  }, [editingStaff, isOpen])
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.email.trim()) newErrors.email = "Email is required";
-    if (!/\S+@\S+\.\S+/.test(formData.email))
-      newErrors.email = "Email is invalid";
-    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  if (!isOpen) return null
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      onSubmit(formData);
-      onClose();
-    }
-  };
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    })
+  }
 
-  const roleOptions = [
-    { value: "waiter", label: "Waiter" },
-    { value: "kitchen", label: "Kitchen Staff" },
-    { value: "manager", label: "Manager" },
-    { value: "admin", label: "Admin" },
-  ];
-
-  const shiftOptions = [
-    { value: "Morning", label: "Morning" },
-    { value: "Evening", label: "Evening" },
-    { value: "Night", label: "Night" },
-  ];
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    onSubmit(formData)
+    onClose()
+  }
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={editingStaff ? "Edit Staff Member" : "Add New Staff Member"}
-      footer={
-        <div className="flex items-center justify-end gap-2">
-          <Button variant="secondary" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit}>
-            {editingStaff ? "Save Changes" : "Add Staff"}
-          </Button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-lg shadow-modal w-full max-w-md p-6 mx-4">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="font-h1 text-h1">
+            {editingStaff ? 'Edit Staff Member' : 'Add New Staff'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="material-symbols-outlined text-neutral-400 hover:text-black"
+          >
+            close
+          </button>
         </div>
-      }
-    >
-      <div className="grid gap-4">
-        <Input
-          label="Full Name"
-          placeholder="Enter full name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          error={errors.name}
-          className="rounded-xl"
-        />
-        <Input
-          label="Email Address"
-          type="email"
-          placeholder="Enter email address"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          error={errors.email}
-          className="rounded-xl"
-        />
-        <Input
-          label="Phone Number"
-          placeholder="Enter phone number"
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          error={errors.phone}
-          className="rounded-xl"
-        />
-        <Select
-          label="Role"
-          value={formData.role}
-          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-          options={roleOptions}
-          className="rounded-xl"
-        />
-        <Select
-          label="Shift"
-          value={formData.shift}
-          onChange={(e) => setFormData({ ...formData, shift: e.target.value })}
-          options={shiftOptions}
-          className="rounded-xl"
-        />
-      </div>
-    </Modal>
-  );
-};
 
-export default AddStaffModal;
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block font-label-caps text-label-caps text-secondary mb-1">
+              Full Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="block font-label-caps text-label-caps text-secondary mb-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="block font-label-caps text-label-caps text-secondary mb-1">
+              Role
+            </label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+            >
+              <option value="Admin">Admin</option>
+              <option value="Waiter">Waiter</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block font-label-caps text-label-caps text-secondary mb-1">
+              Status
+            </label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+            >
+              <option value="On Shift">On Shift</option>
+              <option value="Offline">Offline</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block font-label-caps text-label-caps text-secondary mb-1">
+              Join Date
+            </label>
+            <input
+              type="date"
+              name="joinDate"
+              value={formData.joinDate}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 btn-secondary"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 btn-primary"
+            >
+              {editingStaff ? 'Update' : 'Add'} Staff
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+export default AddStaffModal
