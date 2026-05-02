@@ -1,4 +1,4 @@
-const STORAGE_KEYS = {
+ const STORAGE_KEYS = {
   MENU_ITEMS: "menugo_menu_items",
   CATEGORIES: "menugo_menu_categories",
 };
@@ -153,7 +153,8 @@ const menuService = {
       };
       items[index] = updatedItem;
       saveStoredMenuItems(items);
-      return { success: true, data: updatedItem, error: null };
+      return { success: true, data: updatedItem,
+ error: null };
     } catch (error) {
       console.error("Error updating menu item:", error);
       return {

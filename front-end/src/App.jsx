@@ -1,5 +1,3 @@
-// src/App.jsx
-
 import {
   BrowserRouter as Router,
   Routes,
@@ -21,6 +19,11 @@ import StaffManagement from "./pages/Restaurant_admin/StaffManagement";
 import Appearance from "./pages/Restaurant_admin/Appearance";
 import Settings from "./pages/Restaurant_admin/Settings";
 import QRCode from "./pages/Restaurant_admin/QRCode";
+// Customer Pages
+import MenuPage from "./pages/customer/MenuPage";
+import SearchPage from "./pages/customer/SearchPage";
+import CartPage from "./pages/customer/CartPage";
+import StaffLoginPage from "./pages/customer/StaffLoginPage";
 
 function App() {
   return (
@@ -90,6 +93,7 @@ function App() {
             </AdminLayout>
           }
         />
+
         {/* WAITER ROUTES */}
         <Route
           path="/waiter/orders"
@@ -99,6 +103,15 @@ function App() {
             </AdminLayout>
           }
         />
+        {/* CUSTOMER ROUTES */}
+        <Route path="/customer" element={<MenuPage />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/customer/search" element={<SearchPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/staff-login" element={<StaffLoginPage />} />
+        {/* Duplicate customer-prefixed routes for links from customer pages */}
+        <Route path="/customer/cart" element={<CartPage />} />
+        <Route path="/customer/staff-login" element={<StaffLoginPage />} />
       </Routes>
     </Router>
   );
