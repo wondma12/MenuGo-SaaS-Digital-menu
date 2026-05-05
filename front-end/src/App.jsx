@@ -19,8 +19,14 @@ import MenuManagementPage from "./pages/Restaurant_admin/MenuManagement";
 import Restaurant_adminOrders from "./pages/Restaurant_admin/Orders";
 import StaffManagement from "./pages/Restaurant_admin/StaffManagement";
 import Appearance from "./pages/Restaurant_admin/Appearance";
-import Settings from "./pages/Restaurant_admin/Settings";
+import RestuarantSettings from "./pages/Restaurant_admin/Settings";
 import QRCode from "./pages/Restaurant_admin/QRCode";
+// Platform Admin Pages
+import AdminDashboard from "./pages/Admin/Dashboard";
+import Restaurants from "./pages/Admin/Restaurants";
+import Users from "./pages/Admin/Users";
+import Security from "./pages/Admin/Security";
+import Settings from "./pages/Admin/settings_clean";
 
 function App() {
   return (
@@ -83,13 +89,21 @@ function App() {
           }
         />
         <Route
-          path="/Restaurant_admin/settings"
+          path="/Restaurant_admin/RestuarantSettings"
           element={
             <AdminLayout role="Restaurant_admin">
-              <Settings />
+              <RestuarantSettings />
             </AdminLayout>
           }
         />
+
+        {/* PLATFORM ADMIN ROUTES */}
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/restaurants" element={<Restaurants />} />
+        <Route path="/admin/users" element={<Users />} />
+        <Route path="/admin/security" element={<Security />} />
+        <Route path="/admin/settings" element={<Settings />} />
+
         {/* WAITER ROUTES */}
         <Route
           path="/waiter/orders"

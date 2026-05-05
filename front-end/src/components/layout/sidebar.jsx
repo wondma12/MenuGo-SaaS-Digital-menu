@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   UtensilsCrossed,
+  Utensils,
   FolderOpen,
   ClipboardList,
   Users,
@@ -12,13 +13,18 @@ import {
   BarChart3,
   Settings,
   Clock,
+  Shield,
 } from "lucide-react";
 
 const Sidebar = ({ role = "Restaurant_admin" }) => {
   const location = useLocation();
 
   const adminLinks = [
-    { name: "Dashboard", path: "/Restaurant_admin/dashboard", icon: LayoutDashboard },
+    {
+      name: "Dashboard",
+      path: "/Restaurant_admin/dashboard",
+      icon: LayoutDashboard,
+    },
     { name: "Menu", path: "/Restaurant_admin/menu", icon: FolderOpen },
     { name: "Orders", path: "/Restaurant_admin/orders", icon: ClipboardList },
     { name: "Staff", path: "/Restaurant_admin/staff", icon: Users },
@@ -33,56 +39,99 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
     { name: "Order For customer", path: "/waiter/forcustomer", icon: Users },
   ];
 
-  const links = role === "waiter" ? waiterLinks : adminLinks;
+  const PlatformadminLinks = [
+    {
+      name: "Dashboard",
+      path: "/admin/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      name: "Restaurants",
+      path: "/admin/restaurants",
+      icon: Utensils,
+    },
+    {
+      name: "Users",
+      path: "/admin/users",
+      icon: Users,
+    },
+    {
+      name: "Security",
+      path: "/admin/security",
+      icon: Shield,
+    },
+    {
+      name: "Settings",
+      path: "/admin/settings",
+      icon: Settings,
+    },
+  ];
 
+  let links;
+  switch (role) {
+    case "waiter":
+      links = waiterLinks;
+      break;
+    case "Restaurant_admin":
+      links = adminLinks;
+      break;
+    case "Platform_admin":
+      links = PlatformadminLinks;
+      break;
+    default:
+      links = adminLinks;
+      break;
+  }
   return (
-    <aside className="w-64 h-screen bg-gradient-to-b from-blue-50 to-white border-r border-gray-200 shadow-lg flex flex-col">
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <UtensilsCrossed className="w-5 h-5 text-white" />
-          </div>
-          MenuGo
-        </h2>
-        <p className="text-sm text-gray-500 mt-1">Digital Menu System</p>
+    <aside className="fixed left-0 top-0 h-screen w-64 border-r border-zinc-200 bg-white dark:bg-zinc-950 flex flex-col py-6 font-inter antialiased">
+      <div className="px-8 mb-10">
+        <h1 className="text-xl font-black tracking-tight text-black dark:text-white uppercase">
+          PLATFORM
+        </h1>
+        <p className="text-xs font-medium text-zinc-400 mt-1 uppercase tracking-widest">
+          SaaS Admin
+        </p>
       </div>
 
-      <nav className="p-4 flex-1 overflow-y-auto">
-        <ul className="space-y-2">
-          {links.map((link) => {
-            const Icon = link.icon;
-            const isActive = location.pathname === link.path;
-            return (
-              <li key={link.name}>
-                <Link
-                  to={link.path}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                    isActive
-                      ? "bg-blue-100 text-blue-700 shadow-md"
-                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                  }`}
-                >
-                  <Icon
-                    className={`w-5 h-5 transition-colors ${
-                      isActive
-                        ? "text-blue-600"
-                        : "text-gray-500 group-hover:text-gray-700"
-                    }`}
-                  />
-                  <span className="font-medium">{link.name}</span>
-                  {isActive && (
-                    <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full"></div>
-                  )}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+      <nav className="flex-grow space-y-2 px-4">
+        {links.map((link) => {
+          const Icon = link.icon;
+          const isActive = location.pathname === link.path;
+          return (
+            <Link
+              key={link.name}
+              to={link.path}
+              className={`flex items-center gap-3 py-3 transition-colors transition-all ${
+                isActive
+                  ? "text-black dark:text-white font-bold border-l-2 border-black dark:border-white pl-4"
+                  : "text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white pl-4 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+              }`}
+            >
+              <Icon
+                className="text-lg"
+                style={{
+                  fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0",
+                }}
+              />
+              <span className="text-sm">{link.name}</span>
+            </Link>
+          );
+        })}
       </nav>
 
-      <div className="p-4 border-t border-gray-200">
-        <div className="bg-gray-50 rounded-lg p-3 text-center">
-          <p className="text-xs text-gray-500">Logged in as {role}</p>
+      <div className="px-8 mt-auto pt-6 border-t border-zinc-100 dark:border-zinc-900">
+        <div className="flex items-center gap-3">
+          <img
+            alt="Admin Profile"
+            className="w-10 h-10 rounded-lg object-cover border border-zinc-200"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0MIG45D2ffg84ns4KvPDaPqGM7cBGKAYnhWsuNZMAB2T31UJvQbF7kZhL3lK8mXurwKTZKdekCwaeER8sBnKj2BeT3tv4jxiu4IFhC9bxfQoCNasr8TrdsSh-nVlZrlHUGsUxMjedrHYYPQyKdYPLqfCMsSFBTuWIooLgTuF7WMztck3SaSyaMImMY8MalvZSg-duvhB3RnDE3RZsYFM5ktGLY6xVyjnH1UYNkXFWhXgPmZKbSVyWrfTB8a0uOMhRbFWKio8rluE"
+          />
+          <div className="overflow-hidden">
+            <p className="text-xs font-bold truncate">Alexander Vance</p>
+            <p className="text-[10px] text-zinc-400 truncate uppercase tracking-tighter">
+              Chief Administrator
+            </p>
+          </div>
         </div>
       </div>
     </aside>
