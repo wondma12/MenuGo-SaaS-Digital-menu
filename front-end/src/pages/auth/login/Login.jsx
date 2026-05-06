@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import Input from "../../../components/ui/Input";
+import Input from "../../../components/ui/input";
 import Button from "../../../components/ui/button";
 import AuthLayout from "../../../components/auth/AuthLayout";
 
@@ -65,7 +65,7 @@ const Login = () => {
               placeholder="Enter your email"
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
-              className="border-0 rounded-none focus:ring-0 focus:outline-none flex-1"
+              className="border-0! rounded-none! ring-0! outline-none! flex-1"
             />
           </div>
           {errors.email && (
@@ -89,7 +89,7 @@ const Login = () => {
               placeholder="Enter your password"
               value={formData.password}
               onChange={(e) => handleChange("password", e.target.value)}
-              className="border-0 rounded-none focus:ring-0 focus:outline-none flex-1"
+              className="border-0! rounded-none! ring-0! outline-none! flex-1"
             />
             <button
               type="button"

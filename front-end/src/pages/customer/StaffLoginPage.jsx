@@ -1,80 +1,168 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import Input from "../../components/ui/input";
+import Button from "../../components/ui/button";
+import Footer from "../../components/layout/Footer";
 
 const StaffLoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const validate = () => {
+    const validationErrors = {};
+    if (!formData.email.trim()) {
+      validationErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      validationErrors.email = "Invalid email format";
+    }
+    if (!formData.password) {
+      validationErrors.password = "Password is required";
+    }
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
+  };
+
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('Login attempt (demo)');
+    if (!validate()) return;
+
+    setIsLoading(true);
+    // TODO: Implement actual staff authentication logic
+    setTimeout(() => {
+      setIsLoading(false);
+      alert("Staff login attempt (demo)");
+    }, 1000);
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <header className="w-full pt-12 pb-6 flex justify-center">
-        <h1 className="text-lg font-black tracking-tighter uppercase text-black">LUMIÈRE DINING</h1>
-      </header>
-      <main className="flex-grow flex items-center justify-center px-6">
-        <div className="w-full max-w-md bg-surface-container-lowest border border-outline-variant p-8 md:p-12 shadow-soft rounded-lg">
-          <div className="mb-10 text-center">
-            <h2 className="font-h2 text-h2 text-black mb-2">Staff Login</h2>
-            <p className="font-body-sm text-secondary">Authorized personnel only</p>
+    <div className="min-h-screen bg-white">
+      <main className="min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              LUMIÈRE DINING
+            </h1>
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Staff Login
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Authorized personnel only
+            </p>
           </div>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label className="font-label-caps text-label-caps text-secondary block">EMAIL ADDRESS</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-white border border-outline-variant rounded focus:border-primary focus:ring-0 transition-colors"
-                placeholder="e.g. manager@lumieredining.com"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="font-label-caps text-label-caps text-secondary block">PASSWORD</label>
-                <a href="#" className="font-label-caps text-[10px] text-secondary hover:text-black transition-colors">FORGOT?</a>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+            {/* Email Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <div
+                className={`flex items-center border rounded-xl focus-within:ring-2 focus-within:ring-black ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                }`}
+              >
+                <Mail className="text-gray-400 w-5 h-5 ml-3 shrink-0" />
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  className="border-0! rounded-none! ring-0! outline-none! flex-1"
+                  error={errors.email}
+                />
               </div>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white border border-outline-variant rounded focus:border-primary focus:ring-0 transition-colors"
-                placeholder="••••••••"
-                required
-              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
             </div>
-            <button
+
+            {/* Password Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <div
+                className={`flex items-center border rounded-xl focus-within:ring-2 focus-within:ring-black ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                }`}
+              >
+                <Lock className="text-gray-400 w-5 h-5 ml-3 shrink-0" />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={(e) => handleChange("password", e.target.value)}
+                  className="border-0! rounded-none! ring-0! outline-none! flex-1"
+                  error={errors.password}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors mr-3 shrink-0"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+              )}
+            </div>
+
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                />
+                <span className="text-sm text-gray-600">Remember me</span>
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            {/* Submit Button */}
+            <Button
               type="submit"
-              className="w-full bg-primary text-on-primary font-button text-button py-4 rounded hover:opacity-90 active:scale-[0.98] transition-all uppercase tracking-widest mt-4"
+              className="w-full rounded-xl bg-black text-white hover:bg-gray-800"
+              disabled={isLoading}
             >
-              Login
-            </button>
+              {isLoading ? "Signing in..." : "Sign In"}
+            </Button>
           </form>
-          <div className="mt-8 pt-8 border-t border-outline-variant text-center">
-            <Link to="/" className="font-label-caps text-label-caps text-secondary hover:text-black transition-colors flex items-center justify-center gap-2">
-              <span className="material-symbols-outlined !text-[16px]">arrow_back</span>
-              BACK TO MENU
+
+          {/* Back to Menu Link */}
+          <div className="text-center pt-6 border-t border-gray-200">
+            <Link
+              to="/customer"
+              className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Menu
             </Link>
           </div>
         </div>
       </main>
-      <footer className="bg-neutral-50 border-t border-neutral-200 mt-12">
-        <div className="max-w-container-max mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="text-center md:text-left">
-            <span className="font-bold text-neutral-900 uppercase tracking-tighter">LUMIÈRE DINING</span>
-            <p className="font-['Inter'] text-xs font-light text-neutral-500 mt-1">© {new Date().getFullYear()} LUMIÈRE DINING. POWERED BY MENU-SAAS.</p>
-          </div>
-          <div className="flex gap-6">
-            <Link to="/privacy" className="font-['Inter'] text-xs font-light text-neutral-500 hover:text-black">Privacy Policy</Link>
-            <Link to="/staff-login" className="font-['Inter'] text-xs font-light text-neutral-900 underline">Staff Login</Link>
-            <Link to="/support" className="font-['Inter'] text-xs font-light text-neutral-500 hover:text-black">Contact Support</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
