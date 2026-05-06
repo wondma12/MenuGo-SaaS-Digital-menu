@@ -1,5 +1,3 @@
-// src/App.jsx
-
 import {
   BrowserRouter as Router,
   Routes,
@@ -18,9 +16,20 @@ import DashboardPage from "./pages/Restaurant_admin/Dashboard";
 import MenuManagementPage from "./pages/Restaurant_admin/MenuManagement";
 import Restaurant_adminOrders from "./pages/Restaurant_admin/Orders";
 import StaffManagement from "./pages/Restaurant_admin/StaffManagement";
-// import Appearance from "./pages/Restaurant_admin/Appearance";
-import Settings from "./pages/Restaurant_admin/Settings";
-// import QRCode from "./pages/Restaurant_admin/QRCode";
+import Appearance from "./pages/Restaurant_admin/Appearance";
+import RestuarantSettings from "./pages/Restaurant_admin/Settings";
+import QRCode from "./pages/Restaurant_admin/QRCode";
+// Platform Admin Pages
+import AdminDashboard from "./pages/Admin/Dashboard";
+import Restaurants from "./pages/Admin/Restaurants";
+import Users from "./pages/Admin/Users";
+import Security from "./pages/Admin/Security";
+import Settings from "./pages/Admin/settings_clean";
+//customer 
+import MenuPage from "./pages/customer/MenuPage";
+import SearchPage from "./pages/customer/SearchPage";
+import CartPage from "./pages/customer/CartPage";
+import StaffLoginPage from "./pages/customer/StaffLoginPage";
 
 function App() {
   return (
@@ -66,16 +75,38 @@ function App() {
             </AdminLayout>
           }
         />
-      
-      
         <Route
-          path="/Restaurant_admin/settings"
+          path="/Restaurant_admin/appearance"
           element={
             <AdminLayout role="Restaurant_admin">
-              <Settings />
+              <Appearance />
             </AdminLayout>
           }
         />
+        <Route
+          path="/Restaurant_admin/qr"
+          element={
+            <AdminLayout role="Restaurant_admin">
+              <QRCode />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/Restaurant_admin/RestuarantSettings"
+          element={
+            <AdminLayout role="Restaurant_admin">
+              <RestuarantSettings />
+            </AdminLayout>
+          }
+        />
+
+        {/* PLATFORM ADMIN ROUTES */}
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/restaurants" element={<Restaurants />} />
+        <Route path="/admin/users" element={<Users />} />
+        <Route path="/admin/security" element={<Security />} />
+        <Route path="/admin/settings" element={<Settings />} />
+
         {/* WAITER ROUTES */}
         <Route
           path="/waiter/orders"
@@ -85,6 +116,15 @@ function App() {
             </AdminLayout>
           }
         />
+        {/* CUSTOMER ROUTES */}
+        <Route path="/customer" element={<MenuPage />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/customer/search" element={<SearchPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/staff-login" element={<StaffLoginPage />} />
+        {/* Duplicate customer-prefixed routes for links from customer pages */}
+        <Route path="/customer/cart" element={<CartPage />} />
+        <Route path="/customer/staff-login" element={<StaffLoginPage />} />
       </Routes>
     </Router>
   );
