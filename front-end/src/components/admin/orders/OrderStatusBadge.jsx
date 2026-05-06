@@ -1,30 +1,34 @@
+// src/components/admin/orders/OrderStatusBadge.jsx
 import React from "react";
 
-const statusStyles = {
-  pending: "bg-yellow-100 text-yellow-800",
-  verified: "bg-blue-100 text-blue-800",
-  preparing: "bg-purple-100 text-purple-800",
-  ready: "bg-indigo-100 text-indigo-800",
-  served: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
-};
-
-const statusIcons = {
-  pending: "⏳",
-  verified: "✓",
-  preparing: "🔪",
-  ready: "🍽️",
-  served: "✅",
-  cancelled: "✗",
+const statusConfig = {
+  pending: {
+    classes: "bg-neutral-100 text-neutral-500 border border-neutral-200",
+  },
+  verified: {
+    classes: "bg-neutral-200 text-neutral-700 border border-neutral-300",
+  },
+  preparing: {
+    classes: "bg-neutral-800 text-white",
+  },
+  served: {
+    classes: "bg-black text-white",
+  },
+  ready: {
+    classes: "bg-neutral-700 text-white",
+  },
+  cancelled: {
+    classes: "bg-neutral-300 text-neutral-600",
+  },
 };
 
 const OrderStatusBadge = ({ status }) => {
+  const config = statusConfig[status] || statusConfig.pending;
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full ${statusStyles[status] || statusStyles.pending}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${config.classes}`}
     >
-      <span>{statusIcons[status] || "•"}</span>
-      <span>{status?.toUpperCase() || "PENDING"}</span>
+      {status}
     </span>
   );
 };
