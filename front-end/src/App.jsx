@@ -1,5 +1,3 @@
-// src/App.jsx
-
 import {
   BrowserRouter as Router,
   Routes,
@@ -27,6 +25,11 @@ import Restaurants from "./pages/Admin/Restaurants";
 import Users from "./pages/Admin/Users";
 import Security from "./pages/Admin/Security";
 import Settings from "./pages/Admin/settings_clean";
+//customer 
+import MenuPage from "./pages/customer/MenuPage";
+import SearchPage from "./pages/customer/SearchPage";
+import CartPage from "./pages/customer/CartPage";
+import StaffLoginPage from "./pages/customer/StaffLoginPage";
 
 function App() {
   return (
@@ -113,6 +116,15 @@ function App() {
             </AdminLayout>
           }
         />
+        {/* CUSTOMER ROUTES */}
+        <Route path="/customer" element={<MenuPage />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/customer/search" element={<SearchPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/staff-login" element={<StaffLoginPage />} />
+        {/* Duplicate customer-prefixed routes for links from customer pages */}
+        <Route path="/customer/cart" element={<CartPage />} />
+        <Route path="/customer/staff-login" element={<StaffLoginPage />} />
       </Routes>
     </Router>
   );
