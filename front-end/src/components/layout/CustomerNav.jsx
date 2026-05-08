@@ -142,6 +142,6 @@ const BottomNav = ({ cartCount = 0 }) => {
   );
 };
 
-CustomerHeader.BottomNav = BottomNav;
-
+// Named exports
+export { CustomerHeader, BottomNav };
 export default CustomerHeader;

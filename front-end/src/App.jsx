@@ -11,12 +11,15 @@ import AdminLayout from "./components/layout/AdminLayout";
 import Login from "./pages/auth/login/Login";
 import Signup from "./pages/auth/signup/Signup";
 // resturamat Admin Pages
-import OrdersPage from "./pages/waiter/OrdersPage";
 import DashboardPage from "./pages/Restaurant_admin/Dashboard";
 import MenuManagementPage from "./pages/Restaurant_admin/MenuManagement";
 import Restaurant_adminOrders from "./pages/Restaurant_admin/Orders";
 import StaffManagement from "./pages/Restaurant_admin/StaffManagement";
 import RestuarantSettings from "./pages/Restaurant_admin/Settings"; 
+// Waiter Routes
+import OrdersPage from "./pages/waiter/OrdersPage";
+import ActiveOrders from "./pages/waiter/ActiveOrders";
+import OrderForCustomer from "./pages/waiter/OrderForCustomer";
 // Platform Admin Pages
 import AdminDashboard from "./pages/Admin/Dashboard";
 import Restaurants from "./pages/Admin/Restaurants";
@@ -95,6 +98,22 @@ function App() {
           element={
             <AdminLayout role="waiter">
               <OrdersPage />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/waiter/active"
+          element={
+            <AdminLayout role="waiter">
+              <ActiveOrders />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/waiter/order-for-customer"
+          element={
+            <AdminLayout role="waiter">
+              <OrderForCustomer />
             </AdminLayout>
           }
         />

@@ -1,133 +1,136 @@
-// components/OrderCard.jsx
+// src/components/waiter/OrderCard.jsx
+import React from "react";
+import { Utensils } from "lucide-react";
+import { Timer } from "lucide-react";
+const OrderCard = ({ order, onApprove, onReject, onNotifyWaiter }) => {
+  const getStatusBadgeClasses = () => {
+    switch (order.status) {
+      case "PENDING":
+        return "bg-black text-white";
+      case "VERIFIED":
+        return "bg-gray-200 text-gray-600";
+      case "PREPARING":
+        return "bg-gray-300 text-gray-600";
+      case "REJECTED":
+        return "bg-red-100 text-red-600";
+      default:
+        return "bg-gray-200 text-gray-600";
+    }
+  };
 
-import StatusBadge from "./statusbage";
-import { Home, Check, X, Plus, CheckCircle, Clock, Users } from "lucide-react";
-
-const OrderCard = ({ order, onApprove, onReject, onUpdate }) => {
-  // Calculate total items and estimated time
-  const totalItems = order.items.reduce((sum, item) => sum + item.quantity, 0);
-  const estimatedTime = Math.ceil(totalItems * 5); // 5 minutes per item
+  const getActionButtons = () => {
+    switch (order.status) {
+      case "PENDING":
+      case "VERIFIED":
+        return (
+          <div className="grid grid-cols-2 gap-2 pt-4">
+            <button
+              className="py-2 border border-black text-black text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
+              onClick={() => onReject(order.id)}
+            >
+              Reject
+            </button>
+            <button
+              className="py-2 bg-black text-white text-sm font-medium rounded-lg hover:opacity-80 transition-opacity"
+              onClick={() => onApprove(order.id)}
+            >
+              Approve
+            </button>
+          </div>
+        );
+      case "PREPARING":
+        return (
+          <div className="grid grid-cols-2 gap-2 pt-4">
+            <button
+              className="py-2 border border-black text-black text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
+              onClick={() => onNotifyWaiter(order.id)}
+            >
+              Notify Waiter
+            </button>
+            <button className="py-2 bg-gray-300 text-gray-600 text-sm font-medium rounded-lg cursor-not-allowed">
+              In Progress
+            </button>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md">
-      {/* Header Section */}
-      <div className="border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="bg-blue-100 rounded-lg p-2">
-              <Users className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800">
-                Table #{order.tableNumber}
-              </h3>
-              <p className="text-sm text-gray-500">Order #{order.id}</p>
-            </div>
-          </div>
-          <StatusBadge status={order.status} />
+    <div
+      className={`bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col gap-4 ${
+        order.status === "PREPARING" ? "opacity-90" : ""
+      }`}
+    >
+      {/* Header */}
+      <div className="flex justify-between items-start">
+        <div>
+          <span className="text-[42px] font-black leading-none">
+            {order.tableNumber}
+          </span>
+          <p className="text-xs uppercase text-gray-500 mt-1 font-semibold">
+            Table Number
+          </p>
+        </div>
+        <div className="text-right">
+          <span
+            className={`px-2 py-1 rounded-lg text-[10px] font-semibold ${getStatusBadgeClasses()}`}
+          >
+            {order.status}
+          </span>
+          <p className="text-sm font-semibold mt-1">ID: {order.id}</p>
         </div>
       </div>
 
-      {/* Content Section */}
-      <div className="flex flex-1 flex-col p-4">
-        {/* Order Info */}
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4 text-sm text-gray-600">
-            <div className="flex items-center gap-1">
-              <Users className="w-4 h-4" />
-              <span>{totalItems} items</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              <span>~{estimatedTime} min</span>
-            </div>
+      {/* Order Info */}
+      <div className="flex justify-even gap-10 py-2 border-y border-gray-200 text-gray-500">
+        <div className="flex items-center gap-2">
+          <Utensils className="w-6 h-6" />
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-gray-700">
+              {order.itemCount}
+            </span>
+            <span className="text-xs">Items</span>
           </div>
         </div>
-
-        {/* Items List */}
-        <div className="mb-4">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">
-            Order Items
-          </h4>
-          <div className="space-y-3">
-            {order.items.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
-              >
-                {/* Item Image */}
-                <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                  <img
-                    src={item.image || "/api/placeholder/64/64"}
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                {/* Item Details */}
-                <div className="flex-1 min-w-0">
-                  <h5 className="text-sm font-semibold text-gray-900 truncate">
-                    {item.name}
-                  </h5>
-                  <p className="text-sm text-gray-600">
-                    {item.description || "Delicious item"}
-                  </p>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-sm font-bold text-gray-900">
-                      ${item.price || "0.00"}
-                    </span>
-                    <span className="text-sm text-gray-600 bg-white px-2 py-1 rounded-md border border-gray-200">
-                      × {item.quantity}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+        <div className="flex items-center gap-2">
+          <Timer className="w-6 h-6" />
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-gray-700">
+              {order.timeAgo.split(" ")[0]}
+            </span>
+            <span className="text-xs">
+              {order.timeAgo.split(" ").slice(1).join(" ")}
+            </span>
           </div>
-        </div>
-
-        {/* Actions */}
-        <div className="mt-auto space-y-3">
-          {order.status === "Pending" && (
-            <div className="flex gap-2">
-              <button
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-green-600 px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
-                onClick={() => onApprove(order.id)}
-              >
-                <Check className="w-4 h-4" />
-                Approve
-              </button>
-              <button
-                className="flex-1 bg-gray-100 hover:bg-gray-300 text-red-600 px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
-                onClick={() => onReject(order.id)}
-              >
-                <X className="w-4 h-4" />
-                Reject
-              </button>
-            </div>
-          )}
-
-          {order.status === "Verified" && (
-            <button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
-              onClick={() => onUpdate(order.id, "Preparing")}
-            >
-              <Plus className="w-4 h-4" />
-              Start Preparing
-            </button>
-          )}
-
-          {order.status === "Preparing" && (
-            <button
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
-              onClick={() => onUpdate(order.id, "Served")}
-            >
-              <CheckCircle className="w-4 h-4" />
-              Mark as Served
-            </button>
-          )}
         </div>
       </div>
+
+      {/* Items List */}
+      <div className="space-y-4 flex-grow">
+        {order.items.map((item, index) => (
+          <div key={index} className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-gray-100 rounded-lg flex-shrink-0">
+              <img
+                className="w-full h-full object-cover rounded-lg"
+                src={item.image}
+                alt={item.name}
+              />
+            </div>
+            <div className="flex-grow">
+              <p className="text-sm font-medium">{item.name}</p>
+              <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+            </div>
+            <p className="text-sm font-medium">
+              ${Number(item.price).toFixed(2)}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Action Buttons */}
+      {getActionButtons()}
     </div>
   );
 };

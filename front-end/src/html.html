@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#c6c6c6",
+                    "surface-container-low": "#f3f3f3",
+                    "on-surface": "#1b1b1b",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#848484",
+                    "on-tertiary-container": "#848484",
+                    "surface-container-high": "#e8e8e8",
+                    "secondary": "#5e5e5e",
+                    "surface-bright": "#f9f9f9",
+                    "primary-container": "#1b1b1b",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#dadada",
+                    "outline": "#7e7576",
+                    "secondary-container": "#e3e2e2",
+                    "on-tertiary-fixed-variant": "#474747",
+                    "inverse-surface": "#303030",
+                    "primary-fixed": "#e2e2e2",
+                    "on-error-container": "#93000a",
+                    "surface": "#f9f9f9",
+                    "on-background": "#1b1b1b",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-surface-variant": "#4c4546",
+                    "error-container": "#ffdad6",
+                    "surface-tint": "#5e5e5e",
+                    "background": "#f9f9f9",
+                    "on-tertiary-fixed": "#1b1b1b",
+                    "primary": "#000000",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error": "#ffffff",
+                    "on-secondary-container": "#646464",
+                    "inverse-on-surface": "#f1f1f1",
+                    "surface-variant": "#e2e2e2",
+                    "secondary-fixed": "#e3e2e2",
+                    "on-primary-fixed": "#1b1b1b",
+                    "tertiary-fixed": "#e2e2e2",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#cfc4c5",
+                    "inverse-primary": "#c6c6c6",
+                    "surface-container": "#eeeeee",
+                    "tertiary-container": "#1b1b1b",
+                    "tertiary": "#000000",
+                    "on-secondary-fixed": "#1b1c1c",
+                    "tertiary-fixed-dim": "#c6c6c6",
+                    "on-secondary-fixed-variant": "#464747",
+                    "secondary-fixed-dim": "#c7c6c6",
+                    "on-primary-fixed-variant": "#474747"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xs": "0.25rem",
+                    "2xl": "4rem",
+                    "md": "1rem",
+                    "xl": "2.5rem",
+                    "sm": "0.5rem",
+                    "lg": "1.5rem",
+                    "container-max": "1200px",
+                    "gutter": "1rem"
+            },
+            "fontFamily": {
+                    "label-caps": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "h2": ["Inter"],
+                    "h3": ["Inter"],
+                    "body-md": ["Inter"],
+                    "h1": ["Inter"],
+                    "button": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "display": ["Inter"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "h2": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "h3": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "button": ["15px", {"lineHeight": "1", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "display": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SIDEBAR NAVIGATION -->
+<nav class="flex flex-col h-screen py-lg bg-surface dark:bg-surface-dim h-full w-64 fixed left-0 top-0 border-r border-outline-variant dark:border-outline flat no shadows">
+<div class="px-lg mb-xl">
+<h1 class="font-h2 text-h2 font-black text-on-surface dark:text-on-surface">Service Staff</h1>
+<p class="font-body-md text-body-md opacity-60">Table Management</p>
+</div>
+<div class="flex-grow flex flex-col gap-xs">
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
+<span class="font-body-md text-body-md">Orders</span>
+</a>
+<!-- Active State: Active Orders -->
+<a class="flex items-center gap-md px-lg py-md text-on-surface dark:text-on-surface font-bold border-r-2 border-primary dark:border-primary-fixed hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="pending_actions" data-weight="fill" style="font-variation-settings: 'FILL' 1;">pending_actions</span>
+<span class="font-body-md text-body-md">Active Orders</span>
+</a>
+<a class="flex items-center gap-md px-lg py-md text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-body-md text-body-md">Create Order</span>
+</a>
+</div>
+<div class="px-lg mt-auto border-t border-outline-variant pt-lg">
+<div class="flex items-center gap-sm mb-lg">
+<img alt="Waiter Profile Picture" class="w-10 h-10 rounded-full border border-outline-variant" data-alt="A professional headshot of a restaurant server wearing a crisp black shirt. The portrait is captured in a minimalist studio setting with soft side lighting, creating a clean and sophisticated aesthetic. The overall mood is professional and efficient, emphasizing the high-end hospitality environment with a grayscale color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUsoyX_x68ShJR3i0z6VxMxWElDEE5QvdnpChSt26MdbApFyg9WdUeRPd4cifbBcUIqWyqBmpVuQZGU8Fes8bUXB_tFzRAcZtu0ekefJnAZYqiSK3Nyeiwzt1pAyPwzvGHUsA4OHXkHzMDnwqpqNTneEB4BpP3U-ObogX3sU3QvpjP5PLOznGXKs1IiJi280wc6svr15n_v97shP1V_Zs4fzLCVnLwjYYHeN0Kp9WBiwjPkKNHSwZfsNH4bYKi2_AkFBK7oZh7Pqk"/>
+<div class="overflow-hidden">
+<p class="font-button text-on-surface truncate">M. Rossi</p>
+<p class="font-body-sm text-on-surface-variant text-xs">Section A</p>
+</div>
+</div>
+<button class="w-full py-md bg-secondary-container text-on-surface font-button text-button rounded-lg hover:bg-outline-variant transition-all">
+                Shift Summary
+            </button>
+</div>
+</nav>
+<!-- TOP APP BAR -->
+<header class="flex justify-between items-center w-full px-lg h-16 ml-64 bg-surface dark:bg-surface-bright sticky top-0 z-10 border-b border-outline-variant dark:border-outline flat no shadows">
+<div class="flex items-center gap-md">
+<h2 class="font-h3 text-h3 font-semibold text-on-surface dark:text-on-surface">Active Orders</h2>
+<span class="bg-primary text-on-primary px-sm py-xs text-[12px] font-bold rounded-full">12</span>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-xs px-md py-sm bg-surface-container-low rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="search">search</span>
+<input class="bg-transparent border-none text-body-sm focus:ring-0 p-0 w-32" placeholder="Search tables..." type="text"/>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-opacity" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-opacity" data-icon="account_circle">account_circle</button>
+</div>
+</div>
+</header>
+<!-- MAIN CONTENT CANVAS -->
+<main class="ml-64 p-lg min-h-screen">
+<div class="max-w-container-max mx-auto">
+<!-- FILTERS / TABS -->
+<div class="flex gap-lg mb-xl border-b border-outline-variant">
+<button class="pb-md text-primary font-bold border-b-2 border-primary">All Live (12)</button>
+<button class="pb-md text-on-surface-variant hover:text-on-surface transition-colors">Pending (4)</button>
+<button class="pb-md text-on-surface-variant hover:text-on-surface transition-colors">Verified (5)</button>
+<button class="pb-md text-on-surface-variant hover:text-on-surface transition-colors">Preparing (3)</button>
+</div>
+<!-- BENTO GRID OF ORDER CARDS -->
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-lg">
+<!-- ORDER CARD 1 -->
+<div class="bg-white border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col gap-md">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-display text-[42px] font-black leading-none">12</span>
+<p class="font-label-caps text-on-surface-variant uppercase text-xs mt-xs">Table Number</p>
+</div>
+<div class="text-right">
+<span class="px-sm py-1 bg-surface-container-highest text-on-surface-variant font-label-caps rounded-lg text-[10px]">VERIFIED</span>
+<p class="font-body-sm font-semibold mt-xs">ID: #8821</p>
+</div>
+</div>
+<div class="flex gap-md py-sm border-y border-outline-variant/30 text-on-surface-variant text-[13px]">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="restaurant">restaurant</span>
+<span>4 Items</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span>
+<span>12 mins ago</span>
+</div>
+</div>
+<div class="space-y-md flex-grow">
+<!-- Item -->
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container rounded-lg flex-shrink-0">
+<img class="w-full h-full object-cover rounded-lg" data-alt="A macro photograph of a gourmet garden salad with vibrant microgreens and edible flowers. The image is styled with a high-contrast black and white editorial aesthetic, focusing on the intricate textures and fresh quality of the ingredients. Soft directional lighting highlights the crispness of the leaves against a minimalist backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC65L4Tp4qVCI05cvort8flxjv9vykP8Mj6J83ZgX_1CLBKzohDZ6R489sKEci4eEaLM2ZY90g4UQBGwlXlHkli_E2arggDgIn4FJK2YoL15xifeI6KZ0aGajFYIlO-YurXfnVwSn3Fig3gkvvl7LiHmGbguS8w4Crjwj-1OE-SDOlZy9QIm6HJUZAv-Wvty4cz6cnEwW-jKJgkKKmSysI52_nIfN90Hl4lz2V5TLGn872fut66Fa_i1TA4SiFS43xD07c4tuvP0ao"/>
+</div>
+<div class="flex-grow">
+<p class="font-button text-sm">Truffle Risotto</p>
+<p class="text-xs text-on-surface-variant">Qty: 2</p>
+</div>
+<p class="font-button text-sm">$56.00</p>
+</div>
+<!-- Item -->
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container rounded-lg flex-shrink-0">
+<img class="w-full h-full object-cover rounded-lg" data-alt="An overhead close-up of a premium artisanal burger on a matte ceramic plate. The lighting is sophisticated and moody, emphasizing the textures of the brioche bun and fresh produce. The photography style is modern editorial, maintaining a strict grayscale palette except for the natural color of the food which is desaturated to fit the brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-x4XC_N7h-fRSqhnU1GAeJSaqmnwoHGxFqT328EPFO7wwS8d0Ga2Mx7tyrkCSYqhleLw4gIcaeyCn3rVUV5pUFla7bqNMPBFCBIe8_y-ZhtMVIuYExPGI3ngbnlfVc0nAThUodKinNqG0cl0ZZMmMH8iRmcMX1YIoiHk6d8N1GFyTQlwgtaIQ1nk5mVunC7vWYEUindaa0e3n0WUD-bkinjDpt9dliB0SJ4fFcMOtYGQ40DUzAsMWupha23aqy7jiizV03UsxtsE"/>
+</div>
+<div class="flex-grow">
+<p class="font-button text-sm">Wagyu Burger</p>
+<p class="text-xs text-on-surface-variant">Qty: 1</p>
+</div>
+<p class="font-button text-sm">$32.00</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm pt-md">
+<button class="py-sm border border-primary text-primary font-button rounded-lg hover:bg-surface-container transition-colors">Reject</button>
+<button class="py-sm bg-primary text-on-primary font-button rounded-lg hover:opacity-80 transition-opacity">Approve</button>
+</div>
+</div>
+<!-- ORDER CARD 2 -->
+<div class="bg-white border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col gap-md">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-display text-[42px] font-black leading-none">04</span>
+<p class="font-label-caps text-on-surface-variant uppercase text-xs mt-xs">Table Number</p>
+</div>
+<div class="text-right">
+<span class="px-sm py-1 bg-primary text-on-primary font-label-caps rounded-lg text-[10px]">PENDING</span>
+<p class="font-body-sm font-semibold mt-xs">ID: #8825</p>
+</div>
+</div>
+<div class="flex gap-md py-sm border-y border-outline-variant/30 text-on-surface-variant text-[13px]">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="restaurant">restaurant</span>
+<span>2 Items</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span>
+<span>4 mins ago</span>
+</div>
+</div>
+<div class="space-y-md flex-grow">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container rounded-lg flex-shrink-0">
+<img class="w-full h-full object-cover rounded-lg" data-alt="A minimalist plate of fresh sashimi arranged in an architectural style. The presentation is clean and precise, set against a dark textured stone background. The lighting is focused and sharp, highlighting the premium quality of the fish in a monochromatic, high-end editorial food photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlQxhJR7n_5PAFRW4b-EcvzZKcfub3PDH5CSFUTn8Gf-QTB7Mlg0U-9pZUt-P4k6namgnMV6RHpbQ02UCi6tioT0iNoe5MV70_y-B368S0oLkEyieRYr1sbT2RX1XveZPD2c2VD2bCF7oPkGm4Kj2_zirDOyE4YZ20EuDRD6-XGDd2oM1AGxTDAX0d73m9nI3yJk5Al7gTG07sT6iDFt57my_EPWJoxiUyr3vMSeaspypgYeVveQ98p8lMDC376oZOJj_sQE5xhLo"/>
+</div>
+<div class="flex-grow">
+<p class="font-button text-sm">Salmon Crudo</p>
+<p class="text-xs text-on-surface-variant">Qty: 2</p>
+</div>
+<p class="font-button text-sm">$44.00</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm pt-md">
+<button class="py-sm border border-primary text-primary font-button rounded-lg hover:bg-surface-container transition-colors">Reject</button>
+<button class="py-sm bg-primary text-on-primary font-button rounded-lg hover:opacity-80 transition-opacity">Approve</button>
+</div>
+</div>
+<!-- ORDER CARD 3 -->
+<div class="bg-white border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col gap-md opacity-90">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-display text-[42px] font-black leading-none">21</span>
+<p class="font-label-caps text-on-surface-variant uppercase text-xs mt-xs">Table Number</p>
+</div>
+<div class="text-right">
+<span class="px-sm py-1 bg-surface-variant text-on-surface-variant font-label-caps rounded-lg text-[10px]">PREPARING</span>
+<p class="font-body-sm font-semibold mt-xs">ID: #8819</p>
+</div>
+</div>
+<div class="flex gap-md py-sm border-y border-outline-variant/30 text-on-surface-variant text-[13px]">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="restaurant">restaurant</span>
+<span>6 Items</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span>
+<span>28 mins ago</span>
+</div>
+</div>
+<div class="space-y-md flex-grow">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container rounded-lg flex-shrink-0">
+<img class="w-full h-full object-cover rounded-lg" data-alt="A close-up shot of a perfectly grilled steak resting on a minimalist porcelain plate. The image uses dramatic chiaroscuro lighting to emphasize the texture and sear of the meat. The background is a deep charcoal, maintaining a consistent high-end, monochrome aesthetic for an upscale restaurant atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyI19UmMBS4oOfjLFMTjsIaY84iaLNPRPgUxElbSfA7dM2fNIANOvqJynHIZx7DjuZmVdxsPRy7Nqq8HBRH1aby0IILtg1C2mFgUBxPJP9ATjK5UFRQYwIlX5di7zA4qLM5LYTmsbFu37U6t08GMpkphIEsaSKYbCYkV44vnmasYdGq2_G-NeAOgVczF1KcdQP5AJxm73cmKqax1Zu9Jf84bycGZtFYlhee5UXNTDUat6Jr-XmYJZLgxLenCYcAVa61PbcQmy2TpI"/>
+</div>
+<div class="flex-grow">
+<p class="font-button text-sm">Ribeye Steak</p>
+<p class="text-xs text-on-surface-variant">Qty: 2</p>
+</div>
+<p class="font-button text-sm">$118.00</p>
+</div>
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container rounded-lg flex-shrink-0">
+<img class="w-full h-full object-cover rounded-lg" data-alt="A crystal glass filled with a clear cocktail and a single large square ice cube. The lighting creates sharp reflections and elegant shadows on a polished black surface. The style is sophisticated and minimalist, focusing on the transparency and pure form of the drink in an editorial grayscale layout." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5f4p2YgZaD3GiwwkvKQENcR08ZZKrNdzJ-32nFGMdx-E9Cxd-nF-r3ugbeo6erfnkr-lijX-v9tRPmhT9_Q3RwsJ-lFVqvOvUEnuzg3fx1gphCbpVtc9S_zrH17yjig8zM8Dbaz4QWfiYcoOCd5JoKZaf5XhcP8KHkzXaw-6cqAbdZyWfUxgkQZsGVXoRx5xau8HnMuCi7-bzxO025sqMfAUsG9izc9d9c6umvoRtK9BRJlzE84eHgp2Y31kAcwaRHkTRxucHbsg"/>
+</div>
+<div class="flex-grow">
+<p class="font-button text-sm">Classic Martini</p>
+<p class="text-xs text-on-surface-variant">Qty: 4</p>
+</div>
+<p class="font-button text-sm">$64.00</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm pt-md">
+<button class="py-sm border border-primary text-primary font-button rounded-lg hover:bg-surface-container transition-colors">Notify Waiter</button>
+<button class="py-sm bg-surface-container-highest text-on-surface-variant font-button rounded-lg cursor-not-allowed">In Progress</button>
+</div>
+</div>
+<!-- ADDITIONAL CARDS FOR BENTO EFFECT -->
+<div class="bg-surface-container-low border border-dashed border-outline-variant rounded-xl p-lg flex flex-col items-center justify-center text-center opacity-60">
+<span class="material-symbols-outlined text-[48px] mb-md" data-icon="add_circle">add_circle</span>
+<p class="font-h3">New Order Ready</p>
+<p class="font-body-sm max-w-[200px] mt-sm">Start a new table service from the sidebar.</p>
+</div>
+<div class="col-span-1 lg:col-span-2 bg-white border border-outline-variant rounded-xl p-lg shadow-sm overflow-hidden">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-h3">Live Kitchen Status</h3>
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<p class="font-label-caps text-xs">High Load</p>
+</div>
+</div>
+<div class="flex flex-col gap-md">
+<div class="flex justify-between items-center">
+<p class="font-body-md">Cold Station</p>
+<div class="w-2/3 bg-surface-container h-2 rounded-full">
+<div class="bg-primary h-full rounded-full" style="width: 45%;"></div>
+</div>
+<p class="font-label-caps text-xs">45%</p>
+</div>
+<div class="flex justify-between items-center">
+<p class="font-body-md">Grill Station</p>
+<div class="w-2/3 bg-surface-container h-2 rounded-full">
+<div class="bg-primary h-full rounded-full" style="width: 88%;"></div>
+</div>
+<p class="font-label-caps text-xs text-error">88%</p>
+</div>
+<div class="flex justify-between items-center">
+<p class="font-body-md">Pastry Station</p>
+<div class="w-2/3 bg-surface-container h-2 rounded-full">
+<div class="bg-primary h-full rounded-full" style="width: 20%;"></div>
+</div>
+<p class="font-label-caps text-xs">20%</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

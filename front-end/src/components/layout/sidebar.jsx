@@ -34,7 +34,11 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
   const waiterLinks = [
     { name: "Orders", path: "/waiter/orders", icon: ClipboardList },
     { name: "Active Orders", path: "/waiter/active", icon: Clock },
-    { name: "Order For customer", path: "/waiter/forcustomer", icon: Users },
+    {
+      name: "Order For customer",
+      path: "/waiter/order-for-customer",
+      icon: Users,
+    },
   ];
 
   const PlatformadminLinks = [

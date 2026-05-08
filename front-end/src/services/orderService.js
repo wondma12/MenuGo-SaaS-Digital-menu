@@ -89,4 +89,45 @@ export const orderService = {
       return { pending: 0, preparing: 0, avgTime: "0m", efficiency: "0%" };
     }
   },
+
+  // Get all order items
+  getOrderItems: async () => {
+    try {
+      await delay();
+      const response = await fetch(`${API_BASE_URL}/orderItems`);
+      const orderItems = await response.json();
+      return orderItems;
+    } catch (error) {
+      console.error("Error fetching order items:", error);
+      return [];
+    }
+  },
+
+  // Get all menu items
+  getMenuItems: async () => {
+    try {
+      await delay();
+      const response = await fetch(`${API_BASE_URL}/menuItems`);
+      const menuItems = await response.json();
+      return menuItems;
+    } catch (error) {
+      console.error("Error fetching menu items:", error);
+      return [];
+    }
+  },
+
+  // Get complete order data with items and menu details
+  getAllOrdersWithDetails: async () => {
+    try {
+      const [orders, orderItems, menuItems] = await Promise.all([
+        orderService.getAllOrders(),
+        orderService.getOrderItems(),
+        orderService.getMenuItems(),
+      ]);
+      return { orders, orderItems, menuItems };
+    } catch (error) {
+      console.error("Error fetching complete order data:", error);
+      return { orders: [], orderItems: [], menuItems: [] };
+    }
+  },
 };
