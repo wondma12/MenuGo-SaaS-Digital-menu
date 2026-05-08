@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Sidebar from "../../components/layout/sidebar";
 import TopHeader from "../../components/layout/TopHeader";
 import Table from "../../components/ui/Table";
-import Button from "../../components/ui/button";
+import { Button } from "../../components/ui/button";
 import Card from "../../components/ui/card";
 import SecurityAccessLogs from "../../components/Platform_admin/Security/SecurityAccessLogs";
 import PlatformConfig from "../../components/Platform_admin/Security/PlatformConfig";

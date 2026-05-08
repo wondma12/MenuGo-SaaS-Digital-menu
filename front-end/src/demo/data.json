@@ -1,0 +1,240 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Bekam",
+      "email": "bekam@menugo.com",
+      "phone": "+251900000001",
+      "password": "123456",
+      "role": "platform_admin",
+      "restaurantId": null,
+      "createdAt": "2025-05-01T10:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Alexander Thorne",
+      "email": "alex.thorne@restaurant.com",
+      "phone": "+251900000002",
+      "password": "123456",
+      "role": "restaurant_admin",
+      "restaurantId": 1,
+      "createdAt": "2025-05-02T10:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "name": "Elena Rodriguez",
+      "email": "elena.r@restaurant.com",
+      "phone": "+251900000003",
+      "password": "123456",
+      "role": "waiter",
+      "restaurantId": 1,
+      "createdAt": "2025-05-03T10:00:00.000Z"
+    }
+  ],
+
+  "restaurants": [
+    {
+      "id": 1,
+      "name": "Bella Vista",
+      "email": "info@bellavista.com",
+      "phone": "+251911111111",
+      "logo": "",
+      "slogan": "Luxury Dining Experience",
+      "banner": "",
+      "status": "active",
+      "ownerId": 2,
+      "createdAt": "2025-05-01T09:00:00.000Z"
+    }
+  ],
+
+  "restaurantLocations": [
+    {
+      "id": 1,
+      "restaurantId": 1,
+      "country": "Ethiopia",
+      "city": "Addis Ababa",
+      "subCity": "Bole",
+      "streetAddress": "Bole Road",
+      "mapLink": "https://maps.google.com"
+    }
+  ],
+
+  "restaurantVerifications": [
+    {
+      "id": 1,
+      "restaurantId": 1,
+      "ownerName": "Alexander Thorne",
+      "businessLicenseNumber": "BLN-2025-001",
+      "tinNumber": "TIN-555-222",
+      "businessLicenseDocument": "license.pdf",
+      "documentOfLegalRepresentative": "legal_rep.pdf",
+      "verificationStatus": "approved",
+      "reviewedBy": 1,
+      "reviewedAt": "2025-05-05T12:00:00.000Z"
+    }
+  ],
+
+  "categories": [
+    {
+      "id": "food",
+      "restaurantId": 1,
+      "name": "Food"
+    },
+    {
+      "id": "drinks",
+      "restaurantId": 1,
+      "name": "Drinks"
+    },
+    {
+      "id": "desserts",
+      "restaurantId": 1,
+      "name": "Desserts"
+    },
+    {
+      "id": "appetizers",
+      "restaurantId": 1,
+      "name": "Appetizers"
+    }
+  ],
+
+  "menuItems": [
+    {
+      "id": 1,
+      "name": "Margherita Pizza",
+      "description": "Classic pizza with fresh tomatoes, mozzarella, and basil.",
+      "price": 14.99,
+      "categoryId": "food",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgn-l4PKW5yM3AhlQl0orUMQhtyh-bwFEZ_A&s",
+      "isAvailable": true,
+      "isPopular": true,
+      "calories": 780,
+      "createdAt": "2025-05-07T00:00:00.000Z",
+      "updatedAt": "2025-05-07T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Avocado Salad",
+      "description": "Fresh avocado, mixed greens, cherry tomatoes, and citrus dressing.",
+      "price": 10.5,
+      "categoryId": "food",
+      "image": "",
+      "isAvailable": true,
+      "isPopular": false,
+      "calories": 420,
+      "createdAt": "2025-05-07T00:00:00.000Z",
+      "updatedAt": "2025-05-07T00:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "name": "Chocolate Lava Cake",
+      "description": "Warm chocolate cake with a gooey center and vanilla ice cream.",
+      "price": 8.99,
+      "categoryId": "desserts",
+      "image": "",
+      "isAvailable": false,
+      "isPopular": true,
+      "calories": 620,
+      "createdAt": "2025-05-07T00:00:00.000Z",
+      "updatedAt": "2025-05-07T00:00:00.000Z"
+    }
+  ],
+
+  "orders": [
+    {
+      "id": 1,
+      "restaurantId": 1,
+      "orderCode": "ORD-2984",
+      "tableNumber": 4,
+      "orderType": "dine_in",
+      "status": "pending",
+      "time": "12:45 PM",
+      "total": 84,
+      "createdAt": "2025-04-30T12:45:00.000Z"
+    },
+    {
+      "id": 2,
+      "restaurantId": 1,
+      "orderCode": "ORD-2983",
+      "tableNumber": 12,
+      "orderType": "takeaway",
+      "status": "verified",
+      "time": "12:38 PM",
+      "total": 44,
+      "createdAt": "2025-04-30T12:38:00.000Z"
+    },
+    {
+      "id": 3,
+      "restaurantId": 1,
+      "orderCode": "ORD-2981",
+      "tableNumber": 1,
+      "orderType": "dine_in",
+      "status": "preparing",
+      "time": "12:30 PM",
+      "total": 48,
+      "createdAt": "2025-04-30T12:30:00.000Z"
+    }
+  ],
+
+  "orderItems": [
+    {
+      "id": 1,
+      "orderId": 1,
+      "menuItemId": 1,
+      "quantity": 1,
+      "price": 84
+    },
+    {
+      "id": 2,
+      "orderId": 2,
+      "menuItemId": 2,
+      "quantity": 2,
+      "price": 22
+    },
+    {
+      "id": 3,
+      "orderId": 3,
+      "menuItemId": 3,
+      "quantity": 1,
+      "price": 48
+    }
+  ],
+
+  "staff": [
+    {
+      "id": 1,
+      "name": "Alexander Thorne",
+      "email": "alex.thorne@restaurant.com",
+      "role": "Admin",
+      "status": "On Shift",
+      "joinDate": "2023-10-12",
+      "avatar": null
+    },
+    {
+      "id": 2,
+      "name": "Elena Rodriguez",
+      "email": "elena.r@restaurant.com",
+      "role": "Waiter",
+      "status": "Offline",
+      "joinDate": "2024-01-05",
+      "avatar": null
+    },
+    {
+      "id": 3,
+      "name": "Marcus Chen",
+      "email": "m.chen@restaurant.com",
+      "role": "Chef",
+      "status": "On Shift",
+      "joinDate": "2024-02-20",
+      "avatar": null
+    },
+    {
+      "id": 4,
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@restaurant.com",
+      "role": "Cashier",
+      "status": "On Shift",
+      "joinDate": "2023-04-22",
+      "avatar": null
+    }
+  ]
+}

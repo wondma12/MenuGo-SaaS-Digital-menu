@@ -1,24 +1,24 @@
 import React, { useState } from "react";
-import Button from "../../ui/button";
+import { Button } from "../../ui/button";
 import { Delete } from "lucide-react";
 
 const NetworkWhitelist = () => {
   const [whitelist, setWhitelist] = useState([
-    { 
-      ip: "127.0.0.1", 
-      label: "Localhost", 
-      type: "system" 
+    {
+      ip: "127.0.0.1",
+      label: "Localhost",
+      type: "system",
     },
-    { 
-      ip: "192.168.1.0/24", 
-      label: "Office", 
-      type: "deletable" 
+    {
+      ip: "192.168.1.0/24",
+      label: "Office",
+      type: "deletable",
     },
-    { 
-      ip: "45.2.19.112", 
-      label: "Cloud Proxy", 
-      type: "deletable" 
-    }
+    {
+      ip: "45.2.19.112",
+      label: "Cloud Proxy",
+      type: "deletable",
+    },
   ]);
 
   const handleDeleteIP = (indexToDelete) => {
@@ -33,19 +33,22 @@ const NetworkWhitelist = () => {
   return (
     <div className="bg-white border border-outline-variant p-6 rounded-lg">
       <h3 className="text-h3 font-h3 mb-6">Network Whitelist</h3>
-      
+
       <div className="space-y-3">
         {whitelist.map((item, index) => (
-          <div key={index} className="flex items-center justify-between p-3 border border-outline-variant rounded">
+          <div
+            key={index}
+            className="flex items-center justify-between p-3 border border-outline-variant rounded"
+          >
             <span className="font-mono text-body-sm">
               {item.ip} ({item.label})
             </span>
-            {item.type === 'system' ? (
+            {item.type === "system" ? (
               <span className="text-[10px] font-bold text-on-secondary-container uppercase">
                 System
               </span>
             ) : (
-              <button 
+              <button
                 onClick={() => handleDeleteIP(index)}
                 className="text-error hover:text-red-700 transition-colors"
               >
@@ -54,8 +57,8 @@ const NetworkWhitelist = () => {
             )}
           </div>
         ))}
-        
-        <Button 
+
+        <Button
           label="+ Add New IP Address"
           onClick={handleAddIP}
           variant="secondary"

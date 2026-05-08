@@ -28,8 +28,6 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
     { name: "Menu", path: "/Restaurant_admin/menu", icon: FolderOpen },
     { name: "Orders", path: "/Restaurant_admin/orders", icon: ClipboardList },
     { name: "Staff", path: "/Restaurant_admin/staff", icon: Users },
-    { name: "Appearance", path: "/Restaurant_admin/appearance", icon: Palette },
-    { name: "QR Code", path: "/Restaurant_admin/qr", icon: QrCode },
     { name: "Settings", path: "/Restaurant_admin/settings", icon: Settings },
   ];
 
@@ -101,7 +99,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
             <Link
               key={link.name}
               to={link.path}
-              className={`flex items-center gap-3 py-3 transition-colors transition-all ${
+              className={`flex items-center gap-3 py-3 transition-colors transition-all hover-lift ${
                 isActive
                   ? "text-black dark:text-white font-bold border-l-2 border-black dark:border-white pl-4"
                   : "text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white pl-4 hover:bg-zinc-50 dark:hover:bg-zinc-900"

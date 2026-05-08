@@ -1,9 +1,14 @@
 import React from "react";
 import Select from "../../ui/Select";
-import Button from "../../ui/button";
+import { Button } from "../../ui/button";
 import { Settings } from "lucide-react";
 
-const PlatformConfig = ({ environment, setEnvironment, dataRetention, setDataRetention }) => {
+const PlatformConfig = ({
+  environment,
+  setEnvironment,
+  dataRetention,
+  setDataRetention,
+}) => {
   const handleEnvironmentChange = (e) => {
     setEnvironment(e.target.value);
   };

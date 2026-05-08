@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import Input from "../../components/ui/input";
-import Button from "../../components/ui/button";
+import { Button } from "../../components/ui/button";
 import Footer from "../../components/layout/Footer";
 
 const StaffLoginPage = () => {
@@ -46,9 +46,9 @@ const StaffLoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white animate-slide-in-right">
       <main className="min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+        <div className="max-w-md w-full space-y-8 animate-scale-in">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               LUMIÈRE DINING
@@ -143,7 +143,7 @@ const StaffLoginPage = () => {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full rounded-xl bg-black text-white hover:bg-gray-800"
+              className="w-full rounded-xl bg-black text-white hover:bg-gray-800 hover-lift"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}

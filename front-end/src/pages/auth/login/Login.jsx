@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import Input from "../../../components/ui/input";
-import Button from "../../../components/ui/button";
+import { Button } from "../../../components/ui/button";
 import AuthLayout from "../../../components/auth/AuthLayout";
 
 const Login = () => {
@@ -47,10 +47,14 @@ const Login = () => {
   };
 
   return (
-    <AuthLayout title="Welcome back" subtitle="Sign in to your account">
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Sign in to your account"
+      className="animate-scale-in"
+    >
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Email Field */}
-        <div>
+        <div className="animate-slide-in-staggered stagger-1">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Email Address
           </label>
@@ -74,7 +78,7 @@ const Login = () => {
         </div>
 
         {/* Password Field */}
-        <div>
+        <div className="animate-slide-in-staggered stagger-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Password
           </label>
@@ -109,7 +113,7 @@ const Login = () => {
         </div>
 
         {/* Remember Me & Forgot Password */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between animate-slide-in-staggered stagger-3">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
@@ -128,14 +132,14 @@ const Login = () => {
         {/* Submit Button */}
         <Button
           type="submit"
-          className="w-full rounded-xl bg-gradient-to-r from-balck to-black hover:from-grey-100 hover:to-grey-100"
+          className="w-full rounded-xl bg-gradient-to-r from-balck to-black hover:from-grey-100 hover:to-grey-100 hover-lift btn-micro animate-slide-in-staggered stagger-4"
           disabled={isLoading}
         >
           {isLoading ? "Signing in..." : "Sign In"}
         </Button>
 
         {/* Divider */}
-        <div className="relative my-6">
+        <div className="relative my-6 animate-slide-in-staggered stagger-5">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-200"></div>
           </div>
@@ -153,7 +157,7 @@ const Login = () => {
         </div> */}
 
         {/* Sign Up Link */}
-        <p className="text-center text-gray-600 text-sm">
+        <p className="text-center text-gray-600 text-sm animate-slide-in-staggered stagger-6">
           Don't have an account?{" "}
           <Link
             to="/auth/signup"

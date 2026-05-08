@@ -4,6 +4,7 @@ import HeroBanner from "../../components/customer/Menu/HeroBanner";
 import CategoryTabs from "../../components/customer/Menu/CategoryTabs";
 import MenuItemCard from "../../components/customer/Menu/MenuItemCard";
 import FeedbackSection from "../../components/customer/Feedback/FeedbackSection";
+import CustomerHeader, { BottomNav } from "../../components/layout/CustomerNav";
 import menuService from "../../services/menuService";
 import Footer from "../../components/layout/Footer";
 
@@ -102,7 +103,10 @@ const MenuPage = () => {
     menuService.getCategories().then((res) => {
       if (!mounted) return;
       if (res.success && Array.isArray(res.data))
-        setCategories(["ALL", ...res.data.map((c) => c.toUpperCase())]);
+        setCategories([
+          "ALL",
+          ...res.data.map((c) => c.name?.toUpperCase() || c.toUpperCase()),
+        ]);
     });
     return () => {
       mounted = false;
@@ -112,94 +116,11 @@ const MenuPage = () => {
   const filteredItems =
     activeCategory === "ALL"
       ? menuItems
-      : menuItems.filter(
-          (item) => item.category?.toUpperCase() === activeCategory,
-        );
-
-  // Inline Header
-  const Header = () => (
-    <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 md:px-12 bg-white border-b border-neutral-200">
-      <div className="flex items-center gap-4">
-        <button className="md:hidden p-2 rounded-lg hover:bg-neutral-50">
-          <span className="material-symbols-outlined text-neutral-900">
-            menu
-          </span>
-        </button>
-        <Link to="/customer">
-          <h1 className="text-lg font-black tracking-tighter text-neutral-900 uppercase">
-            LUMIÈRE DINING
-          </h1>
-        </Link>
-      </div>
-      <div className="hidden md:flex items-center gap-4">
-        <Link
-          to="/customer"
-          className="flex items-center gap-2 text-neutral-600 hover:text-neutral-900"
-        >
-          <span className="material-symbols-outlined"></span>
-          <span className="font-label-caps text-label-caps">Menu</span>
-        </Link>
-        <Link
-          to="/search"
-          className="flex items-center gap-2 text-neutral-600 hover:text-neutral-900"
-        >
-          <span className="material-symbols-outlined"></span>
-          <span className="font-label-caps text-label-caps">Search</span>
-        </Link>
-        <Link
-          to="/cart"
-          state={{ cart }}
-          className="relative flex items-center gap-2 text-neutral-600 hover:text-neutral-900"
-        >
-          <span className="material-symbols-outlined"></span>
-          <span className="font-label-caps text-label-caps">Orders</span>
-          {cartCount > 0 && (
-            <span className="absolute -top-2 -right-3 bg-primary text-on-primary text-[11px] font-bold px-2 py-0.5 rounded-full">
-              {cartCount}
-            </span>
-          )}
-        </Link>
-      </div>
-    </header>
-  );
-
-  // Inline Bottom Navigation (mobile only)
-  const BottomNav = () => (
-    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-white/95 backdrop-blur-md border-t border-neutral-200 shadow-soft md:hidden">
-      <Link
-        to="/customer"
-        className="flex flex-col items-center justify-center px-3 py-1 rounded-md bg-neutral-100 text-neutral-900"
-      >
-        <span className="material-symbols-outlined"></span>
-        <span className="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">
-          Menu
-        </span>
-      </Link>
-      <Link
-        to="/search"
-        className="flex flex-col items-center justify-center text-neutral-400"
-      >
-        <span className="material-symbols-outlined"></span>
-        <span className="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">
-          Search
-        </span>
-      </Link>
-      <Link
-        to="/cart"
-        className="flex flex-col items-center justify-center text-neutral-400 relative"
-      >
-        <span className="material-symbols-outlined"></span>
-        <span className="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">
-          Orders
-        </span>
-        {cartCount > 0 && (
-          <span className="absolute -top-1 right-8 bg-primary text-on-primary text-[11px] font-bold px-2 py-0.5 rounded-full">
-            {cartCount}
-          </span>
-        )}
-      </Link>
-    </nav>
-  );
+      : menuItems.filter((item) => {
+          const categoryName =
+            typeof item.category === "string" ? item.category : item.categoryId;
+          return categoryName?.toString().toUpperCase() === activeCategory;
+        });
 
   // Inline Floating Cart Button
   const FloatingCartButton = () => {
@@ -228,25 +149,31 @@ const MenuPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <div className="min-h-screen bg-background animate-fade-in">
+      <CustomerHeader cartCount={cartCount} className="animate-fade-in-down" />
       <main className="pt-28 pb-24 max-w-container-max mx-auto px-6 md:px-gutter">
-        <HeroBanner />
+        <HeroBanner className="animate-fade-in-up stagger-1" />
         <CategoryTabs
           categories={categories}
           activeCategory={activeCategory}
           onCategoryChange={setActiveCategory}
+          className="animate-fade-in-down stagger-2"
         />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredItems.map((item) => (
-            <MenuItemCard key={item.id} item={item} onAddToCart={addToCart} />
+          {filteredItems.map((item, index) => (
+            <MenuItemCard
+              key={item.id}
+              item={item}
+              onAddToCart={addToCart}
+              className={`animate-fade-in-up stagger-${Math.min(index + 3, 6)}`}
+            />
           ))}
         </div>
-        <FeedbackSection />
+        <FeedbackSection className="animate-fade-in-up stagger-6" />
       </main>
 
-      <FloatingCartButton />
-      <BottomNav />
+      <FloatingCartButton className="animate-bounce-in" />
+      <BottomNav cartCount={cartCount} />
       <Footer />
     </div>
   );

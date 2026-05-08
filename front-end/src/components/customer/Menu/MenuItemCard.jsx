@@ -1,21 +1,29 @@
-import React from 'react';
+import React from "react";
 
 const MenuItemCard = ({ item, onAddToCart }) => {
   const handleOrder = () => {
-    if (typeof onAddToCart === 'function') onAddToCart(item);
+    if (typeof onAddToCart === "function") onAddToCart(item);
   };
 
   return (
     <div className="bg-surface-container-lowest border border-surface-variant p-4 flex flex-col group">
       <div className="relative w-full aspect-[4/3] overflow-hidden mb-4 rounded-md">
-        <img
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          src={item.image}
-          alt={item.name}
-        />
+        {item.image ? (
+          <img
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            src={item.image}
+            alt={item.name}
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-400 text-4xl">🍽️</span>
+          </div>
+        )}
         {item.dietary && (
           <div className="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded">
-            <span className="font-label-caps text-[10px] uppercase text-black">Signature</span>
+            <span className="font-label-caps text-[10px] uppercase text-black">
+              Signature
+            </span>
           </div>
         )}
       </div>
@@ -23,11 +31,16 @@ const MenuItemCard = ({ item, onAddToCart }) => {
         <h3 className="font-h3 text-h3 text-black uppercase">{item.name}</h3>
         <span className="font-h3 text-h3 text-black">${item.price}</span>
       </div>
-      <p className="font-body-sm text-body-sm text-secondary mb-4 flex-grow">{item.description}</p>
+      <p className="font-body-sm text-body-sm text-secondary mb-4 flex-grow">
+        {item.description}
+      </p>
       {item.dietary && (
         <div className="flex gap-2 mb-4">
           {item.dietary.map((d) => (
-            <span key={d} className="bg-surface-container px-2 py-1 font-label-caps text-[10px] text-black uppercase rounded-sm">
+            <span
+              key={d}
+              className="bg-surface-container px-2 py-1 font-label-caps text-[10px] text-black uppercase rounded-sm"
+            >
               {d}
             </span>
           ))}

@@ -4,7 +4,7 @@ import RestaurantNameForm from "../../components/admin/appearance/RestaurantName
 import ColorPicker from "../../components/admin/appearance/ColorPicker";
 import BackgroundUpload from "../../components/admin/appearance/BackgroundUpload";
 import ThemeCustomizer from "../../components/admin/appearance/ThemeCustomizer";
-import Button from "../../components/ui/button";
+import { Button } from "../../components/ui/button";
 import Card from "../../components/ui/card";
 import { Save, Eye, RefreshCw, CheckCircle } from "lucide-react";
 

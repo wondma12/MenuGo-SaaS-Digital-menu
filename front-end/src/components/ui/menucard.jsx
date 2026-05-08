@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "./button";
+import { Button } from "./button";
 
 const MenuCard = ({ image, title, description, price, category, onOrder }) => {
   return (

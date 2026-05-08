@@ -14,7 +14,7 @@ import {
   Globe,
   Home,
 } from "lucide-react";
-import Button from "../ui/button";
+import { Button } from "../ui/button";
 import Input from "../ui/Input";
 
 const MultiStepRegistration = () => {
@@ -754,9 +754,9 @@ const MultiStepRegistration = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 animate-fade-in">
       {/* Progress Steps */}
-      <div className="sticky top-0 z-1000 bg-white border-b">
+      <div className="sticky top-0 z-1000 bg-white border-b animate-fade-in-down">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             {steps.map((step, index) => {
@@ -810,16 +810,16 @@ const MultiStepRegistration = () => {
 
       {/* Form Content */}
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-sm p-8">
-          {renderStepContent()}
+        <div className="bg-white rounded-2xl shadow-sm p-8 animate-scale-in">
+          <div className="animate-fade-in-up">{renderStepContent()}</div>
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8">
+          <div className="flex justify-between mt-8 animate-fade-in-up stagger-6">
             <Button
               type="button"
               onClick={handlePrevious}
               disabled={currentStep === 1}
-              className="flex items-center gap-2 px-6 py-2 border bg-black border-gray-30  text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 border bg-black border-gray-30  text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 hover-lift btn-micro"
             >
               <ChevronLeft className="w-4 h-4" />
               Previous
@@ -830,7 +830,7 @@ const MultiStepRegistration = () => {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="flex items-center gap-2 px-6 py-2 bg-green-950 text-white rounded-lg hover:bg-green-800 disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2 bg-green-950 text-white rounded-lg hover:bg-green-800 disabled:opacity-50 hover-lift btn-micro"
               >
                 {isLoading ? "Submitting..." : "Submit for Verification"}
                 <ChevronRight className="w-4 h-4" />
@@ -839,7 +839,7 @@ const MultiStepRegistration = () => {
               <Button
                 type="button"
                 onClick={handleNext}
-                className="flex items-center gap-2 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+                className="flex items-center gap-2 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 hover-lift btn-micro"
               >
                 Next
                 <ChevronRight className="w-4 h-4" />
