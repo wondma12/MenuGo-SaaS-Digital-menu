@@ -4,13 +4,13 @@ import TopHeader from "../../components/layout/TopHeader";
 import Table from "../../components/ui/Table";
 import { Button } from "../../components/ui/button";
 import Card from "../../components/ui/card";
-import SecurityAccessLogs from "../../components/Platform_admin/Security/SecurityAccessLogs";
-import PlatformConfig from "../../components/Platform_admin/Security/PlatformConfig";
-import AdminProfileCard from "../../components/Platform_admin/Security/AdminProfileCard";
-import ThreatAlert from "../../components/Platform_admin/Security/ThreatAlert";
-import SecurityPolicy from "../../components/Platform_admin/Security/SecurityPolicy";
-import NetworkWhitelist from "../../components/Platform_admin/Security/NetworkWhitelist";
-import LiveSessionIndicator from "../../components/Platform_admin/Security/LiveSessionIndicator";
+import SecurityAccessLogs from "../../components/Admin/Security/SecurityAccessLogs";
+import PlatformConfig from "../../components/Admin/Security/PlatformConfig";
+import AdminProfileCard from "../../components/Admin/Security/AdminProfileCard";
+import ThreatAlert from "../../components/Admin/Security/ThreatAlert";
+import SecurityPolicy from "../../components/Admin/Security/SecurityPolicy";
+import NetworkWhitelist from "../../components/Admin/Security/NetworkWhitelist";
+import LiveSessionIndicator from "../../components/Admin/Security/LiveSessionIndicator";
 
 const Security = () => {
   const [dataRetention, setDataRetention] = useState(true);

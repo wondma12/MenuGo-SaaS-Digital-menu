@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import Input from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import Footer from "../../components/layout/Footer";
+import authService from "../../services/authservice";
 
 const StaffLoginPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -13,6 +15,7 @@ const StaffLoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   const validate = () => {
     const validationErrors = {};
@@ -38,11 +41,31 @@ const StaffLoginPage = () => {
     if (!validate()) return;
 
     setIsLoading(true);
-    // TODO: Implement actual staff authentication logic
-    setTimeout(() => {
+    setLoginError("");
+
+    try {
+      const result = await authService.login(formData.email, formData.password);
+
+      if (result.success) {
+        localStorage.setItem("authToken", result.data.token);
+        localStorage.setItem("user", JSON.stringify(result.data.user));
+
+        if (
+          result.data.user.role === "restaurant_admin" ||
+          result.data.user.role === "waiter"
+        ) {
+          navigate(`/restaurant/${result.data.user.restaurantId}/staff`);
+        } else {
+          setLoginError("Access denied. Staff accounts only.");
+        }
+      } else {
+        setLoginError(result.error);
+      }
+    } catch (error) {
+      setLoginError("Login failed. Please try again.");
+    } finally {
       setIsLoading(false);
-      alert("Staff login attempt (demo)");
-    }, 1000);
+    }
   };
 
   return (
@@ -62,6 +85,12 @@ const StaffLoginPage = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+            {/* Login Error Message */}
+            {loginError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {loginError}
+              </div>
+            )}
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

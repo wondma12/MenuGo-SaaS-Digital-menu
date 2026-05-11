@@ -15,7 +15,7 @@ import DashboardPage from "./pages/Restaurant_admin/Dashboard";
 import MenuManagementPage from "./pages/Restaurant_admin/MenuManagement";
 import Restaurant_adminOrders from "./pages/Restaurant_admin/Orders";
 import StaffManagement from "./pages/Restaurant_admin/StaffManagement";
-import RestuarantSettings from "./pages/Restaurant_admin/Settings"; 
+import RestuarantSettings from "./pages/Restaurant_admin/Settings";
 // Waiter Routes
 import OrdersPage from "./pages/waiter/OrdersPage";
 import ActiveOrders from "./pages/waiter/ActiveOrders";
@@ -23,10 +23,11 @@ import OrderForCustomer from "./pages/waiter/OrderForCustomer";
 // Platform Admin Pages
 import AdminDashboard from "./pages/Admin/Dashboard";
 import Restaurants from "./pages/Admin/Restaurants";
+import RestaurantDetail from "./pages/Admin/RestaurantDetail";
 import Users from "./pages/Admin/Users";
 import Security from "./pages/Admin/Security";
 import Settings from "./pages/Admin/settings_clean";
-//customer 
+//customer
 import MenuPage from "./pages/customer/MenuPage";
 import SearchPage from "./pages/customer/SearchPage";
 import CartPage from "./pages/customer/CartPage";
@@ -88,6 +89,7 @@ function App() {
         {/* PLATFORM ADMIN ROUTES */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/restaurants" element={<Restaurants />} />
+        <Route path="/admin/restaurants/:id" element={<RestaurantDetail />} />
         <Route path="/admin/users" element={<Users />} />
         <Route path="/admin/security" element={<Security />} />
         <Route path="/admin/settings" element={<Settings />} />

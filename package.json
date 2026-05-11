@@ -1,6 +1,0 @@
-{
-	"dependencies": {
-		"@fontsource-variable/geist": "^5.2.8",
-		"dotenv": "^17.4.2"
-	}
-}

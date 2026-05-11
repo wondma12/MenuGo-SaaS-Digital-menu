@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import LogoUpload from "../../components/admin/appearance/LogoUpload";
-import RestaurantNameForm from "../../components/admin/appearance/RestaurantNameForm";
-import ColorPicker from "../../components/admin/appearance/ColorPicker";
-import BackgroundUpload from "../../components/admin/appearance/BackgroundUpload";
-import ThemeCustomizer from "../../components/admin/appearance/ThemeCustomizer";
+import LogoUpload from "../../components/Restaurant_admin/appearance/LogoUpload";
+import RestaurantNameForm from "../../components/Restaurant_admin/appearance/RestaurantNameForm";
+import ColorPicker from "../../components/Restaurant_admin/appearance/ColorPicker";
+import BackgroundUpload from "../../components/Restaurant_admin/appearance/BackgroundUpload";
+import ThemeCustomizer from "../../components/Restaurant_admin/appearance/ThemeCustomizer";
 import { Button } from "../../components/ui/button";
 import Card from "../../components/ui/card";
 import { Save, Eye, RefreshCw, CheckCircle } from "lucide-react";

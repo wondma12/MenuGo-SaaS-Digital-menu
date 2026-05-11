@@ -1,9 +1,9 @@
 import React from "react";
 import Sidebar from "../../components/layout/sidebar";
 import TopHeader from "../../components/layout/TopHeader";
-import RestaurantsSummaryCards from "../../components/Platform_admin/Restaurants/RestaurantsSummaryCards";
-import RestaurantsTable from "../../components/Platform_admin/Restaurants/RestaurantsTable";
-import SupportGrid from "../../components/Platform_admin/Restaurants/SupportGrid";
+import RestaurantsSummaryCards from "../../components/Admin/Restaurants/RestaurantsSummaryCards";
+import RestaurantsTable from "../../components/Admin/Restaurants/RestaurantsTable";
+import SupportGrid from "../../components/Admin/Restaurants/SupportGrid";
 
 const Restaurants = () => {
   return (

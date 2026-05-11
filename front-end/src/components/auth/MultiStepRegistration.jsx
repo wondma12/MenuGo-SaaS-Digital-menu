@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   User,
   Mail,
@@ -16,8 +17,10 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 import Input from "../ui/Input";
+import registrationService from "../../services/registration";
 
 const MultiStepRegistration = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -41,6 +44,7 @@ const MultiStepRegistration = () => {
 
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const steps = [
     { id: 1, name: "Account", icon: User, description: "Create your account" },
@@ -152,11 +156,27 @@ const MultiStepRegistration = () => {
   const handleSubmit = async () => {
     if (validateCurrentStep()) {
       setIsLoading(true);
-      // TODO: Implement actual API submission
-      setTimeout(() => {
+      setSubmitError("");
+
+      try {
+        const result = await registrationService.submitRegistration(formData);
+
+        if (result.success) {
+          // Registration successful - redirect to login with success message
+          navigate("/auth/login", {
+            state: {
+              message: result.data.message,
+              type: "success",
+            },
+          });
+        } else {
+          setSubmitError(result.error);
+        }
+      } catch (error) {
+        setSubmitError("Registration failed. Please try again.");
+      } finally {
         setIsLoading(false);
-        // Redirect to login or dashboard
-      }, 2000);
+      }
     }
   };
 
@@ -745,6 +765,13 @@ const MultiStepRegistration = () => {
                 prepared immediately after verification.
               </p>
             </div>
+
+            {/* Submit Error Message */}
+            {submitError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {submitError}
+              </div>
+            )}
           </div>
         );
 

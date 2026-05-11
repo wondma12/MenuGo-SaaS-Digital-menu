@@ -1,7 +1,7 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Bekam",
       "email": "bekam@menugo.com",
       "phone": "+251900000001",
@@ -11,7 +11,7 @@
       "createdAt": "2025-05-01T10:00:00.000Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Alexander Thorne",
       "email": "alex.thorne@restaurant.com",
       "phone": "+251900000002",
@@ -21,7 +21,7 @@
       "createdAt": "2025-05-02T10:00:00.000Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Elena Rodriguez",
       "email": "elena.r@restaurant.com",
       "phone": "+251900000003",
@@ -29,39 +29,67 @@
       "role": "waiter",
       "restaurantId": 1,
       "createdAt": "2025-05-03T10:00:00.000Z"
+    },
+    {
+      "id": "uFvB-4UGf8g",
+      "name": "Abel Asseged Alemu",
+      "email": "Bebabekam@gmail.com",
+      "phone": "0985004834",
+      "password": "12345678",
+      "role": "restaurant_admin",
+      "restaurantId": 2,
+      "createdAt": "2026-05-11T12:29:49.052Z"
     }
   ],
-
   "restaurants": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Bella Vista",
       "email": "info@bellavista.com",
       "phone": "+251911111111",
       "logo": "",
       "slogan": "Luxury Dining Experience",
       "banner": "",
-      "status": "active",
+      "status": "suspended",
       "ownerId": 2,
       "createdAt": "2025-05-01T09:00:00.000Z"
+    },
+    {
+      "id": "tRVTC-Q9HL4",
+      "name": "baki",
+      "email": "loacl@gamil.com",
+      "phone": "0991567831",
+      "logo": "",
+      "slogan": "baki moview",
+      "banner": "",
+      "status": "pending",
+      "ownerId": 4,
+      "createdAt": "2026-05-11T12:29:49.052Z"
     }
   ],
-
   "restaurantLocations": [
     {
-      "id": 1,
+      "id": "1",
       "restaurantId": 1,
       "country": "Ethiopia",
       "city": "Addis Ababa",
       "subCity": "Bole",
       "streetAddress": "Bole Road",
       "mapLink": "https://maps.google.com"
+    },
+    {
+      "id": "N1x39HjtLt4",
+      "restaurantId": 2,
+      "country": "US",
+      "city": "ny",
+      "subCity": "man",
+      "streetAddress": "12234",
+      "mapLink": "gooo.com"
     }
   ],
-
   "restaurantVerifications": [
     {
-      "id": 1,
+      "id": "1",
       "restaurantId": 1,
       "ownerName": "Alexander Thorne",
       "businessLicenseNumber": "BLN-2025-001",
@@ -71,9 +99,20 @@
       "verificationStatus": "approved",
       "reviewedBy": 1,
       "reviewedAt": "2025-05-05T12:00:00.000Z"
+    },
+    {
+      "id": "Ljf7N-TesP8",
+      "restaurantId": 2,
+      "ownerName": "baki hanama",
+      "businessLicenseNumber": "sport",
+      "tinNumber": "12345",
+      "businessLicenseDocument": "Tutor-Ease final.pdf",
+      "documentOfLegalRepresentative": "legal_rep.pdf",
+      "verificationStatus": "pending",
+      "reviewedBy": null,
+      "reviewedAt": null
     }
   ],
-
   "categories": [
     {
       "id": "food",
@@ -96,10 +135,9 @@
       "name": "Appetizers"
     }
   ],
-
   "menuItems": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Margherita Pizza",
       "description": "Classic pizza with fresh tomatoes, mozzarella, and basil.",
       "price": 14.99,
@@ -112,7 +150,7 @@
       "updatedAt": "2025-05-07T00:00:00.000Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Avocado Salad",
       "description": "Fresh avocado, mixed greens, cherry tomatoes, and citrus dressing.",
       "price": 10.5,
@@ -125,7 +163,7 @@
       "updatedAt": "2025-05-07T00:00:00.000Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Chocolate Lava Cake",
       "description": "Warm chocolate cake with a gooey center and vanilla ice cream.",
       "price": 8.99,
@@ -138,10 +176,9 @@
       "updatedAt": "2025-05-07T00:00:00.000Z"
     }
   ],
-
   "orders": [
     {
-      "id": 1,
+      "id": "1",
       "restaurantId": 1,
       "orderCode": "ORD-2984",
       "tableNumber": 4,
@@ -152,7 +189,7 @@
       "createdAt": "2025-04-30T12:45:00.000Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "restaurantId": 1,
       "orderCode": "ORD-2983",
       "tableNumber": 12,
@@ -163,7 +200,7 @@
       "createdAt": "2025-04-30T12:38:00.000Z"
     },
     {
-      "id": 3,
+      "id": "3",
       "restaurantId": 1,
       "orderCode": "ORD-2981",
       "tableNumber": 1,
@@ -174,34 +211,32 @@
       "createdAt": "2025-04-30T12:30:00.000Z"
     }
   ],
-
   "orderItems": [
     {
-      "id": 1,
+      "id": "1",
       "orderId": 1,
       "menuItemId": 1,
       "quantity": 1,
       "price": 84
     },
     {
-      "id": 2,
+      "id": "2",
       "orderId": 2,
       "menuItemId": 2,
       "quantity": 2,
       "price": 22
     },
     {
-      "id": 3,
+      "id": "3",
       "orderId": 3,
       "menuItemId": 3,
       "quantity": 1,
       "price": 48
     }
   ],
-
   "staff": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Alexander Thorne",
       "email": "alex.thorne@restaurant.com",
       "role": "Admin",
@@ -210,7 +245,7 @@
       "avatar": null
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Elena Rodriguez",
       "email": "elena.r@restaurant.com",
       "role": "Waiter",
@@ -219,7 +254,7 @@
       "avatar": null
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Marcus Chen",
       "email": "m.chen@restaurant.com",
       "role": "Chef",
@@ -228,7 +263,7 @@
       "avatar": null
     },
     {
-      "id": 4,
+      "id": "4",
       "name": "Sarah Johnson",
       "email": "sarah.johnson@restaurant.com",
       "role": "Cashier",
@@ -236,5 +271,6 @@
       "joinDate": "2023-04-22",
       "avatar": null
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

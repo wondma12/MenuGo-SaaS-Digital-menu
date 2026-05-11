@@ -7,7 +7,7 @@ import {
   SecuritySettings,
   AppearanceSettings,
   SettingsActionBar,
-} from "../../components/Platform_admin/settings/index";
+} from "../../components/Admin/settings/index";
 
 const Settings = () => {
   const [formData, setFormData] = useState({

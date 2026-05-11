@@ -4,6 +4,7 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import Input from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import AuthLayout from "../../../components/auth/AuthLayout";
+import authService from "../../../services/authservice";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   const validate = () => {
     const validationErrors = {};
@@ -39,11 +41,32 @@ const Login = () => {
     if (!validate()) return;
 
     setIsLoading(true);
-    // TODO: Implement actual authentication logic
-    setTimeout(() => {
+    setLoginError("");
+
+    try {
+      const result = await authService.login(formData.email, formData.password);
+
+      if (result.success) {
+        localStorage.setItem("authToken", result.data.token);
+        localStorage.setItem("user", JSON.stringify(result.data.user));
+
+        if (result.data.user.role === "platform_admin") {
+          navigate("/admin/dashboard");
+        } else if (result.data.user.role === "restaurant_admin") {
+          navigate(
+            `/Restaurant_admin/dashboard/${result.data.user.restaurantId}`,
+          );
+        } else if (result.data.user.role === "waiter") {
+          navigate(`/restaurant/${result.data.user.restaurantId}/staff`);
+        }
+      } else {
+        setLoginError(result.error);
+      }
+    } catch (error) {
+      setLoginError("Login failed. Please try again.");
+    } finally {
       setIsLoading(false);
-      navigate("/admin/dashboard");
-    }, 1000);
+    }
   };
 
   return (
@@ -53,6 +76,12 @@ const Login = () => {
       className="animate-scale-in"
     >
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Login Error Message */}
+        {loginError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            {loginError}
+          </div>
+        )}
         {/* Email Field */}
         <div className="animate-slide-in-staggered stagger-1">
           <label className="block text-sm font-medium text-gray-700 mb-2">
