@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3001";
+import { API_BASE_URL } from "../env";
 
 // Helper to generate new ID
 const generateId = () => `ORD-${Math.floor(1000 + Math.random() * 9000)}`;

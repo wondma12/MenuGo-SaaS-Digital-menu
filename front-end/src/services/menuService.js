@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3001";
+import { API_BASE_URL } from "../env";
 
 const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
