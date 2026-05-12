@@ -1,147 +1,206 @@
 {
   "users": [
     {
-      "id": "1",
+      "id": "usr_platform_1",
       "name": "Bekam",
       "email": "bekam@menugo.com",
       "phone": "+251900000001",
       "password": "123456",
       "role": "platform_admin",
       "restaurantId": null,
-      "createdAt": "2025-05-01T10:00:00.000Z"
+      "createdAt": "2025-05-01T10:00:00.000Z",
+      "updatedAt": "2025-05-01T10:00:00.000Z"
     },
     {
-      "id": "2",
+      "id": "usr_rest_admin_1",
       "name": "Alexander Thorne",
       "email": "alex.thorne@restaurant.com",
       "phone": "+251900000002",
       "password": "123456",
       "role": "restaurant_admin",
-      "restaurantId": 1,
-      "createdAt": "2025-05-02T10:00:00.000Z"
+      "restaurantId": "rest_1",
+      "createdAt": "2025-05-02T10:00:00.000Z",
+      "updatedAt": "2025-05-02T10:00:00.000Z"
     },
     {
-      "id": "3",
+      "id": "usr_waiter_1",
       "name": "Elena Rodriguez",
       "email": "elena.r@restaurant.com",
       "phone": "+251900000003",
       "password": "123456",
       "role": "waiter",
-      "restaurantId": 1,
-      "createdAt": "2025-05-03T10:00:00.000Z"
+      "restaurantId": "rest_1",
+      "createdAt": "2025-05-03T10:00:00.000Z",
+      "updatedAt": "2025-05-03T10:00:00.000Z"
     },
     {
-      "id": "uFvB-4UGf8g",
+      "id": "usr_rest_admin_2",
       "name": "Abel Asseged Alemu",
-      "email": "Bebabekam@gmail.com",
+      "email": "bebabekam@gmail.com",
       "phone": "0985004834",
       "password": "12345678",
       "role": "restaurant_admin",
-      "restaurantId": 2,
-      "createdAt": "2026-05-11T12:29:49.052Z"
+      "restaurantId": "rest_2",
+      "createdAt": "2026-05-11T12:29:49.052Z",
+      "updatedAt": "2026-05-11T12:29:49.052Z"
     }
   ],
+
   "restaurants": [
     {
-      "id": "1",
+      "id": "rest_1",
       "name": "Bella Vista",
       "email": "info@bellavista.com",
       "phone": "+251911111111",
       "logo": "",
       "slogan": "Luxury Dining Experience",
-      "banner": "",
-      "status": "suspended",
-      "ownerId": 2,
-      "createdAt": "2025-05-01T09:00:00.000Z"
+      "banner": "https://www.shutterstock.com/image-photo/healthy-breakfast-food-top-border-260nw-2255183021.jpg",
+      "status": "active",
+      "ownerId": "usr_rest_admin_1",
+      "createdAt": "2025-05-01T09:00:00.000Z",
+      "updatedAt": "2025-05-01T09:00:00.000Z"
     },
     {
-      "id": "tRVTC-Q9HL4",
-      "name": "baki",
-      "email": "loacl@gamil.com",
+      "id": "rest_2",
+      "name": "Baki Movie Cafe",
+      "email": "local@gmail.com",
       "phone": "0991567831",
       "logo": "",
-      "slogan": "baki moview",
-      "banner": "",
-      "status": "pending",
-      "ownerId": 4,
-      "createdAt": "2026-05-11T12:29:49.052Z"
+      "slogan": "Baki Movie Theme Restaurant",
+      "banner": "https://img.freepik.com/free-psd/food-menu-restaurant-web-banner-template_106176-1452.jpg",
+      "status": "active",
+      "ownerId": "usr_rest_admin_2",
+      "createdAt": "2026-05-11T12:29:49.052Z",
+      "updatedAt": "2026-05-11T12:29:49.052Z"
     }
   ],
+
   "restaurantLocations": [
     {
-      "id": "1",
-      "restaurantId": 1,
+      "id": "loc_1",
+      "restaurantId": "rest_1",
       "country": "Ethiopia",
       "city": "Addis Ababa",
       "subCity": "Bole",
       "streetAddress": "Bole Road",
-      "mapLink": "https://maps.google.com"
+      "mapLink": "https://maps.google.com",
+      "createdAt": "2025-05-01T09:00:00.000Z",
+      "updatedAt": "2025-05-01T09:00:00.000Z"
     },
     {
-      "id": "N1x39HjtLt4",
-      "restaurantId": 2,
-      "country": "US",
-      "city": "ny",
-      "subCity": "man",
-      "streetAddress": "12234",
-      "mapLink": "gooo.com"
+      "id": "loc_2",
+      "restaurantId": "rest_2",
+      "country": "USA",
+      "city": "New York",
+      "subCity": "Manhattan",
+      "streetAddress": "12234 Main Street",
+      "mapLink": "https://maps.google.com",
+      "createdAt": "2026-05-11T12:29:49.052Z",
+      "updatedAt": "2026-05-11T12:29:49.052Z"
     }
   ],
+
   "restaurantVerifications": [
     {
-      "id": "1",
-      "restaurantId": 1,
+      "id": "verify_1",
+      "restaurantId": "rest_1",
       "ownerName": "Alexander Thorne",
       "businessLicenseNumber": "BLN-2025-001",
       "tinNumber": "TIN-555-222",
       "businessLicenseDocument": "license.pdf",
       "documentOfLegalRepresentative": "legal_rep.pdf",
       "verificationStatus": "approved",
-      "reviewedBy": 1,
+      "reviewedBy": "usr_platform_1",
       "reviewedAt": "2025-05-05T12:00:00.000Z"
     },
     {
-      "id": "Ljf7N-TesP8",
-      "restaurantId": 2,
-      "ownerName": "baki hanama",
-      "businessLicenseNumber": "sport",
-      "tinNumber": "12345",
-      "businessLicenseDocument": "Tutor-Ease final.pdf",
+      "id": "verify_2",
+      "restaurantId": "rest_2",
+      "ownerName": "Abel Asseged Alemu",
+      "businessLicenseNumber": "BLN-2026-002",
+      "tinNumber": "TIN-12345",
+      "businessLicenseDocument": "business_license.pdf",
       "documentOfLegalRepresentative": "legal_rep.pdf",
       "verificationStatus": "pending",
       "reviewedBy": null,
       "reviewedAt": null
     }
   ],
-  "categories": [
+
+  "restaurantSettings": [
     {
-      "id": "food",
-      "restaurantId": 1,
-      "name": "Food"
+      "id": "setting_1",
+      "restaurantId": "rest_1",
+      "currency": "ETB",
+      "language": "en",
+      "theme": "dark",
+      "taxPercentage": 15,
+      "serviceCharge": 10,
+      "allowOnlineOrders": true,
+      "createdAt": "2025-05-01T09:00:00.000Z",
+      "updatedAt": "2025-05-01T09:00:00.000Z"
     },
     {
-      "id": "drinks",
-      "restaurantId": 1,
-      "name": "Drinks"
-    },
-    {
-      "id": "desserts",
-      "restaurantId": 1,
-      "name": "Desserts"
-    },
-    {
-      "id": "appetizers",
-      "restaurantId": 1,
-      "name": "Appetizers"
+      "id": "setting_2",
+      "restaurantId": "rest_2",
+      "currency": "USD",
+      "language": "en",
+      "theme": "light",
+      "taxPercentage": 10,
+      "serviceCharge": 5,
+      "allowOnlineOrders": true,
+      "createdAt": "2026-05-11T12:29:49.052Z",
+      "updatedAt": "2026-05-11T12:29:49.052Z"
     }
   ],
+
+  "categories": [
+    {
+      "id": "cat_food_rest_1",
+      "restaurantId": "rest_1",
+      "name": "Food",
+      "image": "",
+      "isActive": true,
+      "createdAt": "2025-05-07T00:00:00.000Z",
+      "updatedAt": "2025-05-07T00:00:00.000Z"
+    },
+    {
+      "id": "cat_drinks_rest_1",
+      "restaurantId": "rest_1",
+      "name": "Drinks",
+      "image": "",
+      "isActive": true,
+      "createdAt": "2025-05-07T00:00:00.000Z",
+      "updatedAt": "2025-05-07T00:00:00.000Z"
+    },
+    {
+      "id": "cat_desserts_rest_1",
+      "restaurantId": "rest_1",
+      "name": "Desserts",
+      "image": "",
+      "isActive": true,
+      "createdAt": "2025-05-07T00:00:00.000Z",
+      "updatedAt": "2025-05-07T00:00:00.000Z"
+    },
+    {
+      "id": "cat_anime_rest_2",
+      "restaurantId": "rest_2",
+      "name": "Anime Specials",
+      "image": "",
+      "isActive": true,
+      "createdAt": "2026-05-11T12:29:49.052Z",
+      "updatedAt": "2026-05-11T12:29:49.052Z"
+    }
+  ],
+
   "menuItems": [
     {
-      "id": "1",
+      "id": "menu_1",
+      "restaurantId": "rest_1",
+      "categoryId": "cat_food_rest_1",
       "name": "Margherita Pizza",
       "description": "Classic pizza with fresh tomatoes, mozzarella, and basil.",
       "price": 14.99,
-      "categoryId": "food",
       "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgn-l4PKW5yM3AhlQl0orUMQhtyh-bwFEZ_A&s",
       "isAvailable": true,
       "isPopular": true,
@@ -150,12 +209,13 @@
       "updatedAt": "2025-05-07T00:00:00.000Z"
     },
     {
-      "id": "2",
+      "id": "menu_2",
+      "restaurantId": "rest_1",
+      "categoryId": "cat_food_rest_1",
       "name": "Avocado Salad",
       "description": "Fresh avocado, mixed greens, cherry tomatoes, and citrus dressing.",
       "price": 10.5,
-      "categoryId": "food",
-      "image": "https://plus.unsplash.com/premium_photo-1669557211332-9328425b6f39?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGZvb2QlMjBpbWFnZXN8ZW58MHx8MHx8fDA%3D",
+      "image": "https://plus.unsplash.com/premium_photo-1669557211332-9328425b6f39",
       "isAvailable": true,
       "isPopular": false,
       "calories": 420,
@@ -163,114 +223,170 @@
       "updatedAt": "2025-05-07T00:00:00.000Z"
     },
     {
-      "id": "3",
+      "id": "menu_3",
+      "restaurantId": "rest_1",
+      "categoryId": "cat_desserts_rest_1",
       "name": "Chocolate Lava Cake",
       "description": "Warm chocolate cake with a gooey center and vanilla ice cream.",
       "price": 8.99,
-      "categoryId": "desserts",
-      "image": "https://images.unsplash.com/photo-1626706963470-ea887c742322?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGZvb2QlMjBpbWFnZXN8ZW58MHx8MHx8fDA%3D",
-      "isAvailable": false,
+      "image": "https://images.unsplash.com/photo-1626706963470-ea887c742322",
+      "isAvailable": true,
       "isPopular": true,
       "calories": 620,
       "createdAt": "2025-05-07T00:00:00.000Z",
       "updatedAt": "2025-05-07T00:00:00.000Z"
+    },
+    {
+      "id": "menu_4",
+      "restaurantId": "rest_2",
+      "categoryId": "cat_anime_rest_2",
+      "name": "Titan Burger",
+      "description": "Large spicy beef burger inspired by anime battles.",
+      "price": 18.5,
+      "image": "",
+      "isAvailable": true,
+      "isPopular": true,
+      "calories": 950,
+      "createdAt": "2026-05-11T12:29:49.052Z",
+      "updatedAt": "2026-05-11T12:29:49.052Z"
     }
   ],
+
   "orders": [
     {
-      "id": "1",
-      "restaurantId": 1,
+      "id": "order_1",
+      "restaurantId": "rest_1",
       "orderCode": "ORD-2984",
+      "tableId": "table_4",
       "tableNumber": 4,
       "orderType": "dine_in",
       "status": "pending",
-      "time": "12:45 PM",
       "total": 84,
-      "createdAt": "2025-04-30T12:45:00.000Z"
+      "createdAt": "2025-04-30T12:45:00.000Z",
+      "updatedAt": "2025-04-30T12:45:00.000Z"
     },
     {
-      "id": "2",
-      "restaurantId": 1,
+      "id": "order_2",
+      "restaurantId": "rest_1",
       "orderCode": "ORD-2983",
+      "tableId": "table_2",
       "tableNumber": 12,
       "orderType": "takeaway",
       "status": "verified",
-      "time": "12:38 PM",
       "total": 44,
-      "createdAt": "2025-04-30T12:38:00.000Z"
-    },
-    {
-      "id": "3",
-      "restaurantId": 1,
-      "orderCode": "ORD-2981",
-      "tableNumber": 1,
-      "orderType": "dine_in",
-      "status": "preparing",
-      "time": "12:30 PM",
-      "total": 48,
-      "createdAt": "2025-04-30T12:30:00.000Z"
+      "createdAt": "2025-04-30T12:38:00.000Z",
+      "updatedAt": "2025-04-30T12:38:00.000Z"
     }
   ],
+
   "orderItems": [
     {
-      "id": "1",
-      "orderId": 1,
-      "menuItemId": 1,
+      "id": "order_item_1",
+      "restaurantId": "rest_1",
+      "orderId": "order_1",
+      "menuItemId": "menu_1",
       "quantity": 1,
-      "price": 84
+      "price": 84,
+      "createdAt": "2025-04-30T12:45:00.000Z",
+      "updatedAt": "2025-04-30T12:45:00.000Z"
     },
     {
-      "id": "2",
-      "orderId": 2,
-      "menuItemId": 2,
+      "id": "order_item_2",
+      "restaurantId": "rest_1",
+      "orderId": "order_2",
+      "menuItemId": "menu_2",
       "quantity": 2,
-      "price": 22
-    },
-    {
-      "id": "3",
-      "orderId": 3,
-      "menuItemId": 3,
-      "quantity": 1,
-      "price": 48
+      "price": 22,
+      "createdAt": "2025-04-30T12:38:00.000Z",
+      "updatedAt": "2025-04-30T12:38:00.000Z"
     }
   ],
+
   "staff": [
     {
-      "id": "1",
+      "id": "staff_1",
+      "restaurantId": "rest_1",
+      "userId": "usr_rest_admin_1",
       "name": "Alexander Thorne",
       "email": "alex.thorne@restaurant.com",
-      "role": "Admin",
-      "status": "On Shift",
+      "role": "restaurant_admin",
+      "status": "on_shift",
       "joinDate": "2023-10-12",
-      "avatar": null
+      "avatar": null,
+      "createdAt": "2023-10-12T00:00:00.000Z",
+      "updatedAt": "2023-10-12T00:00:00.000Z"
     },
     {
-      "id": "2",
+      "id": "staff_2",
+      "restaurantId": "rest_1",
+      "userId": "usr_waiter_1",
       "name": "Elena Rodriguez",
       "email": "elena.r@restaurant.com",
-      "role": "Waiter",
-      "status": "Offline",
+      "role": "waiter",
+      "status": "offline",
       "joinDate": "2024-01-05",
-      "avatar": null
+      "avatar": null,
+      "createdAt": "2024-01-05T00:00:00.000Z",
+      "updatedAt": "2024-01-05T00:00:00.000Z"
     },
     {
-      "id": "3",
+      "id": "staff_3",
+      "restaurantId": "rest_1",
+      "userId": null,
       "name": "Marcus Chen",
       "email": "m.chen@restaurant.com",
-      "role": "Chef",
-      "status": "On Shift",
+      "role": "chef",
+      "status": "on_shift",
       "joinDate": "2024-02-20",
-      "avatar": null
-    },
-    {
-      "id": "4",
-      "name": "Sarah Johnson",
-      "email": "sarah.johnson@restaurant.com",
-      "role": "Cashier",
-      "status": "On Shift",
-      "joinDate": "2023-04-22",
-      "avatar": null
+      "avatar": null,
+      "createdAt": "2024-02-20T00:00:00.000Z",
+      "updatedAt": "2024-02-20T00:00:00.000Z"
     }
   ],
+
+  "tables": [
+    {
+      "id": "table_1",
+      "restaurantId": "rest_1",
+      "tableNumber": 1,
+      "capacity": 4,
+      "status": "available",
+      "createdAt": "2025-05-01T00:00:00.000Z",
+      "updatedAt": "2025-05-01T00:00:00.000Z"
+    },
+    {
+      "id": "table_2",
+      "restaurantId": "rest_1",
+      "tableNumber": 12,
+      "capacity": 6,
+      "status": "occupied",
+      "createdAt": "2025-05-01T00:00:00.000Z",
+      "updatedAt": "2025-05-01T00:00:00.000Z"
+    }
+  ],
+
+  "subscriptions": [
+    {
+      "id": "sub_1",
+      "restaurantId": "rest_1",
+      "plan": "premium",
+      "status": "active",
+      "startsAt": "2025-05-01T00:00:00.000Z",
+      "expiresAt": "2026-05-01T00:00:00.000Z",
+      "createdAt": "2025-05-01T00:00:00.000Z",
+      "updatedAt": "2025-05-01T00:00:00.000Z"
+    },
+    {
+      "id": "sub_2",
+      "restaurantId": "rest_2",
+      "plan": "basic",
+      "status": "trial",
+      "startsAt": "2026-05-11T12:29:49.052Z",
+      "expiresAt": "2026-06-11T12:29:49.052Z",
+      "createdAt": "2026-05-11T12:29:49.052Z",
+      "updatedAt": "2026-05-11T12:29:49.052Z"
+    }
+  ],
+
   "$schema": "./node_modules/json-server/schema.json"
 }

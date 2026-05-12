@@ -52,12 +52,15 @@ const Login = () => {
 
         if (result.data.user.role === "platform_admin") {
           navigate("/admin/dashboard");
-        } else if (result.data.user.role === "restaurant_admin") {
-          navigate(
-            `/Restaurant_admin/dashboard/${result.data.user.restaurantId}`,
+        } else {
+          const redirectPath = authService.getRestaurantRedirectPath(
+            result.data.user,
           );
-        } else if (result.data.user.role === "waiter") {
-          navigate(`/restaurant/${result.data.user.restaurantId}/staff`);
+          if (redirectPath) {
+            navigate(redirectPath);
+          } else {
+            setLoginError("Invalid user role");
+          }
         }
       } else {
         setLoginError(result.error);

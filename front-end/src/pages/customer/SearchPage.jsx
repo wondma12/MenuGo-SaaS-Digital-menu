@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import menuService from "../../services/menuService";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import customerAuth from "../../services/customerauth";
 import MenuItemCard from "../../components/customer/Menu/MenuItemCard";
 import CustomerHeader, { BottomNav } from "../../components/layout/CustomerNav";
 import Footer from "../../components/layout/Footer";
 
 const SearchPage = () => {
   const navigate = useNavigate();
+  const { restaurantId } = useParams();
   const [items, setItems] = useState([]);
   const [query, setQuery] = useState("");
   const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // cart count from sessionStorage for header/footer visibility across pages
   const [cartCount, setCartCount] = useState(() => {
@@ -58,24 +61,56 @@ const SearchPage = () => {
   }, []);
 
   useEffect(() => {
-    let mounted = true;
-    menuService.getMenuItems().then((res) => {
-      if (!mounted) return;
-      if (res.success && Array.isArray(res.data)) setItems(res.data);
-    });
-    return () => {
-      mounted = false;
+    const loadRestaurantMenu = async () => {
+      if (!restaurantId) {
+        setError("No restaurant specified");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Check if restaurant is accessible
+        const canAccess = await customerAuth.canAccessRestaurant(restaurantId);
+        if (!canAccess) {
+          setError("Restaurant not available or inactive");
+          setLoading(false);
+          return;
+        }
+
+        // Load restaurant menu
+        const menuResult = await customerAuth.getRestaurantMenu(restaurantId);
+        if (!menuResult.success) {
+          setError(menuResult.error);
+          setLoading(false);
+          return;
+        }
+
+        setItems(menuResult.data.allItems);
+        setLoading(false);
+      } catch (error) {
+        console.error("Load restaurant menu error:", error);
+        setError("Failed to load restaurant menu");
+        setLoading(false);
+      }
     };
-  }, []);
+
+    loadRestaurantMenu();
+  }, [restaurantId]);
 
   const addToCart = (item) => {
+    // Add restaurantId to the item if not present
+    const itemWithRestaurant = { ...item, restaurantId };
+
     setCart((prev) => {
       const existing = prev.find((i) => i.id === item.id);
       const updated = existing
         ? prev.map((i) =>
             i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
           )
-        : [...prev, { ...item, quantity: 1 }];
+        : [...prev, { ...itemWithRestaurant, quantity: 1 }];
       try {
         sessionStorage.setItem("menugo_cart", JSON.stringify(updated));
         // dispatch a storage event so other components in this window (header/menu) update immediately
@@ -104,6 +139,40 @@ const SearchPage = () => {
           .includes(query.toLowerCase()),
       )
     : items;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background animate-fade-in">
+        <CustomerHeader
+          cartCount={cartCount}
+          className="animate-fade-in-down"
+        />
+        <main className="pt-24 pb-24 max-w-container-max mx-auto px-6">
+          <div className="text-center text-zinc-500">
+            Loading restaurant menu...
+          </div>
+        </main>
+        <BottomNav cartCount={cartCount} />
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background animate-fade-in">
+        <CustomerHeader
+          cartCount={cartCount}
+          className="animate-fade-in-down"
+        />
+        <main className="pt-24 pb-24 max-w-container-max mx-auto px-6">
+          <div className="text-center text-red-500">{error}</div>
+        </main>
+        <BottomNav cartCount={cartCount} />
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">

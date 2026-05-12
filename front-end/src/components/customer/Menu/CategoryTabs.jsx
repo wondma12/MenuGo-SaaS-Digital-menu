@@ -2,7 +2,10 @@ import React from "react";
 import { Utensils, Coffee, Cake, Grid3X3 } from "lucide-react";
 
 const getCategoryIcon = (category) => {
-  const cat = category.toUpperCase();
+  const cat =
+    typeof category === "string"
+      ? category.toUpperCase()
+      : category.name?.toUpperCase() || "ALL";
   switch (cat) {
     case "ALL":
       return <Grid3X3 className="w-4 h-4" />;
@@ -26,11 +29,15 @@ const CategoryTabs = ({
   return (
     <nav className="sticky top-[55px] z-40 bg-background/80 backdrop-blur-md py-4 px-4 mb-lg flex gap-8 overflow-x-auto hide-scrollbar border-b border-outline-variant/30">
       {categories.map((cat) => {
-        const isActive = activeCategory === cat.toUpperCase();
+        const categoryName =
+          typeof cat === "string"
+            ? cat.toUpperCase()
+            : cat.name?.toUpperCase() || "ALL";
+        const isActive = activeCategory === categoryName;
         return (
           <button
-            key={cat}
-            onClick={() => onCategoryChange(cat.toUpperCase())}
+            key={cat.id || cat}
+            onClick={() => onCategoryChange(categoryName)}
             className={`relative flex items-center gap-2 font-label-caps text-label-caps uppercase whitespace-nowrap pb-2 transition-all group
     ${isActive ? "text-black" : "text-secondary hover:text-black"}
     
@@ -46,9 +53,9 @@ const CategoryTabs = ({
                   : "text-secondary group-hover:text-black"
               }`}
             >
-              {getCategoryIcon(cat)}
+              {getCategoryIcon(categoryName)}
             </span>
-            {cat}
+            {cat.name || cat}
           </button>
         );
       })}

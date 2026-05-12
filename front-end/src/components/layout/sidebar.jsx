@@ -19,24 +19,68 @@ import {
 const Sidebar = ({ role = "Restaurant_admin" }) => {
   const location = useLocation();
 
+  // Get restaurant ID from user data
+  const getUserRestaurantId = () => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    return user.restaurantId;
+  };
+
+  const restaurantId = getUserRestaurantId();
+
   const adminLinks = [
     {
       name: "Dashboard",
-      path: "/Restaurant_admin/dashboard",
+      path: restaurantId
+        ? `/Restaurant_admin/dashboard/${restaurantId}`
+        : "/Restaurant_admin/dashboard",
       icon: LayoutDashboard,
     },
-    { name: "Menu", path: "/Restaurant_admin/menu", icon: FolderOpen },
-    { name: "Orders", path: "/Restaurant_admin/orders", icon: ClipboardList },
-    { name: "Staff", path: "/Restaurant_admin/staff", icon: Users },
-    { name: "Settings", path: "/Restaurant_admin/settings", icon: Settings },
+    {
+      name: "Menu",
+      path: restaurantId
+        ? `/Restaurant_admin/menu/${restaurantId}`
+        : "/Restaurant_admin/menu",
+      icon: FolderOpen,
+    },
+    {
+      name: "Orders",
+      path: restaurantId
+        ? `/Restaurant_admin/orders/${restaurantId}`
+        : "/Restaurant_admin/orders",
+      icon: ClipboardList,
+    },
+    {
+      name: "Staff",
+      path: restaurantId
+        ? `/Restaurant_admin/staff/${restaurantId}`
+        : "/Restaurant_admin/staff",
+      icon: Users,
+    },
+    {
+      name: "Settings",
+      path: restaurantId
+        ? `/Restaurant_admin/RestuarantSettings/${restaurantId}`
+        : "/Restaurant_admin/settings",
+      icon: Settings,
+    },
   ];
 
   const waiterLinks = [
-    { name: "Orders", path: "/waiter/orders", icon: ClipboardList },
-    { name: "Active Orders", path: "/waiter/active", icon: Clock },
+    {
+      name: "Orders",
+      path: restaurantId ? `/waiter/orders/${restaurantId}` : "/waiter/orders",
+      icon: ClipboardList,
+    },
+    {
+      name: "Active Orders",
+      path: restaurantId ? `/waiter/active/${restaurantId}` : "/waiter/active",
+      icon: Clock,
+    },
     {
       name: "Order For customer",
-      path: "/waiter/order-for-customer",
+      path: restaurantId
+        ? `/waiter/order-for-customer/${restaurantId}`
+        : "/waiter/order-for-customer",
       icon: Users,
     },
   ];

@@ -54,7 +54,23 @@ function App() {
           }
         />
         <Route
+          path="/Restaurant_admin/dashboard/:restaurantId"
+          element={
+            <AdminLayout role="Restaurant_admin">
+              <DashboardPage />
+            </AdminLayout>
+          }
+        />
+        <Route
           path="/Restaurant_admin/orders"
+          element={
+            <AdminLayout role="Restaurant_admin">
+              <Restaurant_adminOrders />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/Restaurant_admin/orders/:restaurantId"
           element={
             <AdminLayout role="Restaurant_admin">
               <Restaurant_adminOrders />
@@ -70,6 +86,14 @@ function App() {
           }
         />
         <Route
+          path="/Restaurant_admin/menu/:restaurantId"
+          element={
+            <AdminLayout role="Restaurant_admin">
+              <MenuManagementPage />
+            </AdminLayout>
+          }
+        />
+        <Route
           path="/Restaurant_admin/staff"
           element={
             <AdminLayout role="Restaurant_admin">
@@ -78,7 +102,23 @@ function App() {
           }
         />
         <Route
+          path="/Restaurant_admin/staff/:restaurantId"
+          element={
+            <AdminLayout role="Restaurant_admin">
+              <StaffManagement />
+            </AdminLayout>
+          }
+        />
+        <Route
           path="/Restaurant_admin/RestuarantSettings"
+          element={
+            <AdminLayout role="Restaurant_admin">
+              <RestuarantSettings />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/Restaurant_admin/RestuarantSettings/:restaurantId"
           element={
             <AdminLayout role="Restaurant_admin">
               <RestuarantSettings />
@@ -104,7 +144,23 @@ function App() {
           }
         />
         <Route
+          path="/waiter/orders/:restaurantId"
+          element={
+            <AdminLayout role="waiter">
+              <OrdersPage />
+            </AdminLayout>
+          }
+        />
+        <Route
           path="/waiter/active"
+          element={
+            <AdminLayout role="waiter">
+              <ActiveOrders />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/waiter/active/:restaurantId"
           element={
             <AdminLayout role="waiter">
               <ActiveOrders />
@@ -119,15 +175,24 @@ function App() {
             </AdminLayout>
           }
         />
+        <Route
+          path="/waiter/order-for-customer/:restaurantId"
+          element={
+            <AdminLayout role="waiter">
+              <OrderForCustomer />
+            </AdminLayout>
+          }
+        />
         {/* CUSTOMER ROUTES */}
-        <Route path="/customer" element={<MenuPage />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/customer/search" element={<SearchPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/staff-login" element={<StaffLoginPage />} />
-        {/* Duplicate customer-prefixed routes for links from customer pages */}
-        <Route path="/customer/cart" element={<CartPage />} />
-        <Route path="/customer/staff-login" element={<StaffLoginPage />} />
+        <Route path="/customer/:restaurantId" element={<MenuPage />} />
+        <Route path="/customer/:restaurantId/search" element={<SearchPage />} />
+        <Route path="/customer/:restaurantId/cart" element={<CartPage />} />
+        <Route path="/restaurant/:restaurantId" element={<MenuPage />} />
+        <Route path="/restaurant/:restaurantId/cart" element={<CartPage />} />
+        <Route
+          path="/restaurant/:restaurantId/staff-login"
+          element={<StaffLoginPage />}
+        />
       </Routes>
     </Router>
   );

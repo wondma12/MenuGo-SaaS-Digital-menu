@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 
 const CustomerHeader = ({
   cartCount = 0,
@@ -7,6 +7,7 @@ const CustomerHeader = ({
   onMobileMenuClick,
 }) => {
   const location = useLocation();
+  const { restaurantId } = useParams();
 
   const isActiveLink = (path) => {
     return location.pathname === path;
@@ -24,7 +25,7 @@ const CustomerHeader = ({
             </span>
           </button>
         )}
-        <Link to="/customer">
+        <Link to={restaurantId ? `/customer/${restaurantId}` : "/customer"}>
           <h1 className="text-lg font-black tracking-tighter text-neutral-900 uppercase">
             LUMIÈRE DINING
           </h1>
@@ -34,9 +35,11 @@ const CustomerHeader = ({
       <div className="hidden md:flex items-center gap-6">
         {/* Menu Link */}
         <Link
-          to="/customer"
+          to={restaurantId ? `/customer/${restaurantId}` : "/customer"}
           className={`relative flex items-center gap-2 text-neutral-600 hover:text-neutral-900 pb-1 transition-all after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-900 after:transition-transform after:duration-300 after:ease-in-out ${
-            isActiveLink("/customer")
+            isActiveLink(
+              restaurantId ? `/customer/${restaurantId}` : "/customer",
+            )
               ? "text-black after:scale-x-100"
               : "after:scale-x-0 hover:after:scale-x-100"
           }`}
@@ -47,9 +50,11 @@ const CustomerHeader = ({
 
         {/* Search Link */}
         <Link
-          to="/search"
+          to={restaurantId ? `/customer/${restaurantId}/search` : "/search"}
           className={`relative flex items-center gap-2 text-neutral-600 hover:text-neutral-900 pb-1 transition-all after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-900 after:transition-transform after:duration-300 after:ease-in-out ${
-            isActiveLink("/search")
+            isActiveLink(
+              restaurantId ? `/customer/${restaurantId}/search` : "/search",
+            )
               ? "text-black after:scale-x-100"
               : "after:scale-x-0 hover:after:scale-x-100"
           }`}
@@ -60,9 +65,13 @@ const CustomerHeader = ({
 
         {/* Orders/Cart Link */}
         <Link
-          to="/cart"
+          to={restaurantId ? `/customer/${restaurantId}/cart` : "/cart"}
           className={`relative flex items-center gap-2 text-neutral-600 hover:text-neutral-900 pb-1 transition-all ${
-            isActiveLink("/cart") ? "text-black" : "group"
+            isActiveLink(
+              restaurantId ? `/customer/${restaurantId}/cart` : "/cart",
+            )
+              ? "text-black"
+              : "group"
           }`}
         >
           <span className="material-symbols-outlined"></span>
@@ -71,7 +80,9 @@ const CustomerHeader = ({
           {/* The Animated Underline for Orders */}
           <span
             className={`absolute bottom-0 left-0 h-[2px] w-full bg-neutral-900 transition-transform duration-300 ease-in-out ${
-              isActiveLink("/cart")
+              isActiveLink(
+                restaurantId ? `/customer/${restaurantId}/cart` : "/cart",
+              )
                 ? "scale-x-100"
                 : "scale-x-0 group-hover:scale-x-100"
             }`}
@@ -91,6 +102,7 @@ const CustomerHeader = ({
 // Bottom Navigation Component (mobile only)
 const BottomNav = ({ cartCount = 0 }) => {
   const location = useLocation();
+  const { restaurantId } = useParams();
 
   const isActiveLink = (path) => {
     return location.pathname === path;
@@ -99,9 +111,9 @@ const BottomNav = ({ cartCount = 0 }) => {
   return (
     <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-white/95 backdrop-blur-md border-t border-neutral-200 shadow-soft md:hidden">
       <Link
-        to="/customer"
+        to={restaurantId ? `/customer/${restaurantId}` : "/customer"}
         className={`flex flex-col items-center justify-center px-3 py-1 rounded-md ${
-          isActiveLink("/customer")
+          isActiveLink(restaurantId ? `/customer/${restaurantId}` : "/customer")
             ? "bg-neutral-100 text-neutral-900"
             : "text-neutral-400"
         }`}
@@ -112,9 +124,13 @@ const BottomNav = ({ cartCount = 0 }) => {
         </span>
       </Link>
       <Link
-        to="/search"
+        to={restaurantId ? `/customer/${restaurantId}/search` : "/search"}
         className={`flex flex-col items-center justify-center ${
-          isActiveLink("/search") ? "text-neutral-900" : "text-neutral-400"
+          isActiveLink(
+            restaurantId ? `/customer/${restaurantId}/search` : "/search",
+          )
+            ? "text-neutral-900"
+            : "text-neutral-400"
         }`}
       >
         <span className="material-symbols-outlined"></span>
@@ -123,9 +139,13 @@ const BottomNav = ({ cartCount = 0 }) => {
         </span>
       </Link>
       <Link
-        to="/cart"
+        to={restaurantId ? `/customer/${restaurantId}/cart` : "/cart"}
         className={`flex flex-col items-center justify-center relative ${
-          isActiveLink("/cart") ? "text-neutral-900" : "text-neutral-400"
+          isActiveLink(
+            restaurantId ? `/customer/${restaurantId}/cart` : "/cart",
+          )
+            ? "text-neutral-900"
+            : "text-neutral-400"
         }`}
       >
         <span className="material-symbols-outlined"></span>

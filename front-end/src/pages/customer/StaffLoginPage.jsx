@@ -54,7 +54,14 @@ const StaffLoginPage = () => {
           result.data.user.role === "restaurant_admin" ||
           result.data.user.role === "waiter"
         ) {
-          navigate(`/restaurant/${result.data.user.restaurantId}/staff`);
+          const redirectPath = authService.getRestaurantRedirectPath(
+            result.data.user,
+          );
+          if (redirectPath) {
+            navigate(redirectPath);
+          } else {
+            setLoginError("Invalid user role");
+          }
         } else {
           setLoginError("Access denied. Staff accounts only.");
         }

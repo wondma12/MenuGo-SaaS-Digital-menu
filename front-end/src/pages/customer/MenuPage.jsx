@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import HeroBanner from "../../components/customer/Menu/HeroBanner";
 import CategoryTabs from "../../components/customer/Menu/CategoryTabs";
 import MenuItemCard from "../../components/customer/Menu/MenuItemCard";
 import FeedbackSection from "../../components/customer/Feedback/FeedbackSection";
 import CustomerHeader, { BottomNav } from "../../components/layout/CustomerNav";
 import menuService from "../../services/menuService";
+import customerAuth from "../../services/customerauth";
 import Footer from "../../components/layout/Footer";
 
 const MenuPage = () => {
+  const { restaurantId } = useParams();
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [cart, setCart] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState(["ALL"]);
+  const [restaurant, setRestaurant] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const addToCart = (item) => {
@@ -49,6 +54,60 @@ const MenuPage = () => {
   });
 
   useEffect(() => {
+    const loadRestaurantData = async () => {
+      if (!restaurantId) {
+        setError("No restaurant specified");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Check if restaurant is accessible
+        const canAccess = await customerAuth.canAccessRestaurant(restaurantId);
+        if (!canAccess) {
+          setError("Restaurant not available or inactive");
+          setLoading(false);
+          return;
+        }
+
+        // Load restaurant data
+        const restaurantResult =
+          await customerAuth.getRestaurantById(restaurantId);
+        if (!restaurantResult.success) {
+          setError(restaurantResult.error);
+          setLoading(false);
+          return;
+        }
+
+        // Load restaurant menu
+        const menuResult = await customerAuth.getRestaurantMenu(restaurantId);
+        if (!menuResult.success) {
+          setError(menuResult.error);
+          setLoading(false);
+          return;
+        }
+
+        setRestaurant(restaurantResult.data);
+        setCategories([
+          { id: "ALL", name: "ALL" },
+          ...menuResult.data.categories,
+        ]);
+        setMenuItems(menuResult.data.allItems);
+        setLoading(false);
+      } catch (error) {
+        console.error("Load restaurant data error:", error);
+        setError("Failed to load restaurant data");
+        setLoading(false);
+      }
+    };
+
+    loadRestaurantData();
+  }, [restaurantId]);
+
+  useEffect(() => {
     const onStorage = (e) => {
       if (e.key === "menugo_cart") {
         try {
@@ -82,8 +141,8 @@ const MenuPage = () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("menugo_cart_updated", onCustom);
     };
-  }, []);
-  // initialize cart from sessionStorage so UI reflects persisted cart
+  }, [cart]);
+
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem("menugo_cart");
@@ -91,26 +150,6 @@ const MenuPage = () => {
     } catch (e) {
       // ignore
     }
-  }, []);
-
-  // load menu items and categories from menuService
-  React.useEffect(() => {
-    let mounted = true;
-    menuService.getMenuItems().then((res) => {
-      if (!mounted) return;
-      if (res.success && Array.isArray(res.data)) setMenuItems(res.data);
-    });
-    menuService.getCategories().then((res) => {
-      if (!mounted) return;
-      if (res.success && Array.isArray(res.data))
-        setCategories([
-          "ALL",
-          ...res.data.map((c) => c.name?.toUpperCase() || c.toUpperCase()),
-        ]);
-    });
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   const filteredItems =
@@ -148,11 +187,48 @@ const MenuPage = () => {
     );
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background animate-fade-in">
+        <CustomerHeader
+          cartCount={cartCount}
+          className="animate-fade-in-down"
+        />
+        <main className="pt-28 pb-24 max-w-container-max mx-auto px-6 md:px-gutter">
+          <div className="text-center text-zinc-500">
+            Loading restaurant data...
+          </div>
+        </main>
+        <BottomNav cartCount={cartCount} />
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background animate-fade-in">
+        <CustomerHeader
+          cartCount={cartCount}
+          className="animate-fade-in-down"
+        />
+        <main className="pt-28 pb-24 max-w-container-max mx-auto px-6 md:px-gutter">
+          <div className="text-center text-red-500">{error}</div>
+        </main>
+        <BottomNav cartCount={cartCount} />
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background animate-fade-in">
       <CustomerHeader cartCount={cartCount} className="animate-fade-in-down" />
       <main className="pt-28 pb-24 max-w-container-max mx-auto px-6 md:px-gutter">
-        <HeroBanner className="animate-fade-in-up stagger-1" />
+        <HeroBanner
+          restaurant={restaurant}
+          className="animate-fade-in-up stagger-1"
+        />
         <CategoryTabs
           categories={categories}
           activeCategory={activeCategory}

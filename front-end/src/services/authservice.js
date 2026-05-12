@@ -107,6 +107,18 @@ const authService = {
     return false;
   },
 
+  getRestaurantRedirectPath(user) {
+    const restaurantId = user.restaurantId;
+
+    if (user.role === "restaurant_admin") {
+      return `/Restaurant_admin/dashboard/${restaurantId}`;
+    } else if (user.role === "waiter") {
+      return `/waiter/orders/${restaurantId}`;
+    }
+
+    return null;
+  },
+
   async logout() {
     try {
       await delay();

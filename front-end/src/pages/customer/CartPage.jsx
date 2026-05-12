@@ -1,8 +1,5 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react-hooks/static-components */
-// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import CartItemRow from "../../components/customer/Cart/CartItemRow";
 import OrderSummary from "../../components/customer/Cart/OrderSummary";
 import OrderTypeSelector from "../../components/customer/Cart/OrderTypeSelector";
@@ -12,9 +9,11 @@ import Footer from "../../components/layout/Footer";
 const CartPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { restaurantId } = useParams();
   const [cartItems, setCartItems] = useState(location.state?.cart || []);
   const [orderType, setOrderType] = useState("Dine-in");
   const [tableNumber, setTableNumber] = useState("");
+  const [restaurant, setRestaurant] = useState(null);
   const [cartCount, setCartCount] = useState(() => {
     try {
       const raw = sessionStorage.getItem("menugo_cart");
@@ -24,14 +23,57 @@ const CartPage = () => {
     }
   });
 
+  // Load restaurant data and filter cart items
+  useEffect(() => {
+    const loadRestaurantAndFilterCart = async () => {
+      if (restaurantId) {
+        try {
+          // Load restaurant data
+          const response = await fetch(
+            `${process.env.REACT_APP_API_BASE_URL || "http://localhost:3000"}/restaurants`,
+          );
+          const restaurants = await response.json();
+          const currentRestaurant = restaurants.find(
+            (r) => r.id === restaurantId,
+          );
+          setRestaurant(currentRestaurant);
+
+          // Filter cart items to only include items from this restaurant
+          const rawCart = sessionStorage.getItem("menugo_cart");
+          if (rawCart) {
+            const allCartItems = JSON.parse(rawCart);
+            const filteredCart = allCartItems.filter(
+              (item) => item.restaurantId === restaurantId,
+            );
+            setCartItems(filteredCart);
+          }
+        } catch (error) {
+          console.error("Error loading restaurant data:", error);
+        }
+      }
+    };
+
+    loadRestaurantAndFilterCart();
+  }, [restaurantId]);
+
+  // Cart count management
   useEffect(() => {
     const onStorage = (e) => {
       if (e.key === "menugo_cart") {
         try {
           const raw = e.newValue;
-          setCartCount(
-            raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0,
-          );
+          if (raw && restaurantId) {
+            const allCartItems = JSON.parse(raw);
+            const filteredCart = allCartItems.filter(
+              (item) => item.restaurantId === restaurantId,
+            );
+            setCartItems(filteredCart);
+            setCartCount(filteredCart.reduce((s, i) => s + i.quantity, 0));
+          } else {
+            setCartCount(
+              raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0,
+            );
+          }
         } catch (err) {
           setCartCount(0);
         }
@@ -39,14 +81,31 @@ const CartPage = () => {
     };
     const onCustom = (e) => {
       const updated = e.detail || (e.newValue ? JSON.parse(e.newValue) : null);
-      if (Array.isArray(updated))
-        setCartCount(updated.reduce((s, i) => s + i.quantity, 0));
-      else {
+      if (Array.isArray(updated)) {
+        if (restaurantId) {
+          const filteredCart = updated.filter(
+            (item) => item.restaurantId === restaurantId,
+          );
+          setCartItems(filteredCart);
+          setCartCount(filteredCart.reduce((s, i) => s + i.quantity, 0));
+        } else {
+          setCartCount(updated.reduce((s, i) => s + i.quantity, 0));
+        }
+      } else {
         try {
           const raw = e.newValue;
-          setCartCount(
-            raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0,
-          );
+          if (raw && restaurantId) {
+            const allCartItems = JSON.parse(raw);
+            const filteredCart = allCartItems.filter(
+              (item) => item.restaurantId === restaurantId,
+            );
+            setCartItems(filteredCart);
+            setCartCount(filteredCart.reduce((s, i) => s + i.quantity, 0));
+          } else {
+            setCartCount(
+              raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0,
+            );
+          }
         } catch (err) {
           // ignore
         }
@@ -58,9 +117,8 @@ const CartPage = () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("menugo_cart_updated", onCustom);
     };
-  }, []);
+  }, [restaurantId]);
 
-  // Update quantity
   const updateQuantity = (id, quantity) => {
     if (quantity <= 0) {
       const next = cartItems.filter((item) => item.id !== id);
@@ -99,7 +157,7 @@ const CartPage = () => {
     try {
       sessionStorage.removeItem("menugo_cart");
     } catch (e) {}
-    navigate("/customer");
+    navigate(restaurantId ? `/customer/${restaurantId}` : "/customer");
   };
 
   // Load cart from sessionStorage if available (direct /cart visits)
@@ -140,7 +198,7 @@ const CartPage = () => {
             Start adding delicious items from the menu.
           </p>
           <Link
-            to="/customer"
+            to={restaurantId ? `/customer/${restaurantId}` : "/customer"}
             className="mt-6 inline-block bg-black text-white px-6 py-3 rounded-lg hover-lift btn-micro animate-fade-in-up stagger-3"
           >
             Browse Menu
