@@ -55,7 +55,7 @@
       "logo": "",
       "slogan": "Luxury Dining Experience",
       "banner": "https://www.shutterstock.com/image-photo/healthy-breakfast-food-top-border-260nw-2255183021.jpg",
-      "status": "active",
+      "status": "pending",
       "ownerId": "usr_rest_admin_1",
       "createdAt": "2025-05-01T09:00:00.000Z",
       "updatedAt": "2025-05-01T09:00:00.000Z"
@@ -133,9 +133,6 @@
       "restaurantId": "rest_1",
       "currency": "ETB",
       "language": "en",
-      "theme": "dark",
-      "taxPercentage": 15,
-      "serviceCharge": 10,
       "allowOnlineOrders": true,
       "createdAt": "2025-05-01T09:00:00.000Z",
       "updatedAt": "2025-05-01T09:00:00.000Z"
