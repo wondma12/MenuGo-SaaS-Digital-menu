@@ -27,279 +27,266 @@ const apiRequest = async (endpoint, options = {}) => {
   }
 };
 
-// Restaurant related API calls
+// ===============================
+// RESTAURANTS API
+// ===============================
+
 export const restaurantAPI = {
-  // Get all restaurants
   getAll: () => apiRequest("/restaurants"),
 
-  // Get restaurant by ID
   getById: (id) => apiRequest(`/restaurants/${id}`),
 
-  // Create restaurant
   create: (data) =>
     apiRequest("/restaurants", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
-  // Update restaurant
   update: (id, data) =>
     apiRequest(`/restaurants/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
 
-  // Delete restaurant
   delete: (id) =>
     apiRequest(`/restaurants/${id}`, {
       method: "DELETE",
     }),
 };
 
-// Restaurant locations API
+// ===============================
+// RESTAURANT LOCATIONS API
+// ===============================
+
 export const restaurantLocationAPI = {
-  // Get all restaurant locations
-  getAll: () => apiRequest("/restaurantLocations"),
+  getAll: () => apiRequest("/restaurant_locations"),
 
-  // Get location by restaurant ID
-  getByRestaurantId: (restaurantId) =>
-    apiRequest(`/restaurantLocations?restaurantId=${restaurantId}`),
+  getByRestaurantId: (restaurant_id) =>
+    apiRequest(`/restaurant_locations?restaurant_id=${restaurant_id}`),
 
-  // Create location
   create: (data) =>
-    apiRequest("/restaurantLocations", {
+    apiRequest("/restaurant_locations", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
-  // Update location
   update: (id, data) =>
-    apiRequest(`/restaurantLocations/${id}`, {
+    apiRequest(`/restaurant_locations/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
 };
 
-// Restaurant verifications API
+// ===============================
+// RESTAURANT VERIFICATIONS API
+// ===============================
+
 export const restaurantVerificationAPI = {
-  // Get all verifications
-  getAll: () => apiRequest("/restaurantVerifications"),
+  getAll: () => apiRequest("/restaurant_verifications"),
 
-  // Get verification by restaurant ID
-  getByRestaurantId: (restaurantId) =>
-    apiRequest(`/restaurantVerifications?restaurantId=${restaurantId}`),
+  getByRestaurantId: (restaurant_id) =>
+    apiRequest(
+      `/restaurant_verifications?restaurant_id=${restaurant_id}`,
+    ),
 
-  // Create verification
   create: (data) =>
-    apiRequest("/restaurantVerifications", {
+    apiRequest("/restaurant_verifications", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
-  // Update verification
   update: (id, data) =>
-    apiRequest(`/restaurantVerifications/${id}`, {
+    apiRequest(`/restaurant_verifications/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
 };
 
-// Users API
+// ===============================
+// USERS API
+// ===============================
+
 export const userAPI = {
-  // Get all users
   getAll: () => apiRequest("/users"),
 
-  // Get user by ID
   getById: (id) => apiRequest(`/users/${id}`),
 
-  // Create user
   create: (data) =>
     apiRequest("/users", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
-  // Update user
   update: (id, data) =>
     apiRequest(`/users/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
 
-  // Delete user
   delete: (id) =>
     apiRequest(`/users/${id}`, {
       method: "DELETE",
     }),
 };
 
-// Staff API
-export const staffAPI = {
-  // Get all staff
-  getAll: () => apiRequest("/staff"),
+// ===============================
+// CATEGORIES API
+// ===============================
 
-  // Get staff by restaurant ID
-  getByRestaurantId: (restaurantId) =>
-    apiRequest(`/staff?restaurantId=${restaurantId}`),
-
-  // Create staff
-  create: (data) =>
-    apiRequest("/staff", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-
-  // Update staff
-  update: (id, data) =>
-    apiRequest(`/staff/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    }),
-
-  // Delete staff
-  delete: (id) =>
-    apiRequest(`/staff/${id}`, {
-      method: "DELETE",
-    }),
-};
-
-// Categories API
 export const categoryAPI = {
-  // Get all categories
   getAll: () => apiRequest("/categories"),
 
-  // Get category by ID
   getById: (id) => apiRequest(`/categories/${id}`),
 
-  // Create category
+  getByRestaurantId: (restaurant_id) =>
+    apiRequest(`/categories?restaurant_id=${restaurant_id}`),
+
   create: (data) =>
     apiRequest("/categories", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
-  // Update category
   update: (id, data) =>
     apiRequest(`/categories/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
 
-  // Delete category
   delete: (id) =>
     apiRequest(`/categories/${id}`, {
       method: "DELETE",
     }),
 };
 
-// Menu Items API
+// ===============================
+// MENU ITEMS API
+// ===============================
+
 export const menuItemAPI = {
-  // Get all menu items
-  getAll: () => apiRequest("/menuItems"),
+  getAll: () => apiRequest("/menu_items"),
 
-  // Get menu items by restaurant ID
-  getByRestaurantId: (restaurantId) =>
-    apiRequest(`/menuItems?restaurantId=${restaurantId}`),
+  getById: (id) => apiRequest(`/menu_items/${id}`),
 
-  // Create menu item
+  getByCategoryId: (category_id) =>
+    apiRequest(`/menu_items?category_id=${category_id}`),
+
   create: (data) =>
-    apiRequest("/menuItems", {
+    apiRequest("/menu_items", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
-  // Update menu item
   update: (id, data) =>
-    apiRequest(`/menuItems/${id}`, {
+    apiRequest(`/menu_items/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
 
-  // Delete menu item
   delete: (id) =>
-    apiRequest(`/menuItems/${id}`, {
+    apiRequest(`/menu_items/${id}`, {
       method: "DELETE",
     }),
 };
 
-// Orders API
+// ===============================
+// ORDERS API
+// ===============================
+
 export const orderAPI = {
-  // Get all orders
   getAll: () => apiRequest("/orders"),
 
-  // Get orders by restaurant ID
-  getByRestaurantId: (restaurantId) =>
-    apiRequest(`/orders?restaurantId=${restaurantId}`),
+  getById: (id) => apiRequest(`/orders/${id}`),
 
-  // Create order
+  getByRestaurantId: (restaurant_id) =>
+    apiRequest(`/orders?restaurant_id=${restaurant_id}`),
+
   create: (data) =>
     apiRequest("/orders", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
-  // Update order
   update: (id, data) =>
     apiRequest(`/orders/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
 
-  // Delete order
   delete: (id) =>
     apiRequest(`/orders/${id}`, {
       method: "DELETE",
     }),
 };
 
-// Order Items API
+// ===============================
+// ORDER ITEMS API
+// ===============================
+
 export const orderItemAPI = {
-  // Get all order items
-  getAll: () => apiRequest("/orderItems"),
+  getAll: () => apiRequest("/order_items"),
 
-  // Get order items by order ID
-  getByOrderId: (orderId) => apiRequest(`/orderItems?orderId=${orderId}`),
+  getById: (id) => apiRequest(`/order_items/${id}`),
 
-  // Create order item
+  getByOrderId: (order_id) =>
+    apiRequest(`/order_items?order_id=${order_id}`),
+
   create: (data) =>
-    apiRequest("/orderItems", {
+    apiRequest("/order_items", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
-  // Update order item
   update: (id, data) =>
-    apiRequest(`/orderItems/${id}`, {
+    apiRequest(`/order_items/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
 
-  // Delete order item
   delete: (id) =>
-    apiRequest(`/orderItems/${id}`, {
+    apiRequest(`/order_items/${id}`, {
       method: "DELETE",
     }),
 };
 
-// Combined API for admin dashboard
+// ===============================
+// ADMIN DASHBOARD API
+// ===============================
+
 export const adminAPI = {
-  // Get dashboard statistics
+  // Dashboard statistics
   getDashboardStats: async () => {
     try {
-      const [restaurants, users, staff] = await Promise.all([
+      const [restaurants, users] = await Promise.all([
         restaurantAPI.getAll(),
         userAPI.getAll(),
-        staffAPI.getAll(),
       ]);
+
+      const waiters = users.filter(
+        (user) => user.role === "waiter",
+      );
+
+      const restaurantAdmins = users.filter(
+        (user) => user.role === "restaurant_admin",
+      );
 
       return {
         totalRestaurants: restaurants.length,
+
         totalUsers: users.length,
-        totalStaff: staff.length,
-        pendingRestaurants: restaurants.filter((r) => r.status === "pending")
-          .length,
-        activeRestaurants: restaurants.filter((r) => r.status === "active")
-          .length,
+
+        totalRestaurantAdmins: restaurantAdmins.length,
+
+        totalStaff: waiters.length,
+
+        pendingRestaurants: restaurants.filter(
+          (r) => r.status === "pending",
+        ).length,
+
+        activeRestaurants: restaurants.filter(
+          (r) => r.status === "active",
+        ).length,
+
         suspendedRestaurants: restaurants.filter(
           (r) => r.status === "suspended",
         ).length,
@@ -310,21 +297,46 @@ export const adminAPI = {
     }
   },
 
-  // Get restaurant with all related data
+  // Restaurant with complete details
   getRestaurantWithDetails: async (id) => {
     try {
-      const [restaurant, locations, verifications, staff] = await Promise.all([
+      const [
+        restaurant,
+        locations,
+        verifications,
+        users,
+        categories,
+        orders,
+      ] = await Promise.all([
         restaurantAPI.getById(id),
+
         restaurantLocationAPI.getByRestaurantId(id),
+
         restaurantVerificationAPI.getByRestaurantId(id),
-        staffAPI.getByRestaurantId(id),
+
+        userAPI.getAll(),
+
+        categoryAPI.getByRestaurantId(id),
+
+        orderAPI.getByRestaurantId(id),
       ]);
+
+      const restaurantUsers = users.filter(
+        (user) => user.restaurant_id === id,
+      );
 
       return {
         ...restaurant,
+
         location: locations[0] || null,
-        verifications,
-        staff,
+
+        verification: verifications[0] || null,
+
+        users: restaurantUsers,
+
+        categories,
+
+        orders,
       };
     } catch (error) {
       console.error("Error fetching restaurant details:", error);

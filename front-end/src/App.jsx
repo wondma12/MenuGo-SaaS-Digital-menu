@@ -1,9 +1,8 @@
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
-} from "react-router-dom";
+} from "react-router-dom"; // Removed BrowserRouter as it's now in main.jsx
 
 // Layout
 import AdminLayout from "./components/layout/AdminLayout";
@@ -32,169 +31,173 @@ import MenuPage from "./pages/customer/MenuPage";
 import SearchPage from "./pages/customer/SearchPage";
 import CartPage from "./pages/customer/CartPage";
 import StaffLoginPage from "./pages/customer/StaffLoginPage";
+// 404 Page
+import NotFound from "./components/layout/NotFound";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* AUTH ROUTES */}
-        <Route path="/auth/login" element={<Login />} />
-        <Route path="/auth/signup" element={<Signup />} />
+    <Routes> {/* Removed Router wrapper */}
+      {/* AUTH ROUTES */}
+      <Route path="/auth/login" element={<Login />} />
+      <Route path="/auth/signup" element={<Signup />} />
 
-        {/* Redirect root */}
-        <Route path="/" element={<Navigate to="/auth/login" />} />
+      {/* Redirect root */}
+      <Route path="/" element={<Navigate to="/auth/login" />} />
 
-        {/* Restaurant_admin ROUTES */}
-        <Route
-          path="/Restaurant_admin/dashboard"
-          element={
-            <AdminLayout role="Restaurant_admin">
-              <DashboardPage />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/Restaurant_admin/dashboard/:restaurantId"
-          element={
-            <AdminLayout role="Restaurant_admin">
-              <DashboardPage />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/Restaurant_admin/orders"
-          element={
-            <AdminLayout role="Restaurant_admin">
-              <Restaurant_adminOrders />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/Restaurant_admin/orders/:restaurantId"
-          element={
-            <AdminLayout role="Restaurant_admin">
-              <Restaurant_adminOrders />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/Restaurant_admin/menu"
-          element={
-            <AdminLayout role="Restaurant_admin">
-              <MenuManagementPage />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/Restaurant_admin/menu/:restaurantId"
-          element={
-            <AdminLayout role="Restaurant_admin">
-              <MenuManagementPage />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/Restaurant_admin/staff"
-          element={
-            <AdminLayout role="Restaurant_admin">
-              <StaffManagement />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/Restaurant_admin/staff/:restaurantId"
-          element={
-            <AdminLayout role="Restaurant_admin">
-              <StaffManagement />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/Restaurant_admin/RestuarantSettings"
-          element={
-            <AdminLayout role="Restaurant_admin">
-              <RestuarantSettings />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/Restaurant_admin/RestuarantSettings/:restaurantId"
-          element={
-            <AdminLayout role="Restaurant_admin">
-              <RestuarantSettings />
-            </AdminLayout>
-          }
-        />
+      {/* Restaurant_admin ROUTES */}
+      <Route
+        path="/Restaurant_admin/dashboard"
+        element={
+          <AdminLayout role="Restaurant_admin">
+            <DashboardPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/Restaurant_admin/dashboard/:restaurantId"
+        element={
+          <AdminLayout role="Restaurant_admin">
+            <DashboardPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/Restaurant_admin/orders"
+        element={
+          <AdminLayout role="Restaurant_admin">
+            <Restaurant_adminOrders />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/Restaurant_admin/orders/:restaurantId"
+        element={
+          <AdminLayout role="Restaurant_admin">
+            <Restaurant_adminOrders />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/Restaurant_admin/menu"
+        element={
+          <AdminLayout role="Restaurant_admin">
+            <MenuManagementPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/Restaurant_admin/menu/:restaurantId"
+        element={
+          <AdminLayout role="Restaurant_admin">
+            <MenuManagementPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/Restaurant_admin/staff"
+        element={
+          <AdminLayout role="Restaurant_admin">
+            <StaffManagement />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/Restaurant_admin/staff/:restaurantId"
+        element={
+          <AdminLayout role="Restaurant_admin">
+            <StaffManagement />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/Restaurant_admin/RestuarantSettings"
+        element={
+          <AdminLayout role="Restaurant_admin">
+            <RestuarantSettings />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/Restaurant_admin/RestuarantSettings/:restaurantId"
+        element={
+          <AdminLayout role="Restaurant_admin">
+            <RestuarantSettings />
+          </AdminLayout>
+        }
+      />
 
-        {/* PLATFORM ADMIN ROUTES */}
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/restaurants" element={<Restaurants />} />
-        <Route path="/admin/restaurants/:id" element={<RestaurantDetail />} />
-        <Route path="/admin/users" element={<Users />} />
-        <Route path="/admin/security" element={<Security />} />
-        <Route path="/admin/settings" element={<Settings />} />
+      {/* PLATFORM ADMIN ROUTES */}
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/restaurants" element={<Restaurants />} />
+      <Route path="/admin/restaurants/:id" element={<RestaurantDetail />} />
+      <Route path="/admin/users" element={<Users />} />
+      <Route path="/admin/security" element={<Security />} />
+      <Route path="/admin/settings" element={<Settings />} />
 
-        {/* WAITER ROUTES */}
-        <Route
-          path="/waiter/orders"
-          element={
-            <AdminLayout role="waiter">
-              <OrdersPage />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/waiter/orders/:restaurantId"
-          element={
-            <AdminLayout role="waiter">
-              <OrdersPage />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/waiter/active"
-          element={
-            <AdminLayout role="waiter">
-              <ActiveOrders />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/waiter/active/:restaurantId"
-          element={
-            <AdminLayout role="waiter">
-              <ActiveOrders />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/waiter/order-for-customer"
-          element={
-            <AdminLayout role="waiter">
-              <OrderForCustomer />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/waiter/order-for-customer/:restaurantId"
-          element={
-            <AdminLayout role="waiter">
-              <OrderForCustomer />
-            </AdminLayout>
-          }
-        />
-        {/* CUSTOMER ROUTES */}
-        <Route path="/customer/:restaurantId" element={<MenuPage />} />
-        <Route path="/customer/:restaurantId/search" element={<SearchPage />} />
-        <Route path="/customer/:restaurantId/cart" element={<CartPage />} />
-        <Route path="/restaurant/:restaurantId" element={<MenuPage />} />
-        <Route path="/restaurant/:restaurantId/cart" element={<CartPage />} />
-        <Route
-          path="/restaurant/:restaurantId/staff-login"
-          element={<StaffLoginPage />}
-        />
-      </Routes>
-    </Router>
+      {/* WAITER ROUTES */}
+      <Route
+        path="/waiter/orders"
+        element={
+          <AdminLayout role="waiter">
+            <OrdersPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/waiter/orders/:restaurantId"
+        element={
+          <AdminLayout role="waiter">
+            <OrdersPage />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/waiter/active"
+        element={
+          <AdminLayout role="waiter">
+            <ActiveOrders />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/waiter/active/:restaurantId"
+        element={
+          <AdminLayout role="waiter">
+            <ActiveOrders />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/waiter/order-for-customer"
+        element={
+          <AdminLayout role="waiter">
+            <OrderForCustomer />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/waiter/order-for-customer/:restaurantId"
+        element={
+          <AdminLayout role="waiter">
+            <OrderForCustomer />
+          </AdminLayout>
+        }
+      />
+      
+      {/* CUSTOMER ROUTES */}
+      <Route path="/customer/:restaurantId" element={<MenuPage />} />
+      <Route path="/customer/:restaurantId/search" element={<SearchPage />} />
+      <Route path="/customer/:restaurantId/cart" element={<CartPage />} />
+      <Route path="/restaurant/:restaurantId" element={<MenuPage />} />
+      <Route path="/restaurant/:restaurantId/cart" element={<CartPage />} />
+      <Route
+        path="/restaurant/:restaurantId/staff-login"
+        element={<StaffLoginPage />}
+      />
+
+      {/* 404 PAGE - MUST BE THE LAST ROUTE */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 

@@ -14,7 +14,7 @@ const MenuPage = () => {
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [cart, setCart] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
-  const [categories, setCategories] = useState(["ALL"]);
+  const [categories, setCategories] = useState([]);
   const [restaurant, setRestaurant] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,12 +25,11 @@ const MenuPage = () => {
       const existing = prev.find((i) => i.id === item.id);
       const updated = existing
         ? prev.map((i) =>
-            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
+            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
           )
         : [...prev, { ...item, quantity: 1 }];
       try {
         sessionStorage.setItem("menugo_cart", JSON.stringify(updated));
-        // update cartCount immediately so header/footer reflect change in this window
         setCartCount(updated.reduce((s, it) => s + it.quantity, 0));
       } catch (e) {
         // ignore storage errors
@@ -43,7 +42,6 @@ const MenuPage = () => {
   const getCartTotal = () =>
     cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-  // cart count from sessionStorage for header/footer visibility across pages
   const [cartCount, setCartCount] = useState(() => {
     try {
       const raw = sessionStorage.getItem("menugo_cart");
@@ -74,8 +72,7 @@ const MenuPage = () => {
         }
 
         // Load restaurant data
-        const restaurantResult =
-          await customerAuth.getRestaurantById(restaurantId);
+        const restaurantResult = await customerAuth.getRestaurantById(restaurantId);
         if (!restaurantResult.success) {
           setError(restaurantResult.error);
           setLoading(false);
@@ -84,6 +81,10 @@ const MenuPage = () => {
 
         // Load restaurant menu
         const menuResult = await customerAuth.getRestaurantMenu(restaurantId);
+        
+        console.log("=== DEBUG ===");
+        console.log("Menu Result:", menuResult);
+        
         if (!menuResult.success) {
           setError(menuResult.error);
           setLoading(false);
@@ -91,11 +92,37 @@ const MenuPage = () => {
         }
 
         setRestaurant(restaurantResult.data);
-        setCategories([
+        
+        // Get categories from service
+        const serviceCategories = menuResult.data.categories || [];
+        const allMenuItems = menuResult.data.allItems || [];
+        
+        console.log("Service Categories:", serviceCategories);
+        console.log("All Menu Items:", allMenuItems);
+        
+        // FIXED: Create categories array for CategoryTabs component
+        // CategoryTabs expects either strings or objects with name property
+        const formattedCategories = [
           { id: "ALL", name: "ALL" },
-          ...menuResult.data.categories,
-        ]);
-        setMenuItems(menuResult.data.allItems);
+          ...serviceCategories.map(cat => ({
+            id: cat.id.toString(),
+            name: cat.name
+          }))
+        ];
+        
+        setCategories(formattedCategories);
+        
+        // Transform menu items with proper category info
+        const transformedItems = allMenuItems.map(item => ({
+          ...item,
+          price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
+          categoryId: item.category_id.toString(),
+          categoryName: getCategoryName(item.category_id, serviceCategories)
+        }));
+        
+        console.log("Transformed Items:", transformedItems);
+        
+        setMenuItems(transformedItems);
         setLoading(false);
       } catch (error) {
         console.error("Load restaurant data error:", error);
@@ -107,13 +134,18 @@ const MenuPage = () => {
     loadRestaurantData();
   }, [restaurantId]);
 
+  const getCategoryName = (categoryId, categories) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.name : "Uncategorized";
+  };
+
   useEffect(() => {
     const onStorage = (e) => {
       if (e.key === "menugo_cart") {
         try {
           const raw = e.newValue;
           setCartCount(
-            raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0,
+            raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0
           );
         } catch (err) {
           setCartCount(0);
@@ -128,7 +160,7 @@ const MenuPage = () => {
         try {
           const raw = e.newValue;
           setCartCount(
-            raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0,
+            raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0
           );
         } catch (err) {
           // ignore
@@ -152,16 +184,17 @@ const MenuPage = () => {
     }
   }, []);
 
-  const filteredItems =
-    activeCategory === "ALL"
-      ? menuItems
-      : menuItems.filter((item) => {
-          const categoryName =
-            typeof item.category === "string" ? item.category : item.categoryId;
-          return categoryName?.toString().toUpperCase() === activeCategory;
-        });
+  // FIXED: Filter items based on active category
+  const filteredItems = menuItems.filter((item) => {
+    if (activeCategory === "ALL") return true;
+    // Compare by category ID (which is a string like "1", "2", etc.)
+    return item.categoryId === activeCategory;
+  });
 
-  // Inline Floating Cart Button
+  console.log("Active Category:", activeCategory);
+  console.log("Filtered Items Count:", filteredItems.length);
+  console.log("Total Menu Items:", menuItems.length);
+
   const FloatingCartButton = () => {
     const count = getCartCount();
     const total = getCartTotal();
@@ -179,7 +212,7 @@ const MenuPage = () => {
         }}
         className="fixed bottom-24 right-6 md:right-12 z-50 flex items-center gap-3 px-6 py-4 bg-black text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all"
       >
-        <span className="material-symbols-outlined"></span>
+        <span className="material-symbols-outlined">shopping_bag</span>
         <span className="font-button text-button uppercase tracking-widest">
           Orders ({count}) · ${total.toFixed(2)}
         </span>
@@ -236,14 +269,20 @@ const MenuPage = () => {
           className="animate-fade-in-down stagger-2"
         />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredItems.map((item, index) => (
-            <MenuItemCard
-              key={item.id}
-              item={item}
-              onAddToCart={addToCart}
-              className={`animate-fade-in-up stagger-${Math.min(index + 3, 6)}`}
-            />
-          ))}
+          {filteredItems.length > 0 ? (
+            filteredItems.map((item, index) => (
+              <MenuItemCard
+                key={item.id}
+                item={item}
+                onAddToCart={addToCart}
+                className={`animate-fade-in-up stagger-${Math.min(index + 3, 6)}`}
+              />
+            ))
+          ) : (
+            <div className="col-span-full text-center text-zinc-500 py-12">
+              No items found in this category
+            </div>
+          )}
         </div>
         <FeedbackSection className="animate-fade-in-up stagger-6" />
       </main>

@@ -1,33 +1,38 @@
 import { API_BASE_URL } from "../env";
 
-const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 300) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 const customerAuth = {
-  // Get restaurant by ID for customer isolation
+  // =========================================
+  // GET RESTAURANT BY ID
+  // =========================================
   async getRestaurantById(restaurantId) {
     try {
       await delay();
 
-      const response = await fetch(`${API_BASE_URL}/restaurants`);
-      const restaurants = await response.json();
+      const response = await fetch(
+        `${API_BASE_URL}/restaurants/${restaurantId}`,
+      );
 
-      const restaurant = restaurants.find((r) => r.id === restaurantId);
-
-      if (restaurant) {
-        return {
-          success: true,
-          data: restaurant,
-          error: null,
-        };
-      } else {
+      if (!response.ok) {
         return {
           success: false,
           data: null,
           error: "Restaurant not found",
         };
       }
+
+      const restaurant = await response.json();
+
+      return {
+        success: true,
+        data: restaurant,
+        error: null,
+      };
     } catch (error) {
       console.error("Get restaurant error:", error);
+
       return {
         success: false,
         data: null,
@@ -36,25 +41,29 @@ const customerAuth = {
     }
   },
 
-  // Get restaurant menu items for specific restaurant
+  // =========================================
+  // GET RESTAURANT MENU
+  // =========================================
   async getRestaurantMenu(restaurantId) {
     try {
       await delay();
 
-      const [restaurantsResponse, menuItemsResponse, categoriesResponse] =
-        await Promise.all([
-          fetch(`${API_BASE_URL}/restaurants`),
-          fetch(`${API_BASE_URL}/menuItems`),
-          fetch(`${API_BASE_URL}/categories`),
-        ]);
+      const [
+        restaurantResponse,
+        categoriesResponse,
+        menuItemsResponse,
+      ] = await Promise.all([
+        fetch(`${API_BASE_URL}/restaurants/${restaurantId}`),
 
-      const restaurants = await restaurantsResponse.json();
-      const menuItems = await menuItemsResponse.json();
-      const categories = await categoriesResponse.json();
+        fetch(
+          `${API_BASE_URL}/categories?restaurant_id=${restaurantId}`,
+        ),
 
-      // Verify restaurant exists
-      const restaurant = restaurants.find((r) => r.id === restaurantId);
-      if (!restaurant) {
+        fetch(`${API_BASE_URL}/menu_items`),
+      ]);
+
+      // Restaurant validation
+      if (!restaurantResponse.ok) {
         return {
           success: false,
           data: null,
@@ -62,33 +71,45 @@ const customerAuth = {
         };
       }
 
-      // Filter menu items and categories for this restaurant
-      const restaurantMenuItems = menuItems.filter(
-        (item) => item.restaurantId === restaurantId,
-      );
-      const restaurantCategories = categories.filter(
-        (cat) => cat.restaurantId === restaurantId,
+      const restaurant = await restaurantResponse.json();
+
+      const categories = await categoriesResponse.json();
+
+      const menuItems = await menuItemsResponse.json();
+
+      // Get category IDs
+      const categoryIds = categories.map((cat) => cat.id);
+
+      // Filter menu items belonging to restaurant categories
+      const restaurantMenuItems = menuItems.filter((item) =>
+        categoryIds.includes(item.category_id),
       );
 
       // Group menu items by category
-      const menuWithCategories = restaurantCategories.map((category) => ({
+      const menuWithCategories = categories.map((category) => ({
         ...category,
+
         items: restaurantMenuItems.filter(
-          (item) => item.categoryId === category.id,
+          (item) => item.category_id === category.id,
         ),
       }));
 
       return {
         success: true,
+
         data: {
           restaurant,
+
           categories: menuWithCategories,
+
           allItems: restaurantMenuItems,
         },
+
         error: null,
       };
     } catch (error) {
       console.error("Get restaurant menu error:", error);
+
       return {
         success: false,
         data: null,
@@ -97,17 +118,20 @@ const customerAuth = {
     }
   },
 
-  // Get restaurant location for specific restaurant
+  // =========================================
+  // GET RESTAURANT LOCATION
+  // =========================================
   async getRestaurantLocation(restaurantId) {
     try {
       await delay();
 
-      const response = await fetch(`${API_BASE_URL}/restaurantLocations`);
+      const response = await fetch(
+        `${API_BASE_URL}/restaurant_locations?restaurant_id=${restaurantId}`,
+      );
+
       const locations = await response.json();
 
-      const location = locations.find(
-        (loc) => loc.restaurantId === restaurantId,
-      );
+      const location = locations[0];
 
       if (location) {
         return {
@@ -115,15 +139,16 @@ const customerAuth = {
           data: location,
           error: null,
         };
-      } else {
-        return {
-          success: false,
-          data: null,
-          error: "Restaurant location not found",
-        };
       }
+
+      return {
+        success: false,
+        data: null,
+        error: "Restaurant location not found",
+      };
     } catch (error) {
       console.error("Get restaurant location error:", error);
+
       return {
         success: false,
         data: null,
@@ -132,49 +157,69 @@ const customerAuth = {
     }
   },
 
-  // Validate restaurant access for customer
-  canAccessRestaurant(restaurantId) {
-    // Customers can access any active restaurant
-    return this.getRestaurantById(restaurantId).then((result) => {
-      return result.success && result.data.status === "active";
-    });
+  // =========================================
+  // CHECK CUSTOMER ACCESS
+  // =========================================
+  async canAccessRestaurant(restaurantId) {
+    try {
+      const result = await this.getRestaurantById(restaurantId);
+
+      return (
+        result.success &&
+        result.data.status === "active"
+      );
+    } catch (error) {
+      console.error("Restaurant access error:", error);
+      return false;
+    }
   },
 
-  // Get restaurant settings for customer view
+  // =========================================
+  // GET RESTAURANT SETTINGS
+  // =========================================
   async getRestaurantSettings(restaurantId) {
     try {
       await delay();
 
-      const response = await fetch(`${API_BASE_URL}/restaurantSettings`);
-      const settings = await response.json();
-
-      const restaurantSettings = settings.find(
-        (setting) => setting.restaurantId === restaurantId,
+      const response = await fetch(
+        `${API_BASE_URL}/restaurant_settings?restaurant_id=${restaurantId}`,
       );
 
-      if (restaurantSettings) {
+      const settings = await response.json();
+
+      const restaurantSettings = settings[0];
+
+      // Default fallback settings
+      if (!restaurantSettings) {
         return {
           success: true,
-          data: restaurantSettings,
-          error: null,
-        };
-      } else {
-        // Return default settings if none found
-        return {
-          success: true,
+
           data: {
+            restaurant_id: restaurantId,
+
             currency: "ETB",
+
             language: "en",
-            theme: "light",
-            taxPercentage: 15,
-            serviceCharge: 10,
-            allowOnlineOrders: true,
+
+            allow_online_orders: true,
+
+            service_charge: 10,
+
+            tax_percentage: 15,
           },
+
           error: null,
         };
       }
+
+      return {
+        success: true,
+        data: restaurantSettings,
+        error: null,
+      };
     } catch (error) {
       console.error("Get restaurant settings error:", error);
+
       return {
         success: false,
         data: null,
@@ -183,17 +228,34 @@ const customerAuth = {
     }
   },
 
-  // Check if restaurant is accepting orders
+  // =========================================
+  // CHECK ORDER AVAILABILITY
+  // =========================================
   async isRestaurantAcceptingOrders(restaurantId) {
     try {
-      const result = await this.getRestaurantById(restaurantId);
-      if (result.success) {
-        const settingsResult = await this.getRestaurantSettings(restaurantId);
-        return settingsResult.success && settingsResult.data.allowOnlineOrders;
+      const restaurantResult =
+        await this.getRestaurantById(restaurantId);
+
+      if (!restaurantResult.success) {
+        return false;
       }
-      return false;
+
+      // Restaurant must be active
+      if (restaurantResult.data.status !== "active") {
+        return false;
+      }
+
+      const settingsResult =
+        await this.getRestaurantSettings(restaurantId);
+
+      if (!settingsResult.success) {
+        return false;
+      }
+
+      return settingsResult.data.allow_online_orders;
     } catch (error) {
       console.error("Check restaurant orders error:", error);
+
       return false;
     }
   },

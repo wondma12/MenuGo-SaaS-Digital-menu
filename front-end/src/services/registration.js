@@ -1,13 +1,19 @@
 import { API_BASE_URL } from "../env";
 
-const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 300) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 const registrationService = {
+  // =========================================
+  // SUBMIT RESTAURANT REGISTRATION
+  // =========================================
   async submitRegistration(registrationData) {
     try {
       await delay();
 
-      // Get current data from JSON server
+      // =========================================
+      // FETCH EXISTING DATA
+      // =========================================
       const [
         usersResponse,
         restaurantsResponse,
@@ -16,19 +22,31 @@ const registrationService = {
       ] = await Promise.all([
         fetch(`${API_BASE_URL}/users`),
         fetch(`${API_BASE_URL}/restaurants`),
-        fetch(`${API_BASE_URL}/restaurantLocations`),
-        fetch(`${API_BASE_URL}/restaurantVerifications`),
+        fetch(`${API_BASE_URL}/restaurant_locations`),
+        fetch(`${API_BASE_URL}/restaurant_verifications`),
       ]);
+
+      if (
+        !usersResponse.ok ||
+        !restaurantsResponse.ok ||
+        !locationsResponse.ok ||
+        !verificationsResponse.ok
+      ) {
+        throw new Error("Failed to fetch existing data");
+      }
 
       const users = await usersResponse.json();
       const restaurants = await restaurantsResponse.json();
       const locations = await locationsResponse.json();
       const verifications = await verificationsResponse.json();
 
-      // Check if email already exists
+      // =========================================
+      // CHECK DUPLICATE EMAIL
+      // =========================================
       const existingUser = users.find(
-        (u) => u.email === registrationData.email,
+        (user) => user.email === registrationData.email
       );
+
       if (existingUser) {
         return {
           success: false,
@@ -37,120 +55,159 @@ const registrationService = {
         };
       }
 
-      // Generate new IDs
-      const newUserId = Math.max(...users.map((u) => u.id), 0) + 1;
-      const newRestaurantId = Math.max(...restaurants.map((r) => r.id), 0) + 1;
-      const newLocationId = Math.max(...locations.map((l) => l.id), 0) + 1;
-      const newVerificationId =
-        Math.max(...verifications.map((v) => v.id), 0) + 1;
+      // =========================================
+      // GENERATE IDS
+      // =========================================
+      const newUserId =
+        Math.max(0, ...users.map((u) => Number(u.id))) + 1;
 
-      // Create user object with restaurant_admin role
+      const newRestaurantId =
+        Math.max(0, ...restaurants.map((r) => Number(r.id))) + 1;
+
+      const newLocationId =
+        Math.max(0, ...locations.map((l) => Number(l.id))) + 1;
+
+      const newVerificationId =
+        Math.max(0, ...verifications.map((v) => Number(v.id))) + 1;
+
+      // =========================================
+      // CREATE USER
+      // =========================================
       const newUser = {
         id: newUserId,
-        name: registrationData.fullName,
+        name: registrationData.owner_name,
         email: registrationData.email,
-        phone: registrationData.phoneNumber,
-        password: registrationData.password, // In real app, this would be hashed
+        phone: registrationData.phone,
+        password: registrationData.password,
         role: "restaurant_admin",
-        restaurantId: newRestaurantId,
-        createdAt: new Date().toISOString(),
+        restaurant_id: newRestaurantId,
+        created_at: new Date().toISOString(),
       };
 
-      // Create restaurant object with PENDING status
+      // =========================================
+      // CREATE RESTAURANT
+      // =========================================
       const newRestaurant = {
         id: newRestaurantId,
-        name: registrationData.restaurantName,
-        email: registrationData.businessEmail,
-        phone: registrationData.businessPhone,
+        name: registrationData.restaurant_name,
+        email: registrationData.business_email,
+        phone: registrationData.business_phone,
+        description: registrationData.description || "",
         logo: registrationData.logo || "",
-        slogan: registrationData.slogan || "",
         banner: registrationData.banner || "",
-        status: "pending", // CRITICAL: New registrations start as pending
-        ownerId: newUserId,
-        createdAt: new Date().toISOString(),
+        qr_code: registrationData.qr_code || "",
+        status: "pending",
+        owner_id: newUserId,
+        created_at: new Date().toISOString(),
       };
 
-      // Create restaurant location
+      // =========================================
+      // CREATE LOCATION
+      // =========================================
       const newLocation = {
         id: newLocationId,
-        restaurantId: newRestaurantId,
+        restaurant_id: newRestaurantId,
         country: registrationData.country,
         city: registrationData.city,
-        subCity: registrationData.subCity,
-        streetAddress: registrationData.streetAddress,
-        mapLink: registrationData.googleMapsLink,
+        sub_city: registrationData.sub_city,
+        street_address: registrationData.street_address,
+        map_link: registrationData.map_link,
       };
 
-      // Create restaurant verification with PENDING status
+      // =========================================
+      // CREATE VERIFICATION
+      // =========================================
       const newVerification = {
         id: newVerificationId,
-        restaurantId: newRestaurantId,
-        ownerName: registrationData.ownerName,
-        businessLicenseNumber: registrationData.businessLicenseNumber,
-        tinNumber: registrationData.tinNumber,
-        businessLicenseDocument:
-          registrationData.businessLicenseDocument?.name || "license.pdf",
-        documentOfLegalRepresentative: "legal_rep.pdf", // Default for now
-        verificationStatus: "pending", // CRITICAL: Starts as pending
-        reviewedBy: null,
-        reviewedAt: null,
+        restaurant_id: newRestaurantId,
+        owner_name: registrationData.owner_name,
+        business_license_number:
+          registrationData.business_license_number,
+
+        tin_number: registrationData.tin_number,
+
+        business_license_document:
+          registrationData.business_license_document || "",
+
+        legal_document:
+          registrationData.legal_document || "",
+
+        verification_status: "pending",
+
+        reviewed_by: null,
+        reviewed_at: null,
       };
 
-      // Save all data to JSON server
+      // =========================================
+      // SAVE DATA
+      // =========================================
       const [
-        userSaveResponse,
-        restaurantSaveResponse,
-        locationSaveResponse,
-        verificationSaveResponse,
+        userSave,
+        restaurantSave,
+        locationSave,
+        verificationSave,
       ] = await Promise.all([
         fetch(`${API_BASE_URL}/users`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(newUser),
         }),
+
         fetch(`${API_BASE_URL}/restaurants`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(newRestaurant),
         }),
-        fetch(`${API_BASE_URL}/restaurantLocations`, {
+
+        fetch(`${API_BASE_URL}/restaurant_locations`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(newLocation),
         }),
-        fetch(`${API_BASE_URL}/restaurantVerifications`, {
+
+        fetch(`${API_BASE_URL}/restaurant_verifications`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(newVerification),
         }),
       ]);
 
-      // Check if all saves were successful
-      const allSuccessful = [
-        userSaveResponse.ok,
-        restaurantSaveResponse.ok,
-        locationSaveResponse.ok,
-        verificationSaveResponse.ok,
-      ].every(Boolean);
+      const allSaved =
+        userSave.ok &&
+        restaurantSave.ok &&
+        locationSave.ok &&
+        verificationSave.ok;
 
-      if (allSuccessful) {
-        return {
-          success: true,
-          data: {
-            user: { ...newUser, password: undefined }, // Remove password from response
-            restaurant: newRestaurant,
-            location: newLocation,
-            verification: newVerification,
-            message:
-              "Registration submitted successfully! Your application is now pending review.",
-          },
-          error: null,
-        };
-      } else {
-        throw new Error("Failed to save registration data");
+      if (!allSaved) {
+        throw new Error("Failed to save registration");
       }
+
+      // REMOVE PASSWORD FROM RESPONSE
+      const { password: _, ...safeUser } = newUser;
+
+      return {
+        success: true,
+        data: {
+          user: safeUser,
+          restaurant: newRestaurant,
+          location: newLocation,
+          verification: newVerification,
+          message:
+            "Restaurant registration submitted successfully.",
+        },
+        error: null,
+      };
     } catch (error) {
       console.error("Registration error:", error);
+
       return {
         success: false,
         data: null,
@@ -159,104 +216,149 @@ const registrationService = {
     }
   },
 
+  // =========================================
+  // GET PENDING REGISTRATIONS
+  // =========================================
   async getPendingRegistrations() {
     try {
       await delay();
 
-      const [restaurantsResponse, verificationsResponse, usersResponse] =
-        await Promise.all([
-          fetch(`${API_BASE_URL}/restaurants`),
-          fetch(`${API_BASE_URL}/restaurantVerifications`),
-          fetch(`${API_BASE_URL}/users`),
-        ]);
+      const [
+        restaurantsResponse,
+        verificationsResponse,
+        usersResponse,
+        locationsResponse,
+      ] = await Promise.all([
+        fetch(`${API_BASE_URL}/restaurants`),
+        fetch(`${API_BASE_URL}/restaurant_verifications`),
+        fetch(`${API_BASE_URL}/users`),
+        fetch(`${API_BASE_URL}/restaurant_locations`),
+      ]);
 
       const restaurants = await restaurantsResponse.json();
       const verifications = await verificationsResponse.json();
       const users = await usersResponse.json();
+      const locations = await locationsResponse.json();
 
-      // Get all pending restaurants with their verification and user data
-      const pendingRegistrations = restaurants
-        .filter((restaurant) => restaurant.status === "pending")
+      const pendingRestaurants = restaurants
+        .filter(
+          (restaurant) => restaurant.status === "pending"
+        )
         .map((restaurant) => {
           const verification = verifications.find(
-            (v) => v.restaurantId === restaurant.id,
+            (v) =>
+              Number(v.restaurant_id) ===
+              Number(restaurant.id)
           );
-          const user = users.find((u) => u.id === restaurant.ownerId);
+
+          const owner = users.find(
+            (u) =>
+              Number(u.id) ===
+              Number(restaurant.owner_id)
+          );
+
+          const location = locations.find(
+            (l) =>
+              Number(l.restaurant_id) ===
+              Number(restaurant.id)
+          );
 
           return {
             ...restaurant,
             verification,
-            owner: user ? { ...user, password: undefined } : null,
+            owner,
+            location,
           };
         });
 
       return {
         success: true,
-        data: pendingRegistrations,
+        data: pendingRestaurants,
         error: null,
       };
     } catch (error) {
-      console.error("Error fetching pending registrations:", error);
+      console.error(
+        "Pending registration fetch error:",
+        error
+      );
+
       return {
         success: false,
         data: [],
-        error: "Failed to fetch pending registrations",
+        error: "Failed to fetch registrations",
       };
     }
   },
 
-  async approveRegistration(restaurantId, reviewedBy) {
+  // =========================================
+  // APPROVE REGISTRATION
+  // =========================================
+  async approveRegistration(
+    restaurantId,
+    platformAdminId
+  ) {
     try {
       await delay();
 
-      // Update restaurant status to active
+      // UPDATE RESTAURANT
       const restaurantResponse = await fetch(
         `${API_BASE_URL}/restaurants/${restaurantId}`,
         {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             status: "active",
-            updatedAt: new Date().toISOString(),
           }),
-        },
+        }
       );
 
-      // Update verification status
-      const verificationsResponse = await fetch(
-        `${API_BASE_URL}/restaurantVerifications`,
+      // GET VERIFICATION
+      const verificationResponse = await fetch(
+        `${API_BASE_URL}/restaurant_verifications`
       );
-      const verifications = await verificationsResponse.json();
+
+      const verifications =
+        await verificationResponse.json();
+
       const verification = verifications.find(
-        (v) => v.restaurantId === restaurantId,
+        (v) =>
+          Number(v.restaurant_id) ===
+          Number(restaurantId)
       );
 
+      // UPDATE VERIFICATION
       if (verification) {
         await fetch(
-          `${API_BASE_URL}/restaurantVerifications/${verification.id}`,
+          `${API_BASE_URL}/restaurant_verifications/${verification.id}`,
           {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({
-              verificationStatus: "approved",
-              reviewedBy: reviewedBy,
-              reviewedAt: new Date().toISOString(),
+              verification_status: "approved",
+              reviewed_by: platformAdminId,
+              reviewed_at: new Date().toISOString(),
             }),
-          },
+          }
         );
       }
 
-      const success = restaurantResponse.ok;
-
       return {
-        success,
-        data: success
-          ? { message: "Registration approved successfully" }
-          : null,
-        error: success ? null : "Failed to approve registration",
+        success: restaurantResponse.ok,
+        data: {
+          message:
+            "Restaurant approved successfully",
+        },
+        error: restaurantResponse.ok
+          ? null
+          : "Approval failed",
       };
     } catch (error) {
-      console.error("Error approving registration:", error);
+      console.error("Approval error:", error);
+
       return {
         success: false,
         data: null,
@@ -265,63 +367,77 @@ const registrationService = {
     }
   },
 
+  // =========================================
+  // REJECT REGISTRATION
+  // =========================================
   async rejectRegistration(
     restaurantId,
-    reviewedBy,
-    reason = "Rejected by admin",
+    platformAdminId,
+    reason = "Rejected by platform admin"
   ) {
     try {
       await delay();
 
-      // Update restaurant status to suspended/rejected
+      // UPDATE RESTAURANT STATUS
       const restaurantResponse = await fetch(
         `${API_BASE_URL}/restaurants/${restaurantId}`,
         {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             status: "suspended",
-            updatedAt: new Date().toISOString(),
           }),
-        },
+        }
       );
 
-      // Update verification status
-      const verificationsResponse = await fetch(
-        `${API_BASE_URL}/restaurantVerifications`,
+      // GET VERIFICATION
+      const verificationResponse = await fetch(
+        `${API_BASE_URL}/restaurant_verifications`
       );
-      const verifications = await verificationsResponse.json();
+
+      const verifications =
+        await verificationResponse.json();
+
       const verification = verifications.find(
-        (v) => v.restaurantId === restaurantId,
+        (v) =>
+          Number(v.restaurant_id) ===
+          Number(restaurantId)
       );
 
+      // UPDATE VERIFICATION
       if (verification) {
         await fetch(
-          `${API_BASE_URL}/restaurantVerifications/${verification.id}`,
+          `${API_BASE_URL}/restaurant_verifications/${verification.id}`,
           {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({
-              verificationStatus: "rejected",
-              reviewedBy: reviewedBy,
-              reviewedAt: new Date().toISOString(),
-              rejectionReason: reason,
+              verification_status: "rejected",
+              reviewed_by: platformAdminId,
+              reviewed_at: new Date().toISOString(),
+              rejection_reason: reason,
             }),
-          },
+          }
         );
       }
 
-      const success = restaurantResponse.ok;
-
       return {
-        success,
-        data: success
-          ? { message: "Registration rejected successfully" }
-          : null,
-        error: success ? null : "Failed to reject registration",
+        success: restaurantResponse.ok,
+        data: {
+          message:
+            "Restaurant rejected successfully",
+        },
+        error: restaurantResponse.ok
+          ? null
+          : "Rejection failed",
       };
     } catch (error) {
-      console.error("Error rejecting registration:", error);
+      console.error("Rejection error:", error);
+
       return {
         success: false,
         data: null,

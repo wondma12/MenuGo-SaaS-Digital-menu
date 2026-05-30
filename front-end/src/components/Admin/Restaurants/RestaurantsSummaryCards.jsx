@@ -1,6 +1,8 @@
 import React from "react";
 import SummaryCard from "../../ui/SummaryCard";
 import { TrendingUp, TrendingDown, Users } from "lucide-react";
+import registrationService from "../../../services/registration";
+
 
 const RestaurantsSummaryCards = () => {
   return (

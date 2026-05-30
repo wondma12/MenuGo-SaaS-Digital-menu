@@ -1,98 +1,178 @@
 import React, { useState, useEffect } from "react";
 import Table from "../../ui/Table";
-import { Coffee, BarChart3, UtensilsCrossed, Home } from "lucide-react";
-import { restaurantAPI } from "../../../services/admin";
+import { UtensilsCrossed } from "lucide-react";
+
 import registrationService from "../../../services/registration";
 
-const RecentRegistrations = ({ stats }) => {
+// IMPORTANT:
+// Rename your loading component to:
+// Loading.jsx or Loading.tsx
+// Then import like this:
+import {SkeletonDemo} from "../../layout/SkeletonDemo";
+
+const RecentRegistrations = () => {
   const [restaurants, setRestaurants] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch pending registrations from API
+  // =========================================
+  // FETCH RECENT PENDING REGISTRATIONS
+  // =========================================
   useEffect(() => {
     const fetchPendingRegistrations = async () => {
       try {
-        setLoading(true);
-        const result = await registrationService.getPendingRegistrations();
+        setIsLoading(true);
+
+        const result =
+          await registrationService.getPendingRegistrations();
 
         if (result.success) {
-          // Get only the 4 most recent pending registrations for dashboard
-          const recentRegistrations = result.data.slice(-4).reverse();
+          // LAST 4 RECENT PENDING REGISTRATIONS
+          const recentRegistrations = result.data
+            .slice(-4)
+            .reverse();
+
           setRestaurants(recentRegistrations);
         } else {
           setError(result.error);
         }
-      } catch (err) {
-        console.error("Error fetching pending registrations:", err);
-        setError("Failed to load recent registrations");
+      } catch (error) {
+        console.error(
+          "Error fetching registrations:",
+          error
+        );
+
+        setError(
+          "Failed to load recent registrations"
+        );
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     fetchPendingRegistrations();
   }, []);
 
-  if (loading) {
+  // =========================================
+  // LOADING
+  // =========================================
+  if (isLoading) {
+    return <SkeletonDemo />;
+  }
+
+  // =========================================
+  // ERROR
+  // =========================================
+  if (error) {
     return (
-      <section>
-        <div className="text-center text-zinc-500">
-          Loading recent registrations...
+      <section className="py-10">
+        <div className="text-center text-red-500 font-medium">
+          {error}
         </div>
       </section>
     );
   }
 
-  if (error) {
-    return (
-      <section>
-        <div className="text-center text-red-500">{error}</div>
-      </section>
-    );
-  }
-
+  // =========================================
+  // TABLE HEADERS
+  // =========================================
   const tableHeaders = [
-    { label: "Restaurant Name" },
+    { label: "Restaurant" },
     { label: "Location" },
-    { label: "Onboard Date" },
-    { label: "Tier" },
+    { label: "Owner" },
+    { label: "Created At" },
     { label: "Status", align: "right" },
   ];
 
+  // =========================================
+  // FORMAT DATE
+  // =========================================
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  // =========================================
+  // STATUS STYLE
+  // =========================================
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "pending":
+        return "text-yellow-600";
+
+      case "active":
+        return "text-green-600";
+
+      case "suspended":
+        return "text-red-600";
+
+      default:
+        return "text-zinc-600";
+    }
+  };
+
+  // =========================================
+  // TABLE ROW
+  // =========================================
   const renderTableRow = (restaurant, index) => (
-    <tr key={index} className="hover:bg-zinc-50 transition-colors">
-      <td className="px-8 py-6">
+    <tr
+      key={index}
+      className="border-b border-zinc-100 hover:bg-zinc-50 transition-colors"
+    >
+      {/* RESTAURANT */}
+      <td className="px-6 py-5">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-zinc-100 flex items-center justify-center rounded">
-            <UtensilsCrossed className="text-zinc-400 w-5 h-5" />
+          <div className="w-11 h-11 rounded-lg bg-zinc-100 flex items-center justify-center">
+            <UtensilsCrossed className="w-5 h-5 text-zinc-500" />
           </div>
+
           <div>
-            <p className="font-bold text-sm tracking-tight">
+            <p className="font-semibold text-sm text-zinc-900">
               {restaurant.name}
             </p>
-            <p className="text-[10px] text-zinc-400 font-medium">
-              {restaurant.type}
+
+            <p className="text-xs text-zinc-500">
+              {restaurant.email}
             </p>
           </div>
         </div>
       </td>
-      <td className="px-8 py-6 text-sm text-zinc-600">{restaurant.location}</td>
-      <td className="px-8 py-6 text-sm text-zinc-600">
-        {restaurant.onboardDate}
+
+      {/* LOCATION */}
+      <td className="px-6 py-5 text-sm text-zinc-600">
+        {restaurant.location
+          ? `${restaurant.location.city}, ${restaurant.location.country}`
+          : "-"}
       </td>
-      <td className="px-8 py-6">
-        <span className="px-3 py-1 bg-zinc-100 text-[10px] font-black uppercase tracking-tighter rounded-full">
-          {restaurant.tier}
-        </span>
+
+      {/* OWNER */}
+      <td className="px-6 py-5 text-sm text-zinc-600">
+        {restaurant.owner?.name || "-"}
       </td>
-      <td className="px-8 py-6 text-right">
+
+      {/* CREATED AT */}
+      <td className="px-6 py-5 text-sm text-zinc-600">
+        {formatDate(restaurant.created_at)}
+      </td>
+
+      {/* STATUS */}
+      <td className="px-6 py-5 text-right">
         <span
-          className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-${restaurant.statusColor}-600`}
+          className={`inline-flex items-center gap-2 text-xs font-semibold capitalize ${getStatusStyle(
+            restaurant.status
+          )}`}
         >
           <span
-            className={`w-1.5 h-1.5 rounded-full bg-${restaurant.statusColor}-600`}
-          ></span>
+            className={`w-2 h-2 rounded-full ${
+              restaurant.status === "pending"
+                ? "bg-yellow-500"
+                : restaurant.status === "active"
+                ? "bg-green-500"
+                : "bg-red-500"
+            }`}
+          />
+
           {restaurant.status}
         </span>
       </td>
@@ -100,20 +180,26 @@ const RecentRegistrations = ({ stats }) => {
   );
 
   return (
-    <section>
+    <section className="w-full">
+      {/* HEADER */}
       <div className="flex items-end justify-between mb-8">
         <div>
-          <h3 className="font-h2 text-[1.5rem] font-bold uppercase tracking-tight">
+          <h3 className="text-2xl font-bold tracking-tight text-zinc-900">
             Recent Registrations
           </h3>
-          <p className="font-body-sm text-on-secondary-container mt-1">
-            Latest entities onboarded to the hospitality ecosystem.
+
+          <p className="text-sm text-zinc-500 mt-1">
+            Latest restaurants waiting for platform
+            approval.
           </p>
         </div>
-        <button className="px-6 py-2 border border-black text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-colors duration-200">
+
+        <button className="px-5 py-2 border border-black text-xs font-semibold uppercase tracking-wider hover:bg-black hover:text-white transition-all duration-200 rounded-md">
           View All
         </button>
       </div>
+
+      {/* TABLE */}
       <Table
         headers={tableHeaders}
         data={restaurants}

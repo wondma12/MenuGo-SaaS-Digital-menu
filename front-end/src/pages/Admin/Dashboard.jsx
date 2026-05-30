@@ -4,6 +4,7 @@ import TopHeader from "../../components/layout/TopHeader";
 import SummaryCards from "../../components/Admin/Dashboard/SummaryCards";
 import RecentRegistrations from "../../components/Admin/Dashboard/RecentRegistrations";
 import { adminAPI } from "../../services/admin";
+import { AdminDashboardSkeleton } from "../../components/layout/DashboardSkeleton";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -36,7 +37,7 @@ const AdminDashboard = () => {
         <main className="ml-64 pt-16 min-h-screen bg-background">
           <div className="max-w-[1200px] mx-auto p-12">
             <div className="text-center text-zinc-500">
-              Loading dashboard...
+             < AdminDashboardSkeleton />
             </div>
           </div>
         </main>

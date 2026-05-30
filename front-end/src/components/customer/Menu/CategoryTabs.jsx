@@ -1,12 +1,11 @@
+// Update CategoryTabs.js to properly handle the active category:
+
 import React from "react";
 import { Utensils, Coffee, Cake, Grid3X3 } from "lucide-react";
 
-const getCategoryIcon = (category) => {
-  const cat =
-    typeof category === "string"
-      ? category.toUpperCase()
-      : category.name?.toUpperCase() || "ALL";
-  switch (cat) {
+const getCategoryIcon = (categoryName) => {
+  const name = categoryName?.toUpperCase() || "ALL";
+  switch (name) {
     case "ALL":
       return <Grid3X3 className="w-4 h-4" />;
     case "FOOD":
@@ -22,29 +21,28 @@ const getCategoryIcon = (category) => {
 };
 
 const CategoryTabs = ({
-  categories = ["ALL", "DRINKS", "FOOD", "DESSERTS"],
+  categories = [],
   activeCategory,
   onCategoryChange,
 }) => {
   return (
     <nav className="sticky top-[55px] z-40 bg-background/80 backdrop-blur-md py-4 px-4 mb-lg flex gap-8 overflow-x-auto hide-scrollbar border-b border-outline-variant/30">
       {categories.map((cat) => {
-        const categoryName =
-          typeof cat === "string"
-            ? cat.toUpperCase()
-            : cat.name?.toUpperCase() || "ALL";
-        const isActive = activeCategory === categoryName;
+        // Handle both string and object categories
+        const categoryId = cat.id || cat;
+        const categoryName = cat.name || cat;
+        const isActive = activeCategory === categoryId;
+        
         return (
           <button
-            key={cat.id || cat}
-            onClick={() => onCategoryChange(categoryName)}
+            key={categoryId}
+            onClick={() => onCategoryChange(categoryId)}
             className={`relative flex items-center gap-2 font-label-caps text-label-caps uppercase whitespace-nowrap pb-2 transition-all group
-    ${isActive ? "text-black" : "text-secondary hover:text-black"}
-    
-    after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-black 
-    after:transition-transform after:duration-300 after:ease-in-out
-    ${isActive ? "after:scale-x-100" : "after:scale-x-0 hover:after:scale-x-100"}
-  `}
+              ${isActive ? "text-black" : "text-secondary hover:text-black"}
+              after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-black 
+              after:transition-transform after:duration-300 after:ease-in-out
+              ${isActive ? "after:scale-x-100" : "after:scale-x-0 hover:after:scale-x-100"}
+            `}
           >
             <span
               className={`transition-colors duration-300 ${
@@ -55,7 +53,7 @@ const CategoryTabs = ({
             >
               {getCategoryIcon(categoryName)}
             </span>
-            {cat.name || cat}
+            {categoryName}
           </button>
         );
       })}

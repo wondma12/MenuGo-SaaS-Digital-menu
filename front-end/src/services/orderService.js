@@ -1,65 +1,73 @@
 import { API_BASE_URL } from "../env";
 
-// Helper to generate new ID
-const generateId = () => `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
-
-const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 300) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 export const orderService = {
-  // Get all orders
-  getAllOrders: async () => {
+  // ==========================================
+  // GET ALL ORDERS
+  // ==========================================
+  async getAllOrders() {
     try {
       await delay();
+
       const response = await fetch(`${API_BASE_URL}/orders`);
-      const orders = await response.json();
-      return orders;
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch orders");
+      }
+
+      return await response.json();
     } catch (error) {
       console.error("Error fetching orders:", error);
       return [];
     }
   },
 
-  // Update order status
-  updateOrderStatus: async (orderId, newStatus) => {
+  // ==========================================
+  // GET ORDERS BY RESTAURANT
+  // ==========================================
+  async getOrdersByRestaurant(restaurantId) {
     try {
       await delay();
-      const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
+
+      const response = await fetch(
+        `${API_BASE_URL}/orders?restaurant_id=${restaurantId}`
+      );
+
       if (!response.ok) {
-        throw new Error("Order not found");
+        throw new Error("Failed to fetch restaurant orders");
       }
-      const updatedOrder = await response.json();
-      return updatedOrder;
+
+      return await response.json();
     } catch (error) {
-      console.error("Error updating order status:", error);
-      throw error;
+      console.error("Error fetching restaurant orders:", error);
+      return [];
     }
   },
 
-  // Create new order
-  createOrder: async (orderData) => {
+  // ==========================================
+  // CREATE ORDER
+  // ==========================================
+  async createOrder(orderData) {
     try {
       await delay();
-      // First get existing orders to determine next ID
+
       const ordersResponse = await fetch(`${API_BASE_URL}/orders`);
-      const existingOrders = await ordersResponse.json();
-      const nextId = Math.max(...existingOrders.map((o) => o.id || 0), 0) + 1;
+      const orders = await ordersResponse.json();
+
+      const newOrderId =
+        Math.max(...orders.map((o) => Number(o.id)), 0) + 1;
 
       const newOrder = {
-        id: nextId,
-        orderCode: generateId(),
-        ...orderData,
-        time: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        createdAt: new Date().toISOString(),
+        id: newOrderId,
+        restaurant_id: orderData.restaurant_id,
+        table_number: orderData.table_number,
+        order_type: orderData.order_type,
+        status: "pending",
+        created_at: new Date().toISOString(),
       };
+
       const response = await fetch(`${API_BASE_URL}/orders`, {
         method: "POST",
         headers: {
@@ -67,7 +75,44 @@ export const orderService = {
         },
         body: JSON.stringify(newOrder),
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to create order");
+      }
+
       const createdOrder = await response.json();
+
+      // Create order items
+      if (
+        orderData.items &&
+        Array.isArray(orderData.items) &&
+        orderData.items.length
+      ) {
+        const orderItemsResponse = await fetch(
+          `${API_BASE_URL}/orderItems`
+        );
+
+        const existingItems = await orderItemsResponse.json();
+
+        let nextItemId =
+          Math.max(...existingItems.map((i) => Number(i.id)), 0) + 1;
+
+        for (const item of orderData.items) {
+          await fetch(`${API_BASE_URL}/orderItems`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: nextItemId++,
+              order_id: createdOrder.id,
+              menu_item_id: item.menu_item_id,
+              quantity: item.quantity,
+            }),
+          });
+        }
+      }
+
       return createdOrder;
     } catch (error) {
       console.error("Error creating order:", error);
@@ -75,59 +120,136 @@ export const orderService = {
     }
   },
 
-  // Get statistics (pending, preparing counts etc.)
-  getStats: async () => {
+  // ==========================================
+  // UPDATE ORDER STATUS
+  // ==========================================
+  async updateOrderStatus(orderId, status) {
     try {
       await delay();
-      const response = await fetch(`${API_BASE_URL}/orders`);
-      const orders = await response.json();
-      const pending = orders.filter((o) => o.status === "pending").length;
-      const preparing = orders.filter((o) => o.status === "preparing").length;
-      return { pending, preparing, avgTime: "18m", efficiency: "94%" };
+
+      const response = await fetch(
+        `${API_BASE_URL}/orders/${orderId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Order not found");
+      }
+
+      return await response.json();
     } catch (error) {
-      console.error("Error fetching order stats:", error);
-      return { pending: 0, preparing: 0, avgTime: "0m", efficiency: "0%" };
+      console.error("Error updating order status:", error);
+      throw error;
     }
   },
 
-  // Get all order items
-  getOrderItems: async () => {
+  // ==========================================
+  // GET ORDER ITEMS
+  // ==========================================
+  async getOrderItems() {
     try {
       await delay();
+
       const response = await fetch(`${API_BASE_URL}/orderItems`);
-      const orderItems = await response.json();
-      return orderItems;
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch order items");
+      }
+
+      return await response.json();
     } catch (error) {
       console.error("Error fetching order items:", error);
       return [];
     }
   },
 
-  // Get all menu items
-  getMenuItems: async () => {
+  // ==========================================
+  // GET MENU ITEMS
+  // ==========================================
+  async getMenuItems() {
     try {
       await delay();
+
       const response = await fetch(`${API_BASE_URL}/menuItems`);
-      const menuItems = await response.json();
-      return menuItems;
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch menu items");
+      }
+
+      return await response.json();
     } catch (error) {
       console.error("Error fetching menu items:", error);
       return [];
     }
   },
 
-  // Get complete order data with items and menu details
-  getAllOrdersWithDetails: async () => {
+  // ==========================================
+  // GET COMPLETE ORDER DETAILS
+  // ==========================================
+  async getAllOrdersWithDetails() {
     try {
       const [orders, orderItems, menuItems] = await Promise.all([
-        orderService.getAllOrders(),
-        orderService.getOrderItems(),
-        orderService.getMenuItems(),
+        this.getAllOrders(),
+        this.getOrderItems(),
+        this.getMenuItems(),
       ]);
-      return { orders, orderItems, menuItems };
+
+      return {
+        orders,
+        orderItems,
+        menuItems,
+      };
     } catch (error) {
       console.error("Error fetching complete order data:", error);
-      return { orders: [], orderItems: [], menuItems: [] };
+
+      return {
+        orders: [],
+        orderItems: [],
+        menuItems: [],
+      };
+    }
+  },
+
+  // ==========================================
+  // DASHBOARD STATS
+  // ==========================================
+  async getStats(restaurantId = null) {
+    try {
+      await delay();
+
+      let orders = [];
+
+      if (restaurantId) {
+        orders = await this.getOrdersByRestaurant(restaurantId);
+      } else {
+        orders = await this.getAllOrders();
+      }
+
+      return {
+        totalOrders: orders.length,
+        pending: orders.filter((o) => o.status === "pending").length,
+        verified: orders.filter((o) => o.status === "verified").length,
+        preparing: orders.filter((o) => o.status === "preparing").length,
+        served: orders.filter((o) => o.status === "served").length,
+      };
+    } catch (error) {
+      console.error("Error fetching order stats:", error);
+
+      return {
+        totalOrders: 0,
+        pending: 0,
+        verified: 0,
+        preparing: 0,
+        served: 0,
+      };
     }
   },
 };
