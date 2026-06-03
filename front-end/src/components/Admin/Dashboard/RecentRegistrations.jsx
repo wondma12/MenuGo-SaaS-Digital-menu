@@ -8,7 +8,6 @@ import registrationService from "../../../services/registration";
 // Rename your loading component to:
 // Loading.jsx or Loading.tsx
 // Then import like this:
-import {SkeletonDemo} from "../../layout/SkeletonDemo";
 
 const RecentRegistrations = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -57,7 +56,6 @@ const RecentRegistrations = () => {
   // LOADING
   // =========================================
   if (isLoading) {
-    return <SkeletonDemo />;
   }
 
   // =========================================

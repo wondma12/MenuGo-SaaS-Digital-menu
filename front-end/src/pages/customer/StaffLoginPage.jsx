@@ -189,7 +189,7 @@ const StaffLoginPage = () => {
           {/* Back to Menu Link */}
           <div className="text-center pt-6 border-t border-gray-200">
             <Link
-              to="/customer"
+              to="/customer/1"
               className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />

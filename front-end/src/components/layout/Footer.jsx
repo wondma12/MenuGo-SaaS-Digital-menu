@@ -13,7 +13,7 @@ const Footer = () => {
         </div>
         <div className="flex gap-6">
           <Link to="/privacy" className="font-['Inter'] text-xs font-light text-neutral-500 hover:text-black">Privacy Policy</Link>
-          <Link to="/staff-login" className="font-['Inter'] text-xs font-light text-neutral-900 underline">Staff Login</Link>
+          <Link to="/restaurant/1/staff-login" className="font-['Inter'] text-xs font-light text-neutral-900 underline">Staff Login</Link>
           <Link to="/support" className="font-['Inter'] text-xs font-light text-neutral-500 hover:text-black">Contact Support</Link>
         </div>
       </div>
