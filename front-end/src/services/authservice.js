@@ -154,7 +154,7 @@ const authService = {
 
     // Restaurant admin
     if (user.role === "restaurant_admin") {
-      return `/restaurant-admin/dashboard/${user.restaurant_id}`;
+      return `/Restaurant_admin/dashboard/${user.restaurant_id}`;
     }
 
     // Waiter

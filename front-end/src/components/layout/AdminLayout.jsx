@@ -1,12 +1,16 @@
-// components/layout/adminLayout.jsx
+// components/layout/AdminLayout.jsx
 import React from "react";
 import Sidebar from "./sidebar";
+import TopHeader from "./TopHeader";
 
 const AdminLayout = ({ role, children }) => {
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
       <Sidebar role={role} />
-      <main className="flex-1 p-4 overflow-y-auto">{children}</main>
+      <TopHeader role={role} title="Dashboard" />
+      <main className="ml-64 pt-16 min-h-screen bg-surface">
+        {children}
+      </main>
     </div>
   );
 };

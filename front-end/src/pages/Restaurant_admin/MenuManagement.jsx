@@ -1,9 +1,11 @@
 // src/pages/Restaurant_admin/MenuManagement.jsx
 import React, { useState, useMemo } from "react";
+import Sidebar from "../../components/layout/sidebar";
+import TopHeader from "../../components/layout/TopHeader";
 import MenuItemList from "../../components/Restaurant_admin/menu/MenuItemList";
 import CreateMenuItemModal from "../../components/Restaurant_admin/menu/CreateMenuItemModal";
 
-// Initial mock data with high-quality images matching the design
+// Initial mock data (keep as is - no changes needed)
 const INITIAL_ITEMS = [
   {
     id: 1,
@@ -12,8 +14,7 @@ const INITIAL_ITEMS = [
     category: "Main Course",
     price: 84.0,
     available: true,
-    imageUrl:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDH_f9EOD8f_YMbHl7quGMKEmzgZqONsROFtP66SOLTAiqX6piY5asfN_ASt1th4d-nPkPCgsntdUfpOK9GXCS3m1jrFfZ-YQotR8s0Xal0TYW4M0UiOWN9DzYI-DG47f9kHw8452sIPauF6L3twER4VlF1YPs8hFw5AJlxXgCcvDsHscz1MXHiWdkCGYDiZuV_MluQC4eJZFYvynbakYFeIWpnpW3XdwO09jSjF4BDCVytVI3J-u1IP738Ukr24uYzKRo7_rkT7CM",
+    imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuDH_f9EOD8f_YMbHl7quGMKEmzgZqONsROFtP66SOLTAiqX6piY5asfN_ASt1th4d-nPkPCgsntdUfpOK9GXCS3m1jrFfZ-YQotR8s0Xal0TYW4M0UiOWN9DzYI-DG47f9kHw8452sIPauF6L3twER4VlF1YPs8hFw5AJlxXgCcvDsHscz1MXHiWdkCGYDiZuV_MluQC4eJZFYvynbakYFeIWpnpW3XdwO09jSjF4BDCVytVI3J-u1IP738Ukr24uYzKRo7_rkT7CM",
     orderCount: 145,
     stock: null,
     margin: 65,
@@ -25,8 +26,7 @@ const INITIAL_ITEMS = [
     category: "Desserts",
     price: 18.0,
     available: true,
-    imageUrl:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAfanwlnLIHnPAh9fvzChXUe_ck18edcaG6zL-osgYe_vxxBnhYsyNu1k_LGQNM1fYDbF44G_ovIz8jP3ZgLMheK3uTNIH79w7hs-fSbbuzYGpxfCF49tZQlPBbxFfeX7cKo2SXI29cdGcqpUZXkamEgsdpuO31CO1ccd8qTemXdm6S613ltS1vQiYGSzmJitNoOksAAl0WuAnPV-SyH84t1LiDF_e8GlgUkVDzwiczEiuipzEN0cznnsMkeoGM1MaXSgiLox1y5FI",
+    imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAfanwlnLIHnPAh9fvzChXUe_ck18edcaG6zL-osgYe_vxxBnhYsyNu1k_LGQNM1fYDbF44G_ovIz8jP3ZgLMheK3uTNIH79w7hs-fSbbuzYGpxfCF49tZQlPBbxFfeX7cKo2SXI29cdGcqpUZXkamEgsdpuO31CO1ccd8qTemXdm6S613ltS1vQiYGSzmJitNoOksAAl0WuAnPV-SyH84t1LiDF_e8GlgUkVDzwiczEiuipzEN0cznnsMkeoGM1MaXSgiLox1y5FI",
     orderCount: 98,
     stock: null,
     margin: 82,
@@ -38,8 +38,7 @@ const INITIAL_ITEMS = [
     category: "Starters",
     price: 22.0,
     available: false,
-    imageUrl:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuArGqaS4vE9QI1Xo64QvoYQUVPqtgn2XPiAYfNn4ooetg8ge1uOfS5w4ZaaIcmI-KT6sGKYZ8FERMiSDsCSAOqFMbBhu-_FIC6XQ9PfKVvfGUOIhSGBA4BtiVh_jOuaNyffKSOD1txr-8WjhAJHSLUPDP7zD9-ywnT2jAmGqkFIRni6T427NjnSLkU2gO9_ZRSGoc3Y_kl49_AfBje3hMOSAIY6aLV0MlEdxky3w-SV4CkbD6pwMXocNXO8YocagcosE6LXclrzA68",
+    imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuArGqaS4vE9QI1Xo64QvoYQUVPqtgn2XPiAYfNn4ooetg8ge1uOfS5w4ZaaIcmI-KT6sGKYZ8FERMiSDsCSAOqFMbBhu-_FIC6XQ9PfKVvfGUOIhSGBA4BtiVh_jOuaNyffKSOD1txr-8WjhAJHSLUPDP7zD9-ywnT2jAmGqkFIRni6T427NjnSLkU2gO9_ZRSGoc3Y_kl49_AfBje3hMOSAIY6aLV0MlEdxky3w-SV4CkbD6pwMXocNXO8YocagcosE6LXclrzA68",
     orderCount: 34,
     stock: null,
     margin: 55,
@@ -51,8 +50,7 @@ const INITIAL_ITEMS = [
     category: "Pasta",
     price: 48.0,
     available: true,
-    imageUrl:
-      "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=100&h=100&fit=crop",
+    imageUrl: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=100&h=100&fit=crop",
     orderCount: 42,
     stock: 12,
     margin: 70,
@@ -64,8 +62,7 @@ const INITIAL_ITEMS = [
     category: "Starters",
     price: 24.0,
     available: true,
-    imageUrl:
-      "https://images.unsplash.com/photo-1617196034183-421b4917c92d?w=100&h=100&fit=crop",
+    imageUrl: "https://images.unsplash.com/photo-1617196034183-421b4917c92d?w=100&h=100&fit=crop",
     orderCount: 67,
     stock: null,
     margin: 60,
@@ -77,8 +74,7 @@ const INITIAL_ITEMS = [
     category: "Starters",
     price: 32.0,
     available: true,
-    imageUrl:
-      "https://images.unsplash.com/photo-1547592180-85f173990554?w=100&h=100&fit=crop",
+    imageUrl: "https://images.unsplash.com/photo-1547592180-85f173990554?w=100&h=100&fit=crop",
     orderCount: 53,
     stock: 8,
     margin: 68,
@@ -150,14 +146,12 @@ const MenuManagement = () => {
 
   const handleSaveItem = (itemData) => {
     if (editingItem) {
-      // Update existing item
       setItems(
         items.map((item) =>
           item.id === editingItem.id ? { ...itemData, id: item.id } : item,
         ),
       );
     } else {
-      // Add new item
       const newItem = {
         ...itemData,
         id: Date.now(),
@@ -175,88 +169,23 @@ const MenuManagement = () => {
     setCurrentPage(newPage);
   };
 
-  // Get unique categories for filter
   const categories = ["All", ...new Set(items.map((item) => item.category))];
 
   return (
-    <div className="min-h-screen bg-surface">
-      {/* SideNavBar */}
+    <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
 
-      {/* TopAppBar */}
-      <header className="sticky top-0 z-40 w-full border-b border-neutral-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-10 h-16">
-        <div className="flex items-center space-x-4">
-          <span className="font-h2 text-h2 text-black">Menu Management</span>
-        </div>
-        <div className="flex items-center space-x-6">
-          <div className="relative group">
-            <button
-              aria-label="Notifications"
-              title="Notifications"
-              className="p-2 rounded-sm hover:bg-neutral-100 transition-all duration-200 text-black"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h11z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M13.73 21a2 2 0 01-3.46 0"
-                />
-              </svg>
-            </button>
-          </div>
-          <div className="flex items-center space-x-3 cursor-pointer hover:bg-neutral-100 p-1 rounded-sm transition-all duration-200">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6 text-black"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="M16 11c1.657 0 3-1.567 3-3.5S17.657 4 16 4s-3 1.567-3 3.5S14.343 11 16 11z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="M4 20a8 8 0 0116 0"
-              />
-            </svg>
-            <span className="font-sans text-base font-semibold tracking-tight text-black">
-              Administrator
-            </span>
-          </div>
-        </div>
-      </header>
-      {/* Main Content */}
-      <div className="min-h-screen flex flex-col">
-        {/* TopAppBar */}
-
-        {/* Main Content Area */}
-        <main className="flex-1 p-8 max-w-[1200px] w-full mx-auto">
+      {/* Main Content - with ml-64 pt-16 for sidebar and header spacing */}
+      <main className=" min-h-screen bg-surface">
+        <div className="p-8 max-w-[1200px] w-full mx-auto">
           {/* Page Header Actions */}
           <div className="flex justify-between items-end mb-6">
             <div>
-              <h1 className="font-h1 text-h1 text-black">Menu Inventory</h1>
-              <p className="font-body-md text-secondary mt-1">
-                Manage your dishes, pricing, and availability across all
-                locations.
+              <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
+                Menu Inventory
               </p>
+              <h2 className="text-black text-5xl font-bold uppercase leading-none">
+                Manage your dishes
+              </h2>
             </div>
             <button
               onClick={handleAddItem}
@@ -305,7 +234,6 @@ const MenuManagement = () => {
           {/* Search & Filters */}
           <div className="mb-4 flex items-center space-x-4">
             <div className="relative flex-1">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"></span>
               <input
                 className="w-full pl-10 pr-4 py-2 border border-neutral-200 rounded-lg focus:border-black focus:ring-0 transition-colors font-body-sm text-on-surface placeholder:text-neutral-400"
                 placeholder="Search by item name or category..."
@@ -395,8 +323,8 @@ const MenuManagement = () => {
               </p>
             </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
 
       {/* Modal */}
       <CreateMenuItemModal
@@ -412,4 +340,4 @@ const MenuManagement = () => {
   );
 };
 
-export default MenuManagement;
+export default MenuManagement;  

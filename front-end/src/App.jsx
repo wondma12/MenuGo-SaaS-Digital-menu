@@ -2,23 +2,27 @@ import {
   Routes,
   Route,
   Navigate,
-} from "react-router-dom"; // Removed BrowserRouter as it's now in main.jsx
+} from "react-router-dom";
 
 // Layout
 import AdminLayout from "./components/layout/AdminLayout";
+
 // Auth Pages
 import Login from "./pages/auth/login/Login";
 import Signup from "./pages/auth/signup/Signup";
-// resturamat Admin Pages
+
+// Restaurant Admin Pages
 import DashboardPage from "./pages/Restaurant_admin/Dashboard";
 import MenuManagementPage from "./pages/Restaurant_admin/MenuManagement";
 import Restaurant_adminOrders from "./pages/Restaurant_admin/Orders";
 import StaffManagement from "./pages/Restaurant_admin/StaffManagement";
 import RestuarantSettings from "./pages/Restaurant_admin/Settings";
+
 // Waiter Routes
 import OrdersPage from "./pages/waiter/OrdersPage";
 import ActiveOrders from "./pages/waiter/ActiveOrders";
 import OrderForCustomer from "./pages/waiter/OrderForCustomer";
+
 // Platform Admin Pages
 import AdminDashboard from "./pages/Admin/Dashboard";
 import Restaurants from "./pages/Admin/Restaurants";
@@ -26,17 +30,19 @@ import RestaurantDetail from "./pages/Admin/RestaurantDetail";
 import Users from "./pages/Admin/Users";
 import Security from "./pages/Admin/Security";
 import Settings from "./pages/Admin/settings_clean";
-//customer
+
+// Customer
 import MenuPage from "./pages/customer/MenuPage";
 import SearchPage from "./pages/customer/SearchPage";
 import CartPage from "./pages/customer/CartPage";
 import StaffLoginPage from "./pages/customer/StaffLoginPage";
+
 // 404 Page
 import NotFound from "./components/layout/NotFound";
 
 function App() {
   return (
-    <Routes> {/* Removed Router wrapper */}
+    <Routes>
       {/* AUTH ROUTES */}
       <Route path="/auth/login" element={<Login />} />
       <Route path="/auth/signup" element={<Signup />} />
@@ -44,7 +50,7 @@ function App() {
       {/* Redirect root */}
       <Route path="/" element={<Navigate to="/auth/login" />} />
 
-      {/* Restaurant_admin ROUTES */}
+      {/* ==================== RESTAURANT ADMIN ROUTES ==================== */}
       <Route
         path="/Restaurant_admin/dashboard"
         element={
@@ -110,7 +116,7 @@ function App() {
         }
       />
       <Route
-        path="/Restaurant_admin/RestuarantSettings"
+        path="/Restaurant_admin/settings"
         element={
           <AdminLayout role="Restaurant_admin">
             <RestuarantSettings />
@@ -118,7 +124,7 @@ function App() {
         }
       />
       <Route
-        path="/Restaurant_admin/RestuarantSettings/:restaurantId"
+        path="/Restaurant_admin/settings/:restaurantId"
         element={
           <AdminLayout role="Restaurant_admin">
             <RestuarantSettings />
@@ -126,15 +132,57 @@ function App() {
         }
       />
 
-      {/* PLATFORM ADMIN ROUTES */}
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/restaurants" element={<Restaurants />} />
-      <Route path="/admin/restaurants/:id" element={<RestaurantDetail />} />
-      <Route path="/admin/users" element={<Users />} />
-      <Route path="/admin/security" element={<Security />} />
-      <Route path="/admin/settings" element={<Settings />} />
+      {/* ==================== PLATFORM ADMIN ROUTES - NOW WITH LAYOUT ==================== */}
+      <Route
+        path="/admin/dashboard"
+        element={
+          <AdminLayout role="Platform_admin">
+            <AdminDashboard />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/restaurants"
+        element={
+          <AdminLayout role="Platform_admin">
+            <Restaurants />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/restaurants/:id"
+        element={
+          <AdminLayout role="Platform_admin">
+            <RestaurantDetail />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <AdminLayout role="Platform_admin">
+            <Users />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/security"
+        element={
+          <AdminLayout role="Platform_admin">
+            <Security />
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/settings"
+        element={
+          <AdminLayout role="Platform_admin">
+            <Settings />
+          </AdminLayout>
+        }
+      />
 
-      {/* WAITER ROUTES */}
+      {/* ==================== WAITER ROUTES ==================== */}
       <Route
         path="/waiter/orders"
         element={
@@ -184,7 +232,7 @@ function App() {
         }
       />
       
-      {/* CUSTOMER ROUTES */}
+      {/* ==================== CUSTOMER ROUTES ==================== */}
       <Route path="/customer/:restaurantId" element={<MenuPage />} />
       <Route path="/customer/:restaurantId/search" element={<SearchPage />} />
       <Route path="/customer/:restaurantId/cart" element={<CartPage />} />
@@ -195,7 +243,7 @@ function App() {
         element={<StaffLoginPage />}
       />
 
-      {/* 404 PAGE - MUST BE THE LAST ROUTE */}
+      {/* 404 PAGE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

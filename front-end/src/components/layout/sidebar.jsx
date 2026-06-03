@@ -1,66 +1,268 @@
-// components/layout/Sidebar.jsx
+// src/components/layout/Sidebar.jsx
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
-  UtensilsCrossed,
   Utensils,
   FolderOpen,
   ClipboardList,
   Users,
-  Palette,
-  QrCode,
-  BarChart3,
   Settings,
   Clock,
   Shield,
+  LogOut,
+  ChevronUp,
+  User,
 } from "lucide-react";
+import { userAPI } from "../../services/admin";
+import { memo } from 'react';
 
 const Sidebar = ({ role = "Restaurant_admin" }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [userData, setUserData] = useState({
+    name: "",
+    email: "",
+    role: "",
+    restaurantId: null,
+    restaurantName: "",
+    avatar: "",
+  });
+  const [loading, setLoading] = useState(true);
 
-  // Get restaurant ID from user data
-  const getUserRestaurantId = () => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    return user.restaurantId;
+  // Fetch user data from API
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Method 1: Check if userId exists in localStorage
+        let userId = localStorage.getItem("userId");
+        
+        // Method 2: If not, decode from JWT token
+        if (!userId) {
+          const token = localStorage.getItem("token");
+          if (token) {
+            try {
+              // Decode JWT token
+              const payload = JSON.parse(atob(token.split('.')[1]));
+              userId = payload.id;
+              console.log("Decoded userId from token:", userId);
+              
+              // Save it for next time
+              if (userId) {
+                localStorage.setItem("userId", userId);
+              }
+            } catch (e) {
+              console.error("Failed to decode token:", e);
+            }
+          }
+        }
+        
+        // Method 3: Try to get from user object
+        if (!userId) {
+          const userStr = localStorage.getItem("user");
+          if (userStr) {
+            try {
+              const user = JSON.parse(userStr);
+              userId = user.id || user.userId;
+            } catch (e) {}
+          }
+        }
+        
+        console.log("Final userId:", userId);
+        
+        if (!userId) {
+          console.warn("No user ID found, using default values");
+          setUserData({
+            name: role === "Platform_admin" ? "Platform Admin" : "Restaurant Admin",
+            email: "admin@example.com",
+            role: role,
+            restaurantId: null,
+            restaurantName: "",
+            avatar: `https://ui-avatars.com/api/?name=${role === "Platform_admin" ? "PA" : "RA"}&background=000000&color=fff`,
+          });
+          setLoading(false);
+          return;
+        }
+        
+        // Fetch user data from API
+        try {
+          const user = await userAPI.getById(userId);
+          setUserData({
+            id: user.id,
+            name: user.name || (role === "Platform_admin" ? "Platform Admin" : "Restaurant Admin"),
+            email: user.email || "admin@example.com",
+            role: user.role || role,
+            restaurantId: user.restaurant_id,
+            restaurantName: user.restaurant_name || "",
+            // FIX: Always provide a valid avatar URL, never empty string
+            avatar: user.avatar && user.avatar !== "" 
+              ? user.avatar 
+              : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || "User")}&background=000000&color=fff`,
+          });
+        } catch (apiError) {
+          console.error("API fetch failed:", apiError);
+          // FIX: Use fallback with valid avatar URL
+          setUserData({
+            name: role === "Platform_admin" ? "Platform Admin" : "Restaurant Admin",
+            email: "admin@example.com",
+            role: role,
+            restaurantId: null,
+            restaurantName: "",
+            avatar: `https://ui-avatars.com/api/?name=${role === "Platform_admin" ? "PA" : "RA"}&background=000000&color=fff`,
+          });
+        }
+      } catch (error) {
+        console.error("Error in fetchUserData:", error);
+        setUserData({
+          name: role === "Platform_admin" ? "Platform Admin" : "Restaurant Admin",
+          email: "admin@example.com",
+          role: role,
+          restaurantId: null,
+          restaurantName: "",
+          avatar: `https://ui-avatars.com/api/?name=${role === "Platform_admin" ? "PA" : "RA"}&background=000000&color=fff`,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchUserData();
+  }, [role]);
+
+  const restaurantId = userData.restaurantId;
+
+  // Handle logout
+  const handleLogout = () => {
+    // Clear all localStorage items
+    localStorage.removeItem("userId");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("restaurantId");
+    
+    // Close dropdown
+    setIsProfileOpen(false);
+    
+    // Redirect to login
+    navigate("/auth/login");
   };
 
-  const restaurantId = getUserRestaurantId();
+  // Get user info based on role
+  const getUserInfo = () => {
+    switch (role) {
+      case "Platform_admin":
+        return {
+          name: userData.name || "Platform Admin",
+          title: "Platform Administrator",
+          email: userData.email || "admin@platform.com",
+          // FIX: Always ensure avatar is not empty
+          avatar: userData.avatar && userData.avatar !== "" 
+            ? userData.avatar 
+            : "https://ui-avatars.com/api/?name=PA&background=000000&color=fff",
+        };
+      case "Restaurant_admin":
+        return {
+          name: userData.name || "Restaurant Admin",
+          title: userData.restaurantName 
+            ? `Manager at ${userData.restaurantName}` 
+            : "Restaurant Manager",
+          email: userData.email || "admin@restaurant.com",
+          avatar: userData.avatar && userData.avatar !== "" 
+            ? userData.avatar 
+            : "https://ui-avatars.com/api/?name=RA&background=000000&color=fff",
+        };
+      case "waiter":
+        return {
+          name: userData.name || "Waiter",
+          title: userData.restaurantName 
+            ? `Waiter at ${userData.restaurantName}` 
+            : "Service Staff",
+          email: userData.email || "waiter@restaurant.com",
+          avatar: userData.avatar && userData.avatar !== "" 
+            ? userData.avatar 
+            : "https://ui-avatars.com/api/?name=WA&background=000000&color=fff",
+        };
+      default:
+        return {
+          name: userData.name || "User",
+          title: "Team Member",
+          email: userData.email || "user@example.com",
+          avatar: userData.avatar && userData.avatar !== "" 
+            ? userData.avatar 
+            : "https://ui-avatars.com/api/?name=US&background=000000&color=fff",
+        };
+    }
+  };
 
+  const userInfo = getUserInfo();
+
+  // Get status color based on role
+  const getStatusColor = () => {
+    switch (role) {
+      case "Platform_admin":
+        return "bg-purple-500";
+      case "Restaurant_admin":
+        return "bg-green-500";
+      case "waiter":
+        return "bg-blue-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
+
+  // Dynamic platform name based on role
+  const getPlatformName = () => {
+    switch (role) {
+      case "Platform_admin":
+        return "PLATFORM OS";
+      case "Restaurant_admin":
+        return "RESTAURANT OS";
+      case "waiter":
+        return "SERVICE OS";
+      default:
+        return "RESTAURANT OS";
+    }
+  };
+
+  const getPlatformSubtitle = () => {
+    switch (role) {
+      case "Platform_admin":
+        return "Admin Console";
+      case "Restaurant_admin":
+        return "Management Portal";
+      case "waiter":
+        return "Service Portal";
+      default:
+        return "Management Portal";
+    }
+  };
+
+  // Navigation links
   const adminLinks = [
     {
       name: "Dashboard",
-      path: restaurantId
-        ? `/Restaurant_admin/dashboard/${restaurantId}`
-        : "/Restaurant_admin/dashboard",
+      path: restaurantId ? `/Restaurant_admin/dashboard/${restaurantId}` : "/Restaurant_admin/dashboard",
       icon: LayoutDashboard,
     },
     {
       name: "Menu",
-      path: restaurantId
-        ? `/Restaurant_admin/menu/${restaurantId}`
-        : "/Restaurant_admin/menu",
+      path: restaurantId ? `/Restaurant_admin/menu/${restaurantId}` : "/Restaurant_admin/menu",
       icon: FolderOpen,
     },
     {
       name: "Orders",
-      path: restaurantId
-        ? `/Restaurant_admin/orders/${restaurantId}`
-        : "/Restaurant_admin/orders",
+      path: restaurantId ? `/Restaurant_admin/orders/${restaurantId}` : "/Restaurant_admin/orders",
       icon: ClipboardList,
     },
     {
       name: "Staff",
-      path: restaurantId
-        ? `/Restaurant_admin/staff/${restaurantId}`
-        : "/Restaurant_admin/staff",
+      path: restaurantId ? `/Restaurant_admin/staff/${restaurantId}` : "/Restaurant_admin/staff",
       icon: Users,
     },
     {
       name: "Settings",
-      path: restaurantId
-        ? `/Restaurant_admin/RestuarantSettings/${restaurantId}`
-        : "/Restaurant_admin/settings",
+      path: restaurantId ? `/Restaurant_admin/settings/${restaurantId}` : "/Restaurant_admin/settings",
       icon: Settings,
     },
   ];
@@ -78,9 +280,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
     },
     {
       name: "Order For customer",
-      path: restaurantId
-        ? `/waiter/order-for-customer/${restaurantId}`
-        : "/waiter/order-for-customer",
+      path: restaurantId ? `/waiter/order-for-customer/${restaurantId}` : "/waiter/order-for-customer",
       icon: Users,
     },
   ];
@@ -128,17 +328,36 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
       links = adminLinks;
       break;
   }
+
+  // Loading state
+  if (loading) {
+    return (
+      <aside className="fixed left-0 top-0 h-screen w-64 border-r border-zinc-200 bg-white dark:bg-zinc-950 flex flex-col py-6">
+        <div className="px-8 mb-10">
+          <div className="h-6 w-32 bg-zinc-200 animate-pulse rounded"></div>
+        </div>
+        <div className="flex-grow px-4 space-y-2">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-10 bg-zinc-100 animate-pulse rounded"></div>
+          ))}
+        </div>
+      </aside>
+    );
+  }
+
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 border-r border-zinc-200 bg-white dark:bg-zinc-950 flex flex-col py-6 font-inter antialiased">
+    <aside className="fixed left-0 top-0 h-screen w-64 border-r border-zinc-200 bg-white dark:bg-zinc-950 flex flex-col py-6 font-inter antialiased z-50">
+      {/* Logo Section */}
       <div className="px-8 mb-10">
         <h1 className="text-xl font-black tracking-tight text-black dark:text-white uppercase">
-          PLATFORM
+          {getPlatformName()}
         </h1>
         <p className="text-xs font-medium text-zinc-400 mt-1 uppercase tracking-widest">
-          SaaS Admin
+          {getPlatformSubtitle()}
         </p>
       </div>
 
+      {/* Navigation Links */}
       <nav className="flex-grow space-y-2 px-4">
         {links.map((link) => {
           const Icon = link.icon;
@@ -147,41 +366,127 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
             <Link
               key={link.name}
               to={link.path}
-              className={`flex items-center gap-3 py-3 transition-colors transition-all hover-lift ${
+              className={`flex items-center gap-3 py-3 transition-colors ${
                 isActive
                   ? "text-black dark:text-white font-bold border-l-2 border-black dark:border-white pl-4"
                   : "text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white pl-4 hover:bg-zinc-50 dark:hover:bg-zinc-900"
               }`}
             >
-              <Icon
-                className="text-lg"
-                style={{
-                  fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0",
-                }}
-              />
+              <Icon className="text-lg" />
               <span className="text-sm">{link.name}</span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="px-8 mt-auto pt-6 border-t border-zinc-100 dark:border-zinc-900">
-        <div className="flex items-center gap-3">
-          <img
-            alt="Admin Profile"
-            className="w-10 h-10 rounded-lg object-cover border border-zinc-200"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0MIG45D2ffg84ns4KvPDaPqGM7cBGKAYnhWsuNZMAB2T31UJvQbF7kZhL3lK8mXurwKTZKdekCwaeER8sBnKj2BeT3tv4jxiu4IFhC9bxfQoCNasr8TrdsSh-nVlZrlHUGsUxMjedrHYYPQyKdYPLqfCMsSFBTuWIooLgTuF7WMztck3SaSyaMImMY8MalvZSg-duvhB3RnDE3RZsYFM5ktGLY6xVyjnH1UYNkXFWhXgPmZKbSVyWrfTB8a0uOMhRbFWKio8rluE"
-          />
-          <div className="overflow-hidden">
-            <p className="text-xs font-bold truncate">Alexander Vance</p>
-            <p className="text-[10px] text-zinc-400 truncate uppercase tracking-tighter">
-              Chief Administrator
-            </p>
-          </div>
+      {/* User Profile Section with Logout */}
+      <div className="px-4 mt-auto pt-4 border-t border-zinc-100 dark:border-zinc-900">
+        <div className="relative">
+          {/* Profile Button */}
+          <button
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all duration-200"
+          >
+            {/* Avatar - FIXED: Always has a valid src, never empty string */}
+            <div className="relative">
+              {userInfo.avatar && userInfo.avatar !== "" ? (
+                <img
+                  alt={userInfo.name}
+                  className="w-10 h-10 rounded-xl object-cover border-2 border-white dark:border-zinc-800 shadow-sm"
+                  src={userInfo.avatar}
+                  onError={(e) => {
+                    // Fallback if image fails to load
+                    e.target.src = `https://ui-avatars.com/api/?name=${userInfo.name.charAt(0)}&background=000000&color=fff`;
+                  }}
+                />
+              ) : (
+                // Fallback when no avatar
+                <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center border-2 border-white dark:border-zinc-800 shadow-sm">
+                  <span className="text-white text-sm font-bold">
+                    {userInfo.name?.charAt(0) || "U"}
+                  </span>
+                </div>
+              )}
+              <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${getStatusColor()} rounded-full border-2 border-white dark:border-zinc-800`} />
+            </div>
+            
+            {/* User Info */}
+            <div className="flex-1 text-left">
+              <p className="text-sm font-semibold text-black dark:text-white truncate">
+                {userInfo.name}
+              </p>
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
+                {userInfo.title}
+              </p>
+            </div>
+            
+            {/* Chevron Icon */}
+            <ChevronUp 
+              className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${
+                isProfileOpen ? "rotate-0" : "rotate-180"
+              }`}
+            />
+          </button>
+
+          {/* Dropdown Menu */}
+          {isProfileOpen && (
+            <>
+              {/* Backdrop */}
+              <div 
+                className="fixed inset-0 z-40" 
+                onClick={() => setIsProfileOpen(false)}
+              />
+              
+              <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-zinc-950 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden z-50">
+                {/* User Details */}
+                <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-900">
+                  <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                    Signed in as
+                  </p>
+                  <p className="text-sm font-semibold text-black dark:text-white truncate">
+                    {userInfo.email}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className={`w-1.5 h-1.5 ${getStatusColor()} rounded-full`} />
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-wider">
+                      {role === "Platform_admin" ? "Platform Access" : 
+                       role === "Restaurant_admin" ? "Management Access" : 
+                       "Service Access"}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Menu Items */}
+                <div className="py-2">
+                  <button
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      navigate(role === "Platform_admin" ? "/admin/profile" : "/profile");
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>View Profile</span>
+                  </button>
+                  
+                  <div className="border-t border-zinc-100 dark:border-zinc-900 my-1" />
+                  
+                  {/* Logout Button */}
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </aside>
   );
 };
 
-export default Sidebar;
+export default memo(Sidebar);

@@ -1,5 +1,7 @@
 // src/pages/Restaurant_admin/Orders.jsx
 import React, { useState, useEffect } from "react";
+import Sidebar from "../../components/layout/sidebar";
+import TopHeader from "../../components/layout/TopHeader";
 import OrderTable from "../../components/Restaurant_admin/orders/OrdersTable";
 import OrderFilter from "../../components/Restaurant_admin/orders/OrderFilter";
 import CreateOrderModal from "../../components/Restaurant_admin/orders/CreateOrderModal";
@@ -24,7 +26,6 @@ const Orders = () => {
 
   // Load orders
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/immutability
     loadOrders();
   }, []);
 
@@ -77,89 +78,21 @@ const Orders = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface">
-      {/* Main Content */}
-      <div className="min-h-screen flex flex-col">
-        {/* Top App Bar */}
-        <header className="sticky top-0 z-40 w-full border-b border-neutral-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 h-16 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
-          <div className="flex items-center flex-1 max-w-md">
-            <div className="relative w-full">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"></span>
-              <input
-                type="text"
-                placeholder="Search orders by ID or table..."
-                className="w-full bg-neutral-50 border border-neutral-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-0 focus:border-black transition-all"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="flex items-center space-x-6">
-            <button
-              aria-label="Notifications"
-              title="Notifications"
-              className="p-2 rounded-sm hover:bg-neutral-100 transition-all duration-200 text-neutral-400"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h11z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M13.73 21a2 2 0 01-3.46 0"
-                />
-              </svg>
-            </button>
-            <button
-              aria-label="Account"
-              title="Account"
-              className="p-2 rounded-sm hover:bg-neutral-100 transition-all duration-200 text-neutral-400"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M16 11c1.657 0 3-1.567 3-3.5S17.657 4 16 4s-3 1.567-3 3.5S14.343 11 16 11z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M4 20a8 8 0 0116 0"
-                />
-              </svg>
-            </button>
-          </div>
-        </header>
+    <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
 
-        <main className="flex-1 p-8 max-w-[1200px] mx-auto">
+
+      {/* Main Content with proper spacing */}
+      <main className=" min-h-screen bg-surface">
+        <div className="p-8 max-w-[1200px] mx-auto">
           {/* Header section */}
           <div className="flex justify-between items-end mb-6">
             <div>
-              <h1 className="font-h1 text-h1 text-on-surface mb-xs">
-                Active Orders
-              </h1>
-              <p className="font-body-md text-secondary">
-                Monitor and manage real-time dining room flow.
+              <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
+                Real-time Dining Flow
               </p>
+              <h2 className="text-black text-5xl font-bold uppercase leading-none">
+                Active Orders
+              </h2>
             </div>
             <div className="flex space-x-4">
               <OrderFilter
@@ -173,6 +106,19 @@ const Orders = () => {
                 <span className="material-symbols-outlined text-sm">add</span>
                 <span>New Order</span>
               </button>
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="mb-6">
+            <div className="relative max-w-md">
+              <input
+                type="text"
+                placeholder="Search orders by ID or table..."
+                className="w-full bg-white border border-neutral-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-0 focus:border-black transition-all"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
 
@@ -209,6 +155,7 @@ const Orders = () => {
             <OrderTable
               orders={paginatedOrders}
               onViewOrder={handleViewOrder}
+              onUpdateStatus={handleUpdateOrderStatus}
             />
 
             {/* Pagination */}
@@ -224,21 +171,26 @@ const Orders = () => {
                   disabled={currentPage === 1}
                   className="w-8 h-8 flex items-center justify-center border border-neutral-200 rounded bg-white hover:bg-neutral-100 transition-colors disabled:opacity-50"
                 >
-                  <span className="material-symbols-outlined text-sm"></span>
+                  ←
                 </button>
-                {[1, 2].map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`w-8 h-8 flex items-center justify-center border rounded font-bold text-xs transition-colors ${
-                      currentPage === page
-                        ? "border-black bg-black text-white"
-                        : "border-neutral-200 bg-white hover:bg-neutral-100 text-black"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
+                {[1, 2, 3].map((page) => {
+                  if (page <= totalPages) {
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-8 h-8 flex items-center justify-center border rounded font-bold text-xs transition-colors ${
+                          currentPage === page
+                            ? "border-black bg-black text-white"
+                            : "border-neutral-200 bg-white hover:bg-neutral-100 text-black"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  }
+                  return null;
+                })}
                 <button
                   onClick={() =>
                     setCurrentPage((p) => Math.min(totalPages, p + 1))
@@ -246,7 +198,7 @@ const Orders = () => {
                   disabled={currentPage === totalPages}
                   className="w-8 h-8 flex items-center justify-center border border-neutral-200 rounded bg-white hover:bg-neutral-100 transition-colors disabled:opacity-50"
                 >
-                  <span className="material-symbols-outlined text-sm"></span>
+                  →
                 </button>
               </div>
             </div>
@@ -258,13 +210,13 @@ const Orders = () => {
               <div className="bg-white border border-neutral-200 p-6 rounded-xl">
                 <h3 className="font-h3 text-h3 mb-4">Kitchen Load Analysis</h3>
                 <div className="h-64 bg-neutral-50 flex items-end justify-between px-6 py-4 space-x-4 rounded">
-                  <div className="w-full bg-neutral-200 h-[30%]"></div>
-                  <div className="w-full bg-neutral-300 h-[60%]"></div>
-                  <div className="w-full bg-black h-[85%]"></div>
-                  <div className="w-full bg-neutral-400 h-[50%]"></div>
-                  <div className="w-full bg-neutral-200 h-[20%]"></div>
-                  <div className="w-full bg-neutral-300 h-[40%]"></div>
-                  <div className="w-full bg-neutral-800 h-[70%]"></div>
+                  <div className="w-full bg-neutral-200 h-[30%] rounded"></div>
+                  <div className="w-full bg-neutral-300 h-[60%] rounded"></div>
+                  <div className="w-full bg-black h-[85%] rounded"></div>
+                  <div className="w-full bg-neutral-400 h-[50%] rounded"></div>
+                  <div className="w-full bg-neutral-200 h-[20%] rounded"></div>
+                  <div className="w-full bg-neutral-300 h-[40%] rounded"></div>
+                  <div className="w-full bg-neutral-800 h-[70%] rounded"></div>
                 </div>
                 <div className="flex justify-between mt-4 text-[10px] font-label-caps text-secondary uppercase tracking-tighter">
                   <span>10:00</span>
@@ -297,7 +249,7 @@ const Orders = () => {
                 <ul className="space-y-4">
                   <li className="flex items-start space-x-3">
                     <span className="material-symbols-outlined text-neutral-400 text-lg">
-                      warning
+                      ⚠️
                     </span>
                     <div>
                       <p className="text-xs font-bold uppercase tracking-wider">
@@ -310,7 +262,7 @@ const Orders = () => {
                   </li>
                   <li className="flex items-start space-x-3">
                     <span className="material-symbols-outlined text-neutral-400 text-lg">
-                      check_circle
+                      ✓
                     </span>
                     <div>
                       <p className="text-xs font-bold uppercase tracking-wider">
@@ -325,9 +277,10 @@ const Orders = () => {
               </div>
             </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
 
+      {/* Modals */}
       <CreateOrderModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -336,6 +289,7 @@ const Orders = () => {
       <ViewOrderModal
         order={selectedOrderForView}
         onClose={() => setSelectedOrderForView(null)}
+        onUpdateStatus={handleUpdateOrderStatus}
       />
     </div>
   );

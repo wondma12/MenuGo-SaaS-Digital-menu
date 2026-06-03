@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../../components/layout/sidebar";
-import TopHeader from "../../components/layout/TopHeader";
+// import Sidebar from "../../components/layout/sidebar";
+// import TopHeader from "../../components/layout/TopHeader";
 import SummaryCards from "../../components/Admin/Dashboard/SummaryCards";
 import RecentRegistrations from "../../components/Admin/Dashboard/RecentRegistrations";
 import { adminAPI } from "../../services/admin";
@@ -32,9 +32,9 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
-        <Sidebar role="Platform_admin" />
-        <TopHeader role="Platform_admin" title="Dashboard" />
-        <main className="ml-64 pt-16 min-h-screen bg-background">
+        {/* <Sidebar role="Platform_admin" /> */}
+        {/* <TopHeader role="Platform_admin" title="Dashboard" /> */}
+        <main className="  min-h-screen bg-background">
           <div className="max-w-[1200px] mx-auto p-12">
             <div className="text-center text-zinc-500">
              < AdminDashboardSkeleton />
@@ -49,8 +49,8 @@ const AdminDashboard = () => {
     return (
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
         <Sidebar role="Platform_admin" />
-        <TopHeader role="Platform_admin" title="Dashboard" />
-        <main className="ml-64 pt-16 min-h-screen bg-background">
+        {/* <TopHeader role="Platform_admin" title="Dashboard" /> */}
+        <main className="  min-h-screen bg-background">
           <div className="max-w-[1200px] mx-auto p-12">
             <div className="text-center text-red-500">{error}</div>
           </div>
@@ -61,10 +61,10 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
-      <Sidebar role="Platform_admin" />
-      <TopHeader role="Platform_admin" title="Dashboard" />
+      {/* <Sidebar role="Platform_admin" /> */}
+      {/* <TopHeader role="Platform_admin" title="Dashboard" /> */}
 
-      <main className="ml-64 pt-16 min-h-screen bg-background">
+      <main className="  min-h-screen bg-background">
         <div className="max-w-[1200px] mx-auto p-12">
           {/* Welcome Header */}
           <div className="mb-12">

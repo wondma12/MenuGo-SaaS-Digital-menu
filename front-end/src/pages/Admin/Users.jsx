@@ -39,7 +39,7 @@ const Users = () => {
           title="Users"
           subtitle="User Management"
         />
-        <main className="ml-64 pt-16 min-h-screen bg-background">
+        <main className="  min-h-screen bg-background">
           <div className="max-w-[1200px] mx-auto p-12">
             <div className="text-center text-zinc-500">Loading users...</div>
           </div>
@@ -57,7 +57,7 @@ const Users = () => {
           title="Users"
           subtitle="User Management"
         />
-        <main className="ml-64 pt-16 min-h-screen bg-background">
+        <main className="  min-h-screen bg-background">
           <div className="max-w-[1200px] mx-auto p-12">
             <div className="text-center text-red-500">{error}</div>
           </div>
@@ -75,7 +75,7 @@ const Users = () => {
         subtitle="User Management"
       />
 
-      <main className="ml-64 pt-16 min-h-screen bg-background">
+      <main className="  min-h-screen bg-background">
         <div className="max-w-[1200px] mx-auto p-12">
           {/* Page Header */}
           <div className="flex justify-between items-end mb-12">

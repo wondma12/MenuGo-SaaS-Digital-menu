@@ -11,7 +11,7 @@ const Restaurants = () => {
       <Sidebar role="Platform_admin" />
       <TopHeader role="Platform_admin" title="Restaurants" />
 
-      <main className="ml-64 pt-16 min-h-screen bg-background">
+      <main className="  min-h-screen bg-background">
         <div className="max-w-[1200px] mx-auto p-12">
           {/* Page Header */}
           <div className="flex justify-between items-end mb-12">

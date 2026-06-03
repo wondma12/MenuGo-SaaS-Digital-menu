@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import Sidebar from "../../components/layout/sidebar";
-import TopHeader from "../../components/layout/TopHeader";
 import {
   PlatformInfo,
   SystemRules,
@@ -62,43 +60,38 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
-      <Sidebar role="Platform_admin" />
-      <TopHeader role="Platform_admin" title="Settings" />
+    <div className="p-8 max-w-[1200px]">
+      <div className="flex flex-col gap-10">
+        <PlatformInfo
+          formData={formData}
+          handleInputChange={handleInputChange}
+        />
 
-      <main className="ml-64 pt-24 pb-12 px-8 max-w-[1200px]">
-        <div className="py-10 flex flex-col gap-10">
-          <PlatformInfo
-            formData={formData}
-            handleInputChange={handleInputChange}
-          />
+        <hr className="border-surface-variant" />
 
-          <hr className="border-surface-variant" />
+        <SystemRules
+          formData={formData}
+          handleInputChange={handleInputChange}
+          handleToggleChange={handleToggleChange}
+        />
 
-          <SystemRules
-            formData={formData}
-            handleInputChange={handleInputChange}
-            handleToggleChange={handleToggleChange}
-          />
+        <hr className="border-surface-variant" />
 
-          <hr className="border-surface-variant" />
+        <SecuritySettings
+          formData={formData}
+          handleInputChange={handleInputChange}
+          handleToggleChange={handleToggleChange}
+        />
 
-          <SecuritySettings
-            formData={formData}
-            handleInputChange={handleInputChange}
-            handleToggleChange={handleToggleChange}
-          />
+        <hr className="border-surface-variant" />
 
-          <hr className="border-surface-variant" />
+        <AppearanceSettings handleFileSelect={handleFileSelect} />
 
-          <AppearanceSettings handleFileSelect={handleFileSelect} />
-
-          <SettingsActionBar
-            handleReset={handleReset}
-            handleSave={handleSave}
-          />
-        </div>
-      </main>
+        <SettingsActionBar
+          handleReset={handleReset}
+          handleSave={handleSave}
+        />
+      </div>
     </div>
   );
 };
