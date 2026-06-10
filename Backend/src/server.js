@@ -7,6 +7,14 @@ import authRoutes from "./routes/auth.routes.js";
 import restaurantRoutes from "./routes/restaurant.routes.js";
 import prisma from "./config/prisma.js";
 import menuRoutes from "./routes/menu.routes.js";
+import qrCodeRoutes from "./routes/qrcode.routes.js";
+import verificationRoutes from "./routes/verification.routes.js";
+import feedbackRoutes from "./routes/feedback.routes.js";
+import analyticsRoutes from "./routes/analytics.routes.js";
+import settingsRoutes from "./routes/settings.routes.js";
+import locationRoutes from "./routes/location.routes.js";
+import routes from "./routes/index.js";
+
 
 
 dotenv.config();
@@ -34,9 +42,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/restaurants", restaurantRoutes);
-app.use("/api/menu", menuRoutes);
+// app.use("/api/auth", authRoutes);
+// app.use("/api/restaurants", restaurantRoutes);
+// app.use("/api/menu", menuRoutes);
+// app.use("/api/qrcodes", qrCodeRoutes);
+// app.use("/api/verification", verificationRoutes);
+// app.use("/api/feedbacks", feedbackRoutes);
+// app.use("/api/analytics", analyticsRoutes);
+// app.use("/api/settings", settingsRoutes);
+// app.use("/api/locations", locationRoutes);
+
+app.use("/api", routes);
 
 // Health check
 app.get("/health", (req, res) => {

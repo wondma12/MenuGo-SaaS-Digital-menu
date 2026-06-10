@@ -60,3 +60,20 @@ export const createMenuItemValidation = [
 export const updateMenuItemStatusValidation = [
   body('status').isIn(['available', 'unavailable']).withMessage('Status must be available or unavailable')
 ];
+
+export const createOrderValidation = [
+  body('items').isArray({ min: 1 }).withMessage('At least one item is required'),
+  body('items.*.menu_item_id').notEmpty().withMessage('Menu item ID is required'),
+  body('items.*.quantity').optional().isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
+  body('table_number').optional().isString(),
+  body('order_type').optional().isIn(['dine_in', 'takeaway']),
+  body('customer_note').optional().isString()
+];
+
+export const updateOrderStatusValidation = [
+  body('status').isIn(['pending', 'verified', 'preparing', 'served']).withMessage('Invalid status')
+];
+
+export const assignWaiterValidation = [
+  body('waiter_id').notEmpty().withMessage('Waiter ID is required')
+];
