@@ -1,9 +1,11 @@
+// src/pages/Admin/AdminDashboard.jsx
+
 import React, { useState, useEffect } from "react";
 // import Sidebar from "../../components/layout/sidebar";
 // import TopHeader from "../../components/layout/TopHeader";
 import SummaryCards from "../../components/Admin/Dashboard/SummaryCards";
 import RecentRegistrations from "../../components/Admin/Dashboard/RecentRegistrations";
-import { adminAPI } from "../../services/admin";
+import { analyticsAPI } from "../../services/api"; // Changed from adminAPI to analyticsAPI
 import { AdminDashboardSkeleton } from "../../components/layout/DashboardSkeleton";
 
 const AdminDashboard = () => {
@@ -16,11 +18,12 @@ const AdminDashboard = () => {
     const fetchDashboardStats = async () => {
       try {
         setLoading(true);
-        const data = await adminAPI.getDashboardStats();
+        // Use analyticsAPI.getDashboard() from your new API
+        const data = await analyticsAPI.getDashboard();
         setStats(data);
       } catch (err) {
         console.error("Error fetching dashboard stats:", err);
-        setError("Failed to load dashboard statistics");
+        setError(err.message || "Failed to load dashboard statistics");
       } finally {
         setLoading(false);
       }
@@ -34,11 +37,9 @@ const AdminDashboard = () => {
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
         {/* <Sidebar role="Platform_admin" /> */}
         {/* <TopHeader role="Platform_admin" title="Dashboard" /> */}
-        <main className="  min-h-screen bg-background">
+        <main className="min-h-screen bg-background">
           <div className="max-w-[1200px] mx-auto p-12">
-            <div className="text-center text-zinc-500">
-             < AdminDashboardSkeleton />
-            </div>
+            <AdminDashboardSkeleton />
           </div>
         </main>
       </div>
@@ -48,11 +49,20 @@ const AdminDashboard = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
-        <Sidebar role="Platform_admin" />
+        {/* <Sidebar role="Platform_admin" /> */}
         {/* <TopHeader role="Platform_admin" title="Dashboard" /> */}
-        <main className="  min-h-screen bg-background">
+        <main className="min-h-screen bg-background">
           <div className="max-w-[1200px] mx-auto p-12">
-            <div className="text-center text-red-500">{error}</div>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+              <p className="text-red-600 font-semibold">Error Loading Dashboard</p>
+              <p className="text-red-500 text-sm mt-2">{error}</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
           </div>
         </main>
       </div>
@@ -64,7 +74,7 @@ const AdminDashboard = () => {
       {/* <Sidebar role="Platform_admin" /> */}
       {/* <TopHeader role="Platform_admin" title="Dashboard" /> */}
 
-      <main className="  min-h-screen bg-background">
+      <main className="min-h-screen bg-background">
         <div className="max-w-[1200px] mx-auto p-12">
           {/* Welcome Header */}
           <div className="mb-12">
@@ -88,14 +98,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
-{
-  /* <div class="mb-12">
-  <p class="text-label-caps text-on-secondary-container mb-2 uppercase tracking-widest">
-    Operational Insights
-  </p>
-  <h2 class="font-display text-display text-primary uppercase leading-none">
-    Global Snapshot
-  </h2>
-</div>; */
-}

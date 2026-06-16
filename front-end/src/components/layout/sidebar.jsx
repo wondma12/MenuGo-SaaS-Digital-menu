@@ -15,7 +15,7 @@ import {
   ChevronUp,
   User,
 } from "lucide-react";
-import { userAPI } from "../../services/admin";
+import { authAPI, staffAPI } from "../../services/api"; // Updated import
 import { memo } from 'react';
 
 const Sidebar = ({ role = "Restaurant_admin" }) => {
@@ -23,6 +23,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [userData, setUserData] = useState({
+    id: null,
     name: "",
     email: "",
     role: "",
@@ -36,86 +37,66 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Method 1: Check if userId exists in localStorage
-        let userId = localStorage.getItem("userId");
+        // Get user from authAPI (which uses localStorage)
+        const user = authAPI.getUser();
         
-        // Method 2: If not, decode from JWT token
-        if (!userId) {
-          const token = localStorage.getItem("token");
-          if (token) {
-            try {
-              // Decode JWT token
-              const payload = JSON.parse(atob(token.split('.')[1]));
-              userId = payload.id;
-              console.log("Decoded userId from token:", userId);
-              
-              // Save it for next time
-              if (userId) {
-                localStorage.setItem("userId", userId);
-              }
-            } catch (e) {
-              console.error("Failed to decode token:", e);
-            }
-          }
-        }
-        
-        // Method 3: Try to get from user object
-        if (!userId) {
-          const userStr = localStorage.getItem("user");
-          if (userStr) {
-            try {
-              const user = JSON.parse(userStr);
-              userId = user.id || user.userId;
-            } catch (e) {}
-          }
-        }
-        
-        console.log("Final userId:", userId);
-        
-        if (!userId) {
-          console.warn("No user ID found, using default values");
-          setUserData({
-            name: role === "Platform_admin" ? "Platform Admin" : "Restaurant Admin",
-            email: "admin@example.com",
-            role: role,
-            restaurantId: null,
-            restaurantName: "",
-            avatar: `https://ui-avatars.com/api/?name=${role === "Platform_admin" ? "PA" : "RA"}&background=000000&color=fff`,
-          });
-          setLoading(false);
-          return;
-        }
-        
-        // Fetch user data from API
-        try {
-          const user = await userAPI.getById(userId);
+        if (user) {
           setUserData({
             id: user.id,
             name: user.name || (role === "Platform_admin" ? "Platform Admin" : "Restaurant Admin"),
             email: user.email || "admin@example.com",
             role: user.role || role,
-            restaurantId: user.restaurant_id,
+            restaurantId: user.restaurant_id || null,
             restaurantName: user.restaurant_name || "",
-            // FIX: Always provide a valid avatar URL, never empty string
             avatar: user.avatar && user.avatar !== "" 
               ? user.avatar 
               : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || "User")}&background=000000&color=fff`,
           });
-        } catch (apiError) {
-          console.error("API fetch failed:", apiError);
-          // FIX: Use fallback with valid avatar URL
-          setUserData({
-            name: role === "Platform_admin" ? "Platform Admin" : "Restaurant Admin",
-            email: "admin@example.com",
-            role: role,
-            restaurantId: null,
-            restaurantName: "",
-            avatar: `https://ui-avatars.com/api/?name=${role === "Platform_admin" ? "PA" : "RA"}&background=000000&color=fff`,
-          });
+          setLoading(false);
+          return;
         }
+
+        // If no user in localStorage, try to fetch from API
+        const token = authAPI.getToken();
+        if (token) {
+          try {
+            const result = await authAPI.getCurrentUser();
+            if (result.success && result.user) {
+              const userData = result.user;
+              setUserData({
+                id: userData.id,
+                name: userData.name || (role === "Platform_admin" ? "Platform Admin" : "Restaurant Admin"),
+                email: userData.email || "admin@example.com",
+                role: userData.role || role,
+                restaurantId: userData.restaurant_id || null,
+                restaurantName: userData.restaurant_name || "",
+                avatar: userData.avatar && userData.avatar !== "" 
+                  ? userData.avatar 
+                  : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || "User")}&background=000000&color=fff`,
+              });
+              setLoading(false);
+              return;
+            }
+          } catch (apiError) {
+            console.error("API fetch failed:", apiError);
+          }
+        }
+
+        // Fallback: Use role-based defaults
+        console.warn("No user data found, using default values");
+        setUserData({
+          id: null,
+          name: role === "Platform_admin" ? "Platform Admin" : "Restaurant Admin",
+          email: "admin@example.com",
+          role: role,
+          restaurantId: null,
+          restaurantName: "",
+          avatar: `https://ui-avatars.com/api/?name=${role === "Platform_admin" ? "PA" : "RA"}&background=000000&color=fff`,
+        });
       } catch (error) {
         console.error("Error in fetchUserData:", error);
         setUserData({
+          id: null,
           name: role === "Platform_admin" ? "Platform Admin" : "Restaurant Admin",
           email: "admin@example.com",
           role: role,
@@ -135,16 +116,8 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
 
   // Handle logout
   const handleLogout = () => {
-    // Clear all localStorage items
-    localStorage.removeItem("userId");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("restaurantId");
-    
-    // Close dropdown
+    authAPI.logout(); // This now handles clearing localStorage
     setIsProfileOpen(false);
-    
-    // Redirect to login
     navigate("/auth/login");
   };
 
@@ -156,7 +129,6 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
           name: userData.name || "Platform Admin",
           title: "Platform Administrator",
           email: userData.email || "admin@platform.com",
-          // FIX: Always ensure avatar is not empty
           avatar: userData.avatar && userData.avatar !== "" 
             ? userData.avatar 
             : "https://ui-avatars.com/api/?name=PA&background=000000&color=fff",

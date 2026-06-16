@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Table from "../../ui/Table";
-import { restaurantAPI } from "../../../services/admin";
+import { restaurantAPI } from "../../../services/api";
 import {
   Search,
   ChevronLeft,
