@@ -1,7 +1,7 @@
-import { API_BASE_URL } from "../env";
+// services/authservice.js
+import { authAPI } from './api.js';
 
-const delay = (ms = 300) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const authService = {
   // =========================
@@ -9,57 +9,31 @@ const authService = {
   // =========================
   async login(email, password) {
     try {
-      await delay();
-
-      const response = await fetch(`${API_BASE_URL}/users`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch users");
-      }
-
-      const users = await response.json();
-
-      const user = users.find(
-        (u) => u.email === email && u.password === password
-      );
-
-      if (!user) {
-        return {
-          success: false,
-          data: null,
-          error: "Invalid email or password",
-        };
-      }
-
-      // Platform admin doesn't belong to restaurant
-      if (
-        user.role !== "platform_admin" &&
-        !user.restaurant_id
-      ) {
-        return {
-          success: false,
-          data: null,
-          error: "Restaurant assignment missing",
-        };
-      }
-
-      const { password: _, ...userWithoutPassword } = user;
-
-      return {
-        success: true,
-        data: {
-          user: userWithoutPassword,
-          token: `mock-token-${user.id}-${Date.now()}`,
-        },
-        error: null,
-      };
+      const result = await authAPI.login(email, password);
+      return result;
     } catch (error) {
-      console.error("Login error:", error);
-
+      console.error('Login error:', error);
       return {
         success: false,
         data: null,
-        error: "Login failed. Please try again.",
+        error: error.message || 'Login failed. Please try again.',
+      };
+    }
+  },
+
+  // =========================
+  // REGISTER
+  // =========================
+  async register(userData) {
+    try {
+      const result = await authAPI.register(userData);
+      return result;
+    } catch (error) {
+      console.error('Registration error:', error);
+      return {
+        success: false,
+        data: null,
+        error: error.message || 'Registration failed. Please try again.',
       };
     }
   },
@@ -67,54 +41,25 @@ const authService = {
   // =========================
   // CURRENT USER
   // =========================
-  async getCurrentUser(token) {
+  async getCurrentUser() {
     try {
-      await delay();
-
-      if (!token || !token.startsWith("mock-token-")) {
-        return {
-          success: false,
-          data: null,
-          error: "Invalid token",
-        };
-      }
-
-      const userId = Number(token.split("-")[2]);
-
-      const response = await fetch(`${API_BASE_URL}/users`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch users");
-      }
-
-      const users = await response.json();
-
-      const user = users.find((u) => u.id === userId);
-
-      if (!user) {
-        return {
-          success: false,
-          data: null,
-          error: "User not found",
-        };
-      }
-
-      const { password: _, ...userWithoutPassword } = user;
-
-      return {
-        success: true,
-        data: userWithoutPassword,
-        error: null,
-      };
+      const result = await authAPI.getCurrentUser();
+      return result;
     } catch (error) {
-      console.error("Get current user error:", error);
-
+      console.error('Get current user error:', error);
       return {
         success: false,
         data: null,
-        error: "Failed to get user information",
+        error: error.message || 'Failed to get user information',
       };
     }
+  },
+
+  // =========================
+  // LOGOUT
+  // =========================
+  logout() {
+    return authAPI.logout();
   },
 
   // =========================
@@ -135,12 +80,12 @@ const authService = {
   // =========================
   canAccessRestaurant(user, restaurantId) {
     // Platform admin can access everything
-    if (user.role === "platform_admin") {
+    if (user.role === 'platform_admin') {
       return true;
     }
 
     // Restaurant users only access their own restaurant
-    return Number(user.restaurant_id) === Number(restaurantId);
+    return user.restaurant_id === restaurantId;
   },
 
   // =========================
@@ -148,21 +93,21 @@ const authService = {
   // =========================
   getRestaurantRedirectPath(user) {
     // Platform admin
-    if (user.role === "platform_admin") {
-      return "/platform/dashboard";
+    if (user.role === 'platform_admin') {
+      return '/platform/dashboard';
     }
 
     // Restaurant admin
-    if (user.role === "restaurant_admin") {
+    if (user.role === 'restaurant_admin') {
       return `/Restaurant_admin/dashboard/${user.restaurant_id}`;
     }
 
     // Waiter
-    if (user.role === "waiter") {
+    if (user.role === 'waiter') {
       return `/waiter/orders/${user.restaurant_id}`;
     }
 
-    return "/";
+    return '/';
   },
 
   // =========================
@@ -170,50 +115,46 @@ const authService = {
   // =========================
   async getRestaurantByUser(user) {
     try {
-      if (
-        user.role === "platform_admin" ||
-        !user.restaurant_id
-      ) {
+      if (user.role === 'platform_admin' || !user.restaurant_id) {
         return null;
       }
 
       const response = await fetch(
-        `${API_BASE_URL}/restaurants/${user.restaurant_id}`
+        `${import.meta.env.VITE_API_URL}/restaurants/${user.restaurant_id}`
       );
 
       if (!response.ok) {
-        throw new Error("Restaurant not found");
+        throw new Error('Restaurant not found');
       }
 
-      return await response.json();
+      const result = await response.json();
+      return result.data;
     } catch (error) {
-      console.error("Restaurant fetch error:", error);
+      console.error('Restaurant fetch error:', error);
       return null;
     }
   },
 
   // =========================
-  // LOGOUT
+  // GET CURRENT USER FROM STORAGE
   // =========================
-  async logout() {
-    try {
-      await delay();
-
-      return {
-        success: true,
-        data: null,
-        error: null,
-      };
-    } catch (error) {
-      console.error("Logout error:", error);
-
-      return {
-        success: false,
-        data: null,
-        error: "Logout failed",
-      };
-    }
+  getCurrentUserFromStorage() {
+    return authAPI.getUser();
   },
+
+  // =========================
+  // IS AUTHENTICATED
+  // =========================
+  isAuthenticated() {
+    return authAPI.isAuthenticated();
+  },
+
+  // =========================
+  // GET TOKEN
+  // =========================
+  getToken() {
+    return authAPI.getToken();
+  }
 };
 
 export default authService;

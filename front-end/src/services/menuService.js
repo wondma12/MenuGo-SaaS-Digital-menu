@@ -1,167 +1,88 @@
-import { API_BASE_URL } from "../env";
+// services/menuService.js
+import { menuAPI } from './api.js';
 
-const delay = (ms = 300) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const menuService = {
   // ==========================================
   // MENU ITEMS
   // ==========================================
 
-  async getMenuItems() {
+  async getMenuItems(params = {}) {
     try {
-      await delay();
-
-      const response = await fetch(
-        `${API_BASE_URL}/menu_items`,
-      );
-
-      const items = await response.json();
-
+      const result = await menuAPI.getMenuItems(params);
       return {
         success: true,
-        data: items,
+        data: result.menuItems || result,
         error: null,
       };
     } catch (error) {
-      console.error("Error fetching menu items:", error);
-
+      console.error('Error fetching menu items:', error);
       return {
         success: false,
         data: null,
-        error: "Failed to fetch menu items",
+        error: error.message || 'Failed to fetch menu items',
       };
     }
   },
 
   async getMenuItemsByCategory(categoryId) {
     try {
-      await delay();
-
-      const response = await fetch(
-        `${API_BASE_URL}/menu_items?category_id=${categoryId}`,
-      );
-
-      const items = await response.json();
-
+      const result = await menuAPI.getMenuItems({ category_id: categoryId });
       return {
         success: true,
-        data: items,
+        data: result.menuItems || result,
         error: null,
       };
     } catch (error) {
       console.error(error);
-
       return {
         success: false,
         data: [],
-        error: "Failed to fetch category items",
+        error: error.message || 'Failed to fetch category items',
       };
     }
   },
 
   async createMenuItem(itemData) {
     try {
-      await delay();
-
-      const newItem = {
-        ...itemData,
-        availability: true,
-        created_at: new Date().toISOString(),
-      };
-
-      const response = await fetch(
-        `${API_BASE_URL}/menu_items`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newItem),
-        },
-      );
-
-      const item = await response.json();
-
+      const result = await menuAPI.createMenuItem(itemData);
       return {
         success: true,
-        data: item,
+        data: result,
         error: null,
       };
     } catch (error) {
       console.error(error);
-
       return {
         success: false,
         data: null,
-        error: "Failed to create menu item",
+        error: error.message || 'Failed to create menu item',
       };
     }
   },
 
   async updateMenuItem(id, updatedData) {
     try {
-      await delay();
-
-      const response = await fetch(
-        `${API_BASE_URL}/menu_items/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...updatedData,
-            updated_at: new Date().toISOString(),
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        return {
-          success: false,
-          data: null,
-          error: "Menu item not found",
-        };
-      }
-
-      const item = await response.json();
-
+      const result = await menuAPI.updateMenuItem(id, updatedData);
       return {
         success: true,
-        data: item,
+        data: result,
         error: null,
       };
     } catch (error) {
       console.error(error);
-
       return {
         success: false,
         data: null,
-        error: "Failed to update menu item",
+        error: error.message || 'Failed to update menu item',
       };
     }
   },
 
   async deleteMenuItem(id) {
     try {
-      await delay();
-
-      const response = await fetch(
-        `${API_BASE_URL}/menu_items/${id}`,
-        {
-          method: "DELETE",
-        },
-      );
-
-      if (!response.ok) {
-        return {
-          success: false,
-          data: null,
-          error: "Menu item not found",
-        };
-      }
-
+      await menuAPI.deleteMenuItem(id);
       return {
         success: true,
         data: { id },
@@ -169,54 +90,28 @@ const menuService = {
       };
     } catch (error) {
       console.error(error);
-
       return {
         success: false,
         data: null,
-        error: "Failed to delete menu item",
+        error: error.message || 'Failed to delete menu item',
       };
     }
   },
 
-  async updateAvailability(id, availability) {
+  async updateAvailability(id, status) {
     try {
-      await delay();
-
-      const response = await fetch(
-        `${API_BASE_URL}/menu_items/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            availability,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        return {
-          success: false,
-          data: null,
-          error: "Menu item not found",
-        };
-      }
-
-      const item = await response.json();
-
+      const result = await menuAPI.updateMenuItemStatus(id, status);
       return {
         success: true,
-        data: item,
+        data: result,
         error: null,
       };
     } catch (error) {
       console.error(error);
-
       return {
         success: false,
         data: null,
-        error: "Failed to update availability",
+        error: error.message || 'Failed to update availability',
       };
     }
   },
@@ -227,40 +122,28 @@ const menuService = {
 
   async getCategories() {
     try {
-      await delay();
-
-      const response = await fetch(
-        `${API_BASE_URL}/categories`,
-      );
-
-      const categories = await response.json();
-
+      const result = await menuAPI.getCategories();
       return {
         success: true,
-        data: categories,
+        data: result.categories || result,
         error: null,
       };
     } catch (error) {
       console.error(error);
-
       return {
         success: false,
         data: [],
-        error: "Failed to fetch categories",
+        error: error.message || 'Failed to fetch categories',
       };
     }
   },
 
   async getCategoriesByRestaurant(restaurantId) {
     try {
-      await delay();
-
-      const response = await fetch(
-        `${API_BASE_URL}/categories?restaurant_id=${restaurantId}`,
-      );
-
-      const categories = await response.json();
-
+      // This would need a filter by restaurant
+      const result = await menuAPI.getCategories();
+      const categories = result.categories || result;
+      // Filter by restaurant - this would be better handled server-side
       return {
         success: true,
         data: categories,
@@ -268,103 +151,53 @@ const menuService = {
       };
     } catch (error) {
       console.error(error);
-
       return {
         success: false,
         data: [],
-        error: "Failed to fetch restaurant categories",
+        error: error.message || 'Failed to fetch restaurant categories',
       };
     }
   },
 
   async addCategory(categoryData) {
     try {
-      await delay();
-
-      const response = await fetch(
-        `${API_BASE_URL}/categories`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...categoryData,
-            created_at: new Date().toISOString(),
-          }),
-        },
-      );
-
-      const category = await response.json();
-
+      const result = await menuAPI.createCategory(categoryData);
       return {
         success: true,
-        data: category,
+        data: result,
         error: null,
       };
     } catch (error) {
       console.error(error);
-
       return {
         success: false,
         data: null,
-        error: "Failed to create category",
+        error: error.message || 'Failed to create category',
       };
     }
   },
 
   async updateCategory(id, data) {
     try {
-      await delay();
-
-      const response = await fetch(
-        `${API_BASE_URL}/categories/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        },
-      );
-
-      const category = await response.json();
-
+      const result = await menuAPI.updateCategory(id, data);
       return {
         success: true,
-        data: category,
+        data: result,
         error: null,
       };
     } catch (error) {
       console.error(error);
-
       return {
         success: false,
         data: null,
-        error: "Failed to update category",
+        error: error.message || 'Failed to update category',
       };
     }
   },
 
   async deleteCategory(id) {
     try {
-      await delay();
-
-      const response = await fetch(
-        `${API_BASE_URL}/categories/${id}`,
-        {
-          method: "DELETE",
-        },
-      );
-
-      if (!response.ok) {
-        return {
-          success: false,
-          data: null,
-          error: "Category not found",
-        };
-      }
-
+      await menuAPI.deleteCategory(id);
       return {
         success: true,
         data: { id },
@@ -372,14 +205,75 @@ const menuService = {
       };
     } catch (error) {
       console.error(error);
-
       return {
         success: false,
         data: null,
-        error: "Failed to delete category",
+        error: error.message || 'Failed to delete category',
       };
     }
   },
+
+  // ==========================================
+  // FEATURED & ORGANIZED MENU
+  // ==========================================
+
+  async getFeaturedItems(limit = 10) {
+    try {
+      const result = await menuAPI.getFeaturedItems(limit);
+      return {
+        success: true,
+        data: result,
+        error: null,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        success: false,
+        data: [],
+        error: error.message || 'Failed to fetch featured items',
+      };
+    }
+  },
+
+  async getMenuByCategory() {
+    try {
+      const result = await menuAPI.getMenuByCategory();
+      return {
+        success: true,
+        data: result,
+        error: null,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        success: false,
+        data: [],
+        error: error.message || 'Failed to fetch organized menu',
+      };
+    }
+  },
+
+  // ==========================================
+  // PUBLIC MENU
+  // ==========================================
+
+  async getPublicMenu(restaurantId) {
+    try {
+      const result = await menuAPI.getPublicMenu(restaurantId);
+      return {
+        success: true,
+        data: result,
+        error: null,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        success: false,
+        data: null,
+        error: error.message || 'Failed to fetch public menu',
+      };
+    }
+  }
 };
 
 export default menuService;

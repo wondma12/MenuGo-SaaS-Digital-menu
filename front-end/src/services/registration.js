@@ -1,7 +1,7 @@
-import { API_BASE_URL } from "../env";
+// services/registration.js
+import { authAPI, restaurantAPI, verificationAPI, locationAPI } from './api.js';
 
-const delay = (ms = 300) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const registrationService = {
   // =========================================
@@ -9,209 +9,105 @@ const registrationService = {
   // =========================================
   async submitRegistration(registrationData) {
     try {
-      await delay();
+      // 1. Register the user
+      const userResult = await authAPI.register({
+        name: registrationData.owner_name,
+        email: registrationData.email,
+        password: registrationData.password,
+        phone: registrationData.phone,
+        role: 'restaurant_admin',
+      });
 
-      // =========================================
-      // FETCH EXISTING DATA
-      // =========================================
-      const [
-        usersResponse,
-        restaurantsResponse,
-        locationsResponse,
-        verificationsResponse,
-      ] = await Promise.all([
-        fetch(`${API_BASE_URL}/users`),
-        fetch(`${API_BASE_URL}/restaurants`),
-        fetch(`${API_BASE_URL}/restaurant_locations`),
-        fetch(`${API_BASE_URL}/restaurant_verifications`),
-      ]);
-
-      if (
-        !usersResponse.ok ||
-        !restaurantsResponse.ok ||
-        !locationsResponse.ok ||
-        !verificationsResponse.ok
-      ) {
-        throw new Error("Failed to fetch existing data");
-      }
-
-      const users = await usersResponse.json();
-      const restaurants = await restaurantsResponse.json();
-      const locations = await locationsResponse.json();
-      const verifications = await verificationsResponse.json();
-
-      // =========================================
-      // CHECK DUPLICATE EMAIL
-      // =========================================
-      const existingUser = users.find(
-        (user) => user.email === registrationData.email
-      );
-
-      if (existingUser) {
+      if (!userResult.success) {
         return {
           success: false,
           data: null,
-          error: "Email already registered",
+          error: userResult.error || 'User registration failed',
         };
       }
 
-      // =========================================
-      // GENERATE IDS
-      // =========================================
-      const newUserId =
-        Math.max(0, ...users.map((u) => Number(u.id))) + 1;
+      const user = userResult.data.user;
 
-      const newRestaurantId =
-        Math.max(0, ...restaurants.map((r) => Number(r.id))) + 1;
-
-      const newLocationId =
-        Math.max(0, ...locations.map((l) => Number(l.id))) + 1;
-
-      const newVerificationId =
-        Math.max(0, ...verifications.map((v) => Number(v.id))) + 1;
-
-      // =========================================
-      // CREATE USER
-      // =========================================
-      const newUser = {
-        id: newUserId,
-        name: registrationData.owner_name,
-        email: registrationData.email,
-        phone: registrationData.phone,
-        password: registrationData.password,
-        role: "restaurant_admin",
-        restaurant_id: newRestaurantId,
-        created_at: new Date().toISOString(),
-      };
-
-      // =========================================
-      // CREATE RESTAURANT
-      // =========================================
-      const newRestaurant = {
-        id: newRestaurantId,
+      // 2. Create the restaurant
+      const restaurantResult = await restaurantAPI.create({
         name: registrationData.restaurant_name,
         email: registrationData.business_email,
         phone: registrationData.business_phone,
-        description: registrationData.description || "",
-        logo: registrationData.logo || "",
-        banner: registrationData.banner || "",
-        qr_code: registrationData.qr_code || "",
-        status: "pending",
-        owner_id: newUserId,
-        created_at: new Date().toISOString(),
-      };
+        description: registrationData.description || '',
+        logo: registrationData.logo || '',
+        banner: registrationData.banner || '',
+        qr_code: registrationData.qr_code || '',
+        // The backend will set status to 'pending' by default
+      });
 
-      // =========================================
-      // CREATE LOCATION
-      // =========================================
-      const newLocation = {
-        id: newLocationId,
-        restaurant_id: newRestaurantId,
+      if (!restaurantResult.success) {
+        return {
+          success: false,
+          data: null,
+          error: restaurantResult.error || 'Restaurant creation failed',
+        };
+      }
+
+      const restaurant = restaurantResult;
+
+      // 3. Add location
+      const locationResult = await locationAPI.add({
+        restaurant_id: restaurant.id,
         country: registrationData.country,
         city: registrationData.city,
         sub_city: registrationData.sub_city,
         street_address: registrationData.street_address,
         map_link: registrationData.map_link,
-      };
+        latitude: registrationData.latitude || null,
+        longitude: registrationData.longitude || null,
+      });
 
-      // =========================================
-      // CREATE VERIFICATION
-      // =========================================
-      const newVerification = {
-        id: newVerificationId,
-        restaurant_id: newRestaurantId,
-        owner_name: registrationData.owner_name,
-        business_license_number:
-          registrationData.business_license_number,
-
-        tin_number: registrationData.tin_number,
-
-        business_license_document:
-          registrationData.business_license_document || "",
-
-        legal_document:
-          registrationData.legal_document || "",
-
-        verification_status: "pending",
-
-        reviewed_by: null,
-        reviewed_at: null,
-      };
-
-      // =========================================
-      // SAVE DATA
-      // =========================================
-      const [
-        userSave,
-        restaurantSave,
-        locationSave,
-        verificationSave,
-      ] = await Promise.all([
-        fetch(`${API_BASE_URL}/users`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newUser),
-        }),
-
-        fetch(`${API_BASE_URL}/restaurants`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newRestaurant),
-        }),
-
-        fetch(`${API_BASE_URL}/restaurant_locations`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newLocation),
-        }),
-
-        fetch(`${API_BASE_URL}/restaurant_verifications`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newVerification),
-        }),
-      ]);
-
-      const allSaved =
-        userSave.ok &&
-        restaurantSave.ok &&
-        locationSave.ok &&
-        verificationSave.ok;
-
-      if (!allSaved) {
-        throw new Error("Failed to save registration");
+      if (!locationResult.success) {
+        return {
+          success: false,
+          data: null,
+          error: locationResult.error || 'Location creation failed',
+        };
       }
 
-      // REMOVE PASSWORD FROM RESPONSE
-      const { password: _, ...safeUser } = newUser;
+      // 4. Submit verification
+      const verificationResult = await verificationAPI.submit({
+        restaurant_id: restaurant.id,
+        owner_name: registrationData.owner_name,
+        business_license_number: registrationData.business_license_number,
+        tin_number: registrationData.tin_number,
+        business_license_document: registrationData.business_license_document || '',
+        legal_document: registrationData.legal_document || '',
+      });
+
+      if (!verificationResult.success) {
+        return {
+          success: false,
+          data: null,
+          error: verificationResult.error || 'Verification submission failed',
+        };
+      }
+
+      // Remove password from response
+      const { password: _, ...safeUser } = user;
 
       return {
         success: true,
         data: {
           user: safeUser,
-          restaurant: newRestaurant,
-          location: newLocation,
-          verification: newVerification,
-          message:
-            "Restaurant registration submitted successfully.",
+          restaurant,
+          location: locationResult,
+          verification: verificationResult,
+          message: 'Restaurant registration submitted successfully.',
         },
         error: null,
       };
     } catch (error) {
-      console.error("Registration error:", error);
-
+      console.error('Registration error:', error);
       return {
         success: false,
         data: null,
-        error: "Registration failed. Please try again.",
+        error: error.message || 'Registration failed. Please try again.',
       };
     }
   },
@@ -221,71 +117,19 @@ const registrationService = {
   // =========================================
   async getPendingRegistrations() {
     try {
-      await delay();
-
-      const [
-        restaurantsResponse,
-        verificationsResponse,
-        usersResponse,
-        locationsResponse,
-      ] = await Promise.all([
-        fetch(`${API_BASE_URL}/restaurants`),
-        fetch(`${API_BASE_URL}/restaurant_verifications`),
-        fetch(`${API_BASE_URL}/users`),
-        fetch(`${API_BASE_URL}/restaurant_locations`),
-      ]);
-
-      const restaurants = await restaurantsResponse.json();
-      const verifications = await verificationsResponse.json();
-      const users = await usersResponse.json();
-      const locations = await locationsResponse.json();
-
-      const pendingRestaurants = restaurants
-        .filter(
-          (restaurant) => restaurant.status === "pending"
-        )
-        .map((restaurant) => {
-          const verification = verifications.find(
-            (v) =>
-              Number(v.restaurant_id) ===
-              Number(restaurant.id)
-          );
-
-          const owner = users.find(
-            (u) =>
-              Number(u.id) ===
-              Number(restaurant.owner_id)
-          );
-
-          const location = locations.find(
-            (l) =>
-              Number(l.restaurant_id) ===
-              Number(restaurant.id)
-          );
-
-          return {
-            ...restaurant,
-            verification,
-            owner,
-            location,
-          };
-        });
-
+      const result = await verificationAPI.getAll({ status: 'pending' });
+      
       return {
         success: true,
-        data: pendingRestaurants,
+        data: result.verifications || result,
         error: null,
       };
     } catch (error) {
-      console.error(
-        "Pending registration fetch error:",
-        error
-      );
-
+      console.error('Pending registration fetch error:', error);
       return {
         success: false,
         data: [],
-        error: "Failed to fetch registrations",
+        error: error.message || 'Failed to fetch registrations',
       };
     }
   },
@@ -293,76 +137,42 @@ const registrationService = {
   // =========================================
   // APPROVE REGISTRATION
   // =========================================
-  async approveRegistration(
-    restaurantId,
-    platformAdminId
-  ) {
+  async approveRegistration(restaurantId, platformAdminId) {
     try {
-      await delay();
-
-      // UPDATE RESTAURANT
-      const restaurantResponse = await fetch(
-        `${API_BASE_URL}/restaurants/${restaurantId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status: "active",
-          }),
-        }
-      );
-
-      // GET VERIFICATION
-      const verificationResponse = await fetch(
-        `${API_BASE_URL}/restaurant_verifications`
-      );
-
-      const verifications =
-        await verificationResponse.json();
-
-      const verification = verifications.find(
-        (v) =>
-          Number(v.restaurant_id) ===
-          Number(restaurantId)
-      );
-
-      // UPDATE VERIFICATION
-      if (verification) {
-        await fetch(
-          `${API_BASE_URL}/restaurant_verifications/${verification.id}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              verification_status: "approved",
-              reviewed_by: platformAdminId,
-              reviewed_at: new Date().toISOString(),
-            }),
-          }
-        );
+      // Find the verification for this restaurant
+      const verifications = await verificationAPI.getAll({ restaurant_id: restaurantId });
+      const verification = (verifications.verifications || verifications || [])[0];
+      
+      if (!verification) {
+        return {
+          success: false,
+          data: null,
+          error: 'Verification record not found',
+        };
       }
 
+      const result = await verificationAPI.review(
+        verification.id,
+        'approved',
+        'Approved by platform admin'
+      );
+
+      // Also update restaurant status
+      await restaurantAPI.updateStatus(restaurantId, 'active');
+
       return {
-        success: restaurantResponse.ok,
+        success: true,
         data: {
-          message:
-            "Restaurant approved successfully",
+          message: 'Restaurant approved successfully',
         },
-        error: restaurantResponse.ok
-          ? null
-          : "Approval failed",
+        error: null,
       };
     } catch (error) {
-      console.error("Approval error:", error);
-
+      console.error('Approval error:', error);
       return {
         success: false,
         data: null,
-        error: "Failed to approve registration",
+        error: error.message || 'Failed to approve registration',
       };
     }
   },
@@ -370,78 +180,42 @@ const registrationService = {
   // =========================================
   // REJECT REGISTRATION
   // =========================================
-  async rejectRegistration(
-    restaurantId,
-    platformAdminId,
-    reason = "Rejected by platform admin"
-  ) {
+  async rejectRegistration(restaurantId, platformAdminId, reason = 'Rejected by platform admin') {
     try {
-      await delay();
-
-      // UPDATE RESTAURANT STATUS
-      const restaurantResponse = await fetch(
-        `${API_BASE_URL}/restaurants/${restaurantId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status: "suspended",
-          }),
-        }
-      );
-
-      // GET VERIFICATION
-      const verificationResponse = await fetch(
-        `${API_BASE_URL}/restaurant_verifications`
-      );
-
-      const verifications =
-        await verificationResponse.json();
-
-      const verification = verifications.find(
-        (v) =>
-          Number(v.restaurant_id) ===
-          Number(restaurantId)
-      );
-
-      // UPDATE VERIFICATION
-      if (verification) {
-        await fetch(
-          `${API_BASE_URL}/restaurant_verifications/${verification.id}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              verification_status: "rejected",
-              reviewed_by: platformAdminId,
-              reviewed_at: new Date().toISOString(),
-              rejection_reason: reason,
-            }),
-          }
-        );
+      // Find the verification for this restaurant
+      const verifications = await verificationAPI.getAll({ restaurant_id: restaurantId });
+      const verification = (verifications.verifications || verifications || [])[0];
+      
+      if (!verification) {
+        return {
+          success: false,
+          data: null,
+          error: 'Verification record not found',
+        };
       }
 
+      const result = await verificationAPI.review(
+        verification.id,
+        'rejected',
+        reason
+      );
+
+      // Also update restaurant status
+      await restaurantAPI.updateStatus(restaurantId, 'suspended');
+
       return {
-        success: restaurantResponse.ok,
+        success: true,
         data: {
-          message:
-            "Restaurant rejected successfully",
+          message: 'Restaurant rejected successfully',
         },
-        error: restaurantResponse.ok
-          ? null
-          : "Rejection failed",
+        error: null,
       };
     } catch (error) {
-      console.error("Rejection error:", error);
-
+      console.error('Rejection error:', error);
       return {
         success: false,
         data: null,
-        error: "Failed to reject registration",
+        error: error.message || 'Failed to reject registration',
       };
     }
   },

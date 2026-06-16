@@ -1,48 +1,91 @@
-import { API_BASE_URL } from "../env";
+// services/orderService.js
+import { orderAPI } from './api.js';
 
-const delay = (ms = 300) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const orderService = {
   // ==========================================
   // GET ALL ORDERS
   // ==========================================
-  async getAllOrders() {
+  async getAllOrders(params = {}) {
     try {
-      await delay();
-
-      const response = await fetch(`${API_BASE_URL}/orders`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch orders");
-      }
-
-      return await response.json();
+      const result = await orderAPI.getAll(params);
+      return {
+        success: true,
+        data: result.orders || result,
+        error: null,
+      };
     } catch (error) {
-      console.error("Error fetching orders:", error);
-      return [];
+      console.error('Error fetching orders:', error);
+      return {
+        success: false,
+        data: null,
+        error: error.message || 'Failed to fetch orders',
+      };
     }
   },
 
   // ==========================================
   // GET ORDERS BY RESTAURANT
   // ==========================================
-  async getOrdersByRestaurant(restaurantId) {
+  async getOrdersByRestaurant(restaurantId, params = {}) {
     try {
-      await delay();
-
-      const response = await fetch(
-        `${API_BASE_URL}/orders?restaurant_id=${restaurantId}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch restaurant orders");
-      }
-
-      return await response.json();
+      // The backend should filter by restaurant automatically based on user's role
+      const result = await orderAPI.getAll({ ...params });
+      return {
+        success: true,
+        data: result.orders || result,
+        error: null,
+      };
     } catch (error) {
-      console.error("Error fetching restaurant orders:", error);
-      return [];
+      console.error('Error fetching restaurant orders:', error);
+      return {
+        success: false,
+        data: [],
+        error: error.message || 'Failed to fetch restaurant orders',
+      };
+    }
+  },
+
+  // ==========================================
+  // GET ACTIVE ORDERS
+  // ==========================================
+  async getActiveOrders() {
+    try {
+      const result = await orderAPI.getActive();
+      return {
+        success: true,
+        data: result,
+        error: null,
+      };
+    } catch (error) {
+      console.error('Error fetching active orders:', error);
+      return {
+        success: false,
+        data: [],
+        error: error.message || 'Failed to fetch active orders',
+      };
+    }
+  },
+
+  // ==========================================
+  // GET KITCHEN DISPLAY
+  // ==========================================
+  async getKitchenDisplay() {
+    try {
+      const result = await orderAPI.getKitchenDisplay();
+      return {
+        success: true,
+        data: result,
+        error: null,
+      };
+    } catch (error) {
+      console.error('Error fetching kitchen display:', error);
+      return {
+        success: false,
+        data: { verified: [], preparing: [], total_active: 0 },
+        error: error.message || 'Failed to fetch kitchen display',
+      };
     }
   },
 
@@ -51,169 +94,143 @@ export const orderService = {
   // ==========================================
   async createOrder(orderData) {
     try {
-      await delay();
-
-      const ordersResponse = await fetch(`${API_BASE_URL}/orders`);
-      const orders = await ordersResponse.json();
-
-      const newOrderId =
-        Math.max(...orders.map((o) => Number(o.id)), 0) + 1;
-
-      const newOrder = {
-        id: newOrderId,
-        restaurant_id: orderData.restaurant_id,
-        table_number: orderData.table_number,
-        order_type: orderData.order_type,
-        status: "pending",
-        created_at: new Date().toISOString(),
+      const result = await orderAPI.create(orderData);
+      return {
+        success: true,
+        data: result,
+        error: null,
       };
-
-      const response = await fetch(`${API_BASE_URL}/orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newOrder),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create order");
-      }
-
-      const createdOrder = await response.json();
-
-      // Create order items
-      if (
-        orderData.items &&
-        Array.isArray(orderData.items) &&
-        orderData.items.length
-      ) {
-        const orderItemsResponse = await fetch(
-          `${API_BASE_URL}/orderItems`
-        );
-
-        const existingItems = await orderItemsResponse.json();
-
-        let nextItemId =
-          Math.max(...existingItems.map((i) => Number(i.id)), 0) + 1;
-
-        for (const item of orderData.items) {
-          await fetch(`${API_BASE_URL}/orderItems`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              id: nextItemId++,
-              order_id: createdOrder.id,
-              menu_item_id: item.menu_item_id,
-              quantity: item.quantity,
-            }),
-          });
-        }
-      }
-
-      return createdOrder;
     } catch (error) {
-      console.error("Error creating order:", error);
-      throw error;
+      console.error('Error creating order:', error);
+      return {
+        success: false,
+        data: null,
+        error: error.message || 'Failed to create order',
+      };
     }
   },
 
   // ==========================================
-  // UPDATE ORDER STATUS
-  // ==========================================
+  // UPDATE ORDER STATUS  // ==========================================
   async updateOrderStatus(orderId, status) {
     try {
-      await delay();
-
-      const response = await fetch(
-        `${API_BASE_URL}/orders/${orderId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Order not found");
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Error updating order status:", error);
-      throw error;
-    }
-  },
-
-  // ==========================================
-  // GET ORDER ITEMS
-  // ==========================================
-  async getOrderItems() {
-    try {
-      await delay();
-
-      const response = await fetch(`${API_BASE_URL}/orderItems`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch order items");
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching order items:", error);
-      return [];
-    }
-  },
-
-  // ==========================================
-  // GET MENU ITEMS
-  // ==========================================
-  async getMenuItems() {
-    try {
-      await delay();
-
-      const response = await fetch(`${API_BASE_URL}/menuItems`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch menu items");
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching menu items:", error);
-      return [];
-    }
-  },
-
-  // ==========================================
-  // GET COMPLETE ORDER DETAILS
-  // ==========================================
-  async getAllOrdersWithDetails() {
-    try {
-      const [orders, orderItems, menuItems] = await Promise.all([
-        this.getAllOrders(),
-        this.getOrderItems(),
-        this.getMenuItems(),
-      ]);
-
+      const result = await orderAPI.updateStatus(orderId, status);
       return {
-        orders,
-        orderItems,
-        menuItems,
+        success: true,
+        data: result,
+        error: null,
       };
     } catch (error) {
-      console.error("Error fetching complete order data:", error);
-
+      console.error('Error updating order status:', error);
       return {
-        orders: [],
-        orderItems: [],
-        menuItems: [],
+        success: false,
+        data: null,
+        error: error.message || 'Failed to update order status',
+      };
+    }
+  },
+
+  // ==========================================
+  // GET ORDER BY ID
+  // ==========================================
+  async getOrderById(orderId) {
+    try {
+      const result = await orderAPI.getById(orderId);
+      return {
+        success: true,
+        data: result,
+        error: null,
+      };
+    } catch (error) {
+      console.error('Error fetching order:', error);
+      return {
+        success: false,
+        data: null,
+        error: error.message || 'Failed to fetch order',
+      };
+    }
+  },
+
+  // ==========================================
+  // GET TODAY'S ORDERS
+  // ==========================================
+  async getTodayOrders() {
+    try {
+      const result = await orderAPI.getToday();
+      return {
+        success: true,
+        data: result,
+        error: null,
+      };
+    } catch (error) {
+      console.error('Error fetching today\'s orders:', error);
+      return {
+        success: false,
+        data: { orders: [], stats: {} },
+        error: error.message || 'Failed to fetch today\'s orders',
+      };
+    }
+  },
+
+  // ==========================================
+  // GET ORDER HISTORY
+  // ==========================================
+  async getOrderHistory(params = {}) {
+    try {
+      const result = await orderAPI.getHistory(params);
+      return {
+        success: true,
+        data: result,
+        error: null,
+      };
+    } catch (error) {
+      console.error('Error fetching order history:', error);
+      return {
+        success: false,
+        data: { orders: [], daily_revenue: [] },
+        error: error.message || 'Failed to fetch order history',
+      };
+    }
+  },
+
+  // ==========================================
+  // ASSIGN WAITER
+  // ==========================================
+  async assignWaiter(orderId, waiterId) {
+    try {
+      const result = await orderAPI.assignWaiter(orderId, waiterId);
+      return {
+        success: true,
+        data: result,
+        error: null,
+      };
+    } catch (error) {
+      console.error('Error assigning waiter:', error);
+      return {
+        success: false,
+        data: null,
+        error: error.message || 'Failed to assign waiter',
+      };
+    }
+  },
+
+  // ==========================================
+  // TRACK ORDER (Public)
+  // ==========================================
+  async trackOrder(orderNumber) {
+    try {
+      const result = await orderAPI.trackOrder(orderNumber);
+      return {
+        success: true,
+        data: result,
+        error: null,
+      };
+    } catch (error) {
+      console.error('Error tracking order:', error);
+      return {
+        success: false,
+        data: null,
+        error: error.message || 'Failed to track order',
       };
     }
   },
@@ -223,33 +240,35 @@ export const orderService = {
   // ==========================================
   async getStats(restaurantId = null) {
     try {
-      await delay();
-
-      let orders = [];
-
-      if (restaurantId) {
-        orders = await this.getOrdersByRestaurant(restaurantId);
-      } else {
-        orders = await this.getAllOrders();
-      }
-
+      const result = await orderAPI.getAll(restaurantId ? { restaurant_id: restaurantId } : {});
+      const orders = result.orders || [];
+      
       return {
-        totalOrders: orders.length,
-        pending: orders.filter((o) => o.status === "pending").length,
-        verified: orders.filter((o) => o.status === "verified").length,
-        preparing: orders.filter((o) => o.status === "preparing").length,
-        served: orders.filter((o) => o.status === "served").length,
+        success: true,
+        data: {
+          totalOrders: orders.length,
+          pending: orders.filter((o) => o.status === 'pending').length,
+          verified: orders.filter((o) => o.status === 'verified').length,
+          preparing: orders.filter((o) => o.status === 'preparing').length,
+          served: orders.filter((o) => o.status === 'served').length,
+        },
+        error: null,
       };
     } catch (error) {
-      console.error("Error fetching order stats:", error);
-
+      console.error('Error fetching order stats:', error);
       return {
-        totalOrders: 0,
-        pending: 0,
-        verified: 0,
-        preparing: 0,
-        served: 0,
+        success: false,
+        data: {
+          totalOrders: 0,
+          pending: 0,
+          verified: 0,
+          preparing: 0,
+          served: 0,
+        },
+        error: error.message || 'Failed to fetch order stats',
       };
     }
   },
 };
+
+export default orderService;

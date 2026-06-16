@@ -1,7 +1,7 @@
-import { API_BASE_URL } from "../env";
+// services/staffServices.js
+import { authAPI, staffAPI, restaurantAPI } from './api.js';
 
-const delay = (ms = 300) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /*
 |--------------------------------------------------------------------------
@@ -11,31 +11,26 @@ const delay = (ms = 300) =>
 
 export const fetchStaff = async (restaurantId = null) => {
   try {
-    await delay();
-
-    const response = await fetch(`${API_BASE_URL}/users`);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch users");
+    // Get all users with waiter or restaurant_admin roles
+    const params = { role: 'waiter,restaurant_admin' };
+    if (restaurantId) {
+      params.restaurant_id = restaurantId;
     }
-
-    const users = await response.json();
-
+    
+    const result = await staffAPI.getAll(params);
+    const users = result.users || result || [];
+    
     let staff = users.filter(
-      (user) =>
-        user.role === "waiter" ||
-        user.role === "restaurant_admin"
+      (user) => user.role === 'waiter' || user.role === 'restaurant_admin'
     );
 
     if (restaurantId) {
-      staff = staff.filter(
-        (user) => user.restaurant_id === restaurantId
-      );
+      staff = staff.filter((user) => user.restaurant_id === restaurantId);
     }
 
     return staff;
   } catch (error) {
-    console.error("Error fetching staff:", error);
+    console.error('Error fetching staff:', error);
     return [];
   }
 };
@@ -48,43 +43,18 @@ export const fetchStaff = async (restaurantId = null) => {
 
 export const addStaff = async (newStaff) => {
   try {
-    await delay();
-
-    const response = await fetch(`${API_BASE_URL}/users`);
-    const users = await response.json();
-
-    const nextId =
-      Math.max(...users.map((u) => Number(u.id)), 0) + 1;
-
-    const staff = {
-      id: nextId,
+    const result = await staffAPI.create({
       name: newStaff.name,
       email: newStaff.email,
       phone: newStaff.phone,
-      password: newStaff.password || "123456",
-      role: newStaff.role || "waiter",
+      password: newStaff.password || '123456',
+      role: newStaff.role || 'waiter',
       restaurant_id: newStaff.restaurant_id,
-      created_at: new Date().toISOString(),
-    };
+    });
 
-    const createResponse = await fetch(
-      `${API_BASE_URL}/users`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(staff),
-      }
-    );
-
-    if (!createResponse.ok) {
-      throw new Error("Failed to create staff");
-    }
-
-    return await createResponse.json();
+    return result;
   } catch (error) {
-    console.error("Error adding staff:", error);
+    console.error('Error adding staff:', error);
     throw error;
   }
 };
@@ -97,26 +67,10 @@ export const addStaff = async (newStaff) => {
 
 export const updateStaff = async (id, updatedData) => {
   try {
-    await delay();
-
-    const response = await fetch(
-      `${API_BASE_URL}/users/${id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedData),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Staff not found");
-    }
-
-    return await response.json();
+    const result = await staffAPI.update(id, updatedData);
+    return result;
   } catch (error) {
-    console.error("Error updating staff:", error);
+    console.error('Error updating staff:', error);
     throw error;
   }
 };
@@ -129,22 +83,10 @@ export const updateStaff = async (id, updatedData) => {
 
 export const deleteStaff = async (id) => {
   try {
-    await delay();
-
-    const response = await fetch(
-      `${API_BASE_URL}/users/${id}`,
-      {
-        method: "DELETE",
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Staff not found");
-    }
-
+    await staffAPI.delete(id);
     return id;
   } catch (error) {
-    console.error("Error deleting staff:", error);
+    console.error('Error deleting staff:', error);
     throw error;
   }
 };
@@ -166,18 +108,11 @@ export const staffService = {
 
       return {
         totalStaff: staff.length,
-
-        restaurantAdmins: staff.filter(
-          (s) => s.role === "restaurant_admin"
-        ).length,
-
-        waiters: staff.filter(
-          (s) => s.role === "waiter"
-        ).length,
+        restaurantAdmins: staff.filter((s) => s.role === 'restaurant_admin').length,
+        waiters: staff.filter((s) => s.role === 'waiter').length,
       };
     } catch (error) {
-      console.error("Error fetching staff stats:", error);
-
+      console.error('Error fetching staff stats:', error);
       return {
         totalStaff: 0,
         restaurantAdmins: 0,
