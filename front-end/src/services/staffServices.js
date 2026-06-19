@@ -1,99 +1,104 @@
 // services/staffServices.js
-import { authAPI, staffAPI, restaurantAPI } from './api.js';
 
-const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
+import { staffAPI } from './api.js';
 
 /*
 |--------------------------------------------------------------------------
-| Fetch All Staff
+| Staff Service
 |--------------------------------------------------------------------------
 */
 
 export const fetchStaff = async (restaurantId = null) => {
   try {
-    // Get all users with waiter or restaurant_admin roles
-    const params = { role: 'waiter,restaurant_admin' };
+    const params = {};
     if (restaurantId) {
       params.restaurant_id = restaurantId;
     }
     
     const result = await staffAPI.getAll(params);
-    const users = result.users || result || [];
-    
-    let staff = users.filter(
-      (user) => user.role === 'waiter' || user.role === 'restaurant_admin'
-    );
-
-    if (restaurantId) {
-      staff = staff.filter((user) => user.restaurant_id === restaurantId);
-    }
-
-    return staff;
+    return {
+      success: true,
+      data: result || [],
+    };
   } catch (error) {
-    console.error('Error fetching staff:', error);
-    return [];
+    console.error('[StaffService] Error fetching staff:', error);
+    return {
+      success: false,
+      data: [],
+      error: error.message || 'Failed to fetch staff',
+    };
   }
 };
-
-/*
-|--------------------------------------------------------------------------
-| Add Staff
-|--------------------------------------------------------------------------
-*/
 
 export const addStaff = async (newStaff) => {
   try {
     const result = await staffAPI.create({
       name: newStaff.name,
       email: newStaff.email,
-      phone: newStaff.phone,
+      phone: newStaff.phone || '',
       password: newStaff.password || '123456',
       role: newStaff.role || 'waiter',
       restaurant_id: newStaff.restaurant_id,
     });
-
-    return result;
+    
+    return {
+      success: true,
+      data: result,
+    };
   } catch (error) {
-    console.error('Error adding staff:', error);
-    throw error;
+    console.error('[StaffService] Error adding staff:', error);
+    return {
+      success: false,
+      data: null,
+      error: error.message || 'Failed to add staff',
+    };
   }
 };
-
-/*
-|--------------------------------------------------------------------------
-| Update Staff
-|--------------------------------------------------------------------------
-*/
 
 export const updateStaff = async (id, updatedData) => {
   try {
-    const result = await staffAPI.update(id, updatedData);
-    return result;
+    const result = await staffAPI.update(id, {
+      name: updatedData.name,
+      email: updatedData.email,
+      phone: updatedData.phone || '',
+      role: updatedData.role || 'waiter',
+      is_active: updatedData.is_active !== undefined ? updatedData.is_active : true,
+    });
+    
+    return {
+      success: true,
+      data: result,
+    };
   } catch (error) {
-    console.error('Error updating staff:', error);
-    throw error;
+    console.error('[StaffService] Error updating staff:', error);
+    return {
+      success: false,
+      data: null,
+      error: error.message || 'Failed to update staff',
+    };
   }
 };
-
-/*
-|--------------------------------------------------------------------------
-| Delete Staff
-|--------------------------------------------------------------------------
-*/
 
 export const deleteStaff = async (id) => {
   try {
     await staffAPI.delete(id);
-    return id;
+    return {
+      success: true,
+      data: { id },
+    };
   } catch (error) {
-    console.error('Error deleting staff:', error);
-    throw error;
+    console.error('[StaffService] Error deleting staff:', error);
+    return {
+      success: false,
+      data: null,
+      error: error.message || 'Failed to delete staff',
+    };
   }
 };
 
 /*
 |--------------------------------------------------------------------------
-| Staff Service
+| Staff Service Object
 |--------------------------------------------------------------------------
 */
 
@@ -104,19 +109,47 @@ export const staffService = {
 
   getStats: async (restaurantId = null) => {
     try {
-      const staff = await fetchStaff(restaurantId);
-
+      const result = await fetchStaff(restaurantId);
+      
+      if (!result.success) {
+        return {
+          success: false,
+          data: {
+            totalStaff: 0,
+            activeNow: 0,
+            admins: 0,
+            waitstaff: 0,
+          },
+          error: result.error,
+        };
+      }
+      
+      const staff = result.data || [];
+      const total = staff.length;
+      const admins = staff.filter((s) => s.role === 'restaurant_admin' || s.role === 'admin').length;
+      const waitstaff = staff.filter((s) => s.role === 'waiter').length;
+      const activeNow = staff.filter((s) => s.is_active !== false).length;
+      
       return {
-        totalStaff: staff.length,
-        restaurantAdmins: staff.filter((s) => s.role === 'restaurant_admin').length,
-        waiters: staff.filter((s) => s.role === 'waiter').length,
+        success: true,
+        data: {
+          totalStaff: total,
+          activeNow,
+          admins,
+          waitstaff,
+        },
       };
     } catch (error) {
-      console.error('Error fetching staff stats:', error);
+      console.error('[StaffService] Error fetching stats:', error);
       return {
-        totalStaff: 0,
-        restaurantAdmins: 0,
-        waiters: 0,
+        success: false,
+        data: {
+          totalStaff: 0,
+          activeNow: 0,
+          admins: 0,
+          waitstaff: 0,
+        },
+        error: error.message || 'Failed to fetch stats',
       };
     }
   },
