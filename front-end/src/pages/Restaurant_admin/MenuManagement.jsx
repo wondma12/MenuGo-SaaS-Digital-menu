@@ -1,94 +1,84 @@
 // src/pages/Restaurant_admin/MenuManagement.jsx
-import React, { useState, useMemo } from "react";
+
+import React, { useState, useEffect, useMemo } from "react";
+import { useParams } from "react-router-dom";
 import Sidebar from "../../components/layout/sidebar";
 import TopHeader from "../../components/layout/TopHeader";
 import MenuItemList from "../../components/Restaurant_admin/menu/MenuItemList";
 import CreateMenuItemModal from "../../components/Restaurant_admin/menu/CreateMenuItemModal";
-
-// Initial mock data (keep as is - no changes needed)
-const INITIAL_ITEMS = [
-  {
-    id: 1,
-    name: "Wagyu Ribeye",
-    description: "A5 Grade, Truffle Butter",
-    category: "Main Course",
-    price: 84.0,
-    available: true,
-    imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuDH_f9EOD8f_YMbHl7quGMKEmzgZqONsROFtP66SOLTAiqX6piY5asfN_ASt1th4d-nPkPCgsntdUfpOK9GXCS3m1jrFfZ-YQotR8s0Xal0TYW4M0UiOWN9DzYI-DG47f9kHw8452sIPauF6L3twER4VlF1YPs8hFw5AJlxXgCcvDsHscz1MXHiWdkCGYDiZuV_MluQC4eJZFYvynbakYFeIWpnpW3XdwO09jSjF4BDCVytVI3J-u1IP738Ukr24uYzKRo7_rkT7CM",
-    orderCount: 145,
-    stock: null,
-    margin: 65,
-  },
-  {
-    id: 2,
-    name: "Citrus Deconstruction",
-    description: "Meyer Lemon, Yuzu Curd",
-    category: "Desserts",
-    price: 18.0,
-    available: true,
-    imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAfanwlnLIHnPAh9fvzChXUe_ck18edcaG6zL-osgYe_vxxBnhYsyNu1k_LGQNM1fYDbF44G_ovIz8jP3ZgLMheK3uTNIH79w7hs-fSbbuzYGpxfCF49tZQlPBbxFfeX7cKo2SXI29cdGcqpUZXkamEgsdpuO31CO1ccd8qTemXdm6S613ltS1vQiYGSzmJitNoOksAAl0WuAnPV-SyH84t1LiDF_e8GlgUkVDzwiczEiuipzEN0cznnsMkeoGM1MaXSgiLox1y5FI",
-    orderCount: 98,
-    stock: null,
-    margin: 82,
-  },
-  {
-    id: 3,
-    name: "Heirloom Burrata",
-    description: "Balsamic Pearls, Basil Oil",
-    category: "Starters",
-    price: 22.0,
-    available: false,
-    imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuArGqaS4vE9QI1Xo64QvoYQUVPqtgn2XPiAYfNn4ooetg8ge1uOfS5w4ZaaIcmI-KT6sGKYZ8FERMiSDsCSAOqFMbBhu-_FIC6XQ9PfKVvfGUOIhSGBA4BtiVh_jOuaNyffKSOD1txr-8WjhAJHSLUPDP7zD9-ywnT2jAmGqkFIRni6T427NjnSLkU2gO9_ZRSGoc3Y_kl49_AfBje3hMOSAIY6aLV0MlEdxky3w-SV4CkbD6pwMXocNXO8YocagcosE6LXclrzA68",
-    orderCount: 34,
-    stock: null,
-    margin: 55,
-  },
-  {
-    id: 4,
-    name: "Black Truffle Pasta",
-    description: "Handmade Fettuccine, Parmesan",
-    category: "Pasta",
-    price: 48.0,
-    available: true,
-    imageUrl: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=100&h=100&fit=crop",
-    orderCount: 42,
-    stock: 12,
-    margin: 70,
-  },
-  {
-    id: 5,
-    name: "Spicy Tuna Roll",
-    description: "Fresh Tuna, Sriracha, Avocado",
-    category: "Starters",
-    price: 24.0,
-    available: true,
-    imageUrl: "https://images.unsplash.com/photo-1617196034183-421b4917c92d?w=100&h=100&fit=crop",
-    orderCount: 67,
-    stock: null,
-    margin: 60,
-  },
-  {
-    id: 6,
-    name: "Lobster Bisque",
-    description: "Cognac, Crème Fraîche",
-    category: "Starters",
-    price: 32.0,
-    available: true,
-    imageUrl: "https://images.unsplash.com/photo-1547592180-85f173990554?w=100&h=100&fit=crop",
-    orderCount: 53,
-    stock: 8,
-    margin: 68,
-  },
-];
+import menuService from "../../services/menuService";
 
 const MenuManagement = () => {
-  const [items, setItems] = useState(INITIAL_ITEMS);
+  const { restaurantId } = useParams();
+
+  // ============================================================
+  // STATE
+  // ============================================================
+
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const itemsPerPage = 3;
+
+  // ============================================================
+  // FETCH DATA
+  // ============================================================
+
+  const fetchMenuItems = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const result = await menuService.getMenuItems();
+      
+      if (result.success) {
+        // Transform API data to match component format
+        const transformedItems = result.data.map((item) => ({
+          id: item.id,
+          name: item.name,
+          description: item.description || "",
+          category: item.categories?.name || "Uncategorized",
+          price: parseFloat(item.price),
+          available: item.status === "available",
+          imageUrl: item.image || "https://images.unsplash.com/photo-1547592180-85f173990554?w=100&h=100&fit=crop",
+          orderCount: item.order_count || 0,
+          stock: item.stock || null,
+          margin: item.margin || 50,
+          category_id: item.category_id,
+        }));
+        
+        setItems(transformedItems);
+      } else {
+        setError(result.error || "Failed to fetch menu items");
+      }
+    } catch (err) {
+      console.error("[MenuManagement] Error fetching menu items:", err);
+      setError(err.message || "Failed to load menu items");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMenuItems();
+  }, []);
+
+  // ============================================================
+  // FILTERS & PAGINATION
+  // ============================================================
+
+  // Get unique categories
+  const categories = useMemo(() => {
+    const cats = ["All", ...new Set(items.map((item) => item.category))];
+    return cats;
+  }, [items]);
 
   // Filter items based on search and category
   const filteredItems = useMemo(() => {
@@ -112,22 +102,33 @@ const MenuManagement = () => {
   // Stats calculations
   const activeItemsCount = items.filter((item) => item.available).length;
   const averageOrderValue =
-    items.reduce((sum, item) => sum + item.price, 0) / items.length;
+    items.length > 0
+      ? items.reduce((sum, item) => sum + item.price, 0) / items.length
+      : 0;
 
   // Insights calculations
-  const mostPopularItem = items.reduce(
-    (prev, current) => (current.orderCount > prev.orderCount ? current : prev),
-    items[0],
-  );
+  const mostPopularItem = items.length > 0
+    ? items.reduce((prev, current) =>
+        current.orderCount > prev.orderCount ? current : prev,
+        items[0]
+      )
+    : null;
+    
   const lowInventoryItem = items.find(
     (item) => item.stock !== null && item.stock < 20 && item.available,
   );
-  const profitLeader = items.reduce(
-    (prev, current) => (current.margin > prev.margin ? current : prev),
-    items[0],
-  );
+  
+  const profitLeader = items.length > 0
+    ? items.reduce((prev, current) =>
+        current.margin > prev.margin ? current : prev,
+        items[0]
+      )
+    : null;
 
-  // CRUD Operations
+  // ============================================================
+  // CRUD OPERATIONS
+  // ============================================================
+
   const handleAddItem = () => {
     setEditingItem(null);
     setIsModalOpen(true);
@@ -138,112 +139,220 @@ const MenuManagement = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteItem = (id) => {
-    if (window.confirm("Are you sure you want to delete this item?")) {
-      setItems(items.filter((item) => item.id !== id));
+  const handleDeleteItem = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this item?")) {
+      return;
+    }
+
+    try {
+      const result = await menuService.deleteMenuItem(id);
+      
+      if (result.success) {
+        // Remove item from state
+        setItems(items.filter((item) => item.id !== id));
+        // Show success feedback (you can add toast notifications here)
+        console.log("Item deleted successfully");
+      } else {
+        alert(result.error || "Failed to delete item");
+      }
+    } catch (error) {
+      console.error("[MenuManagement] Error deleting item:", error);
+      alert("Failed to delete item. Please try again.");
     }
   };
 
-  const handleSaveItem = (itemData) => {
-    if (editingItem) {
-      setItems(
-        items.map((item) =>
-          item.id === editingItem.id ? { ...itemData, id: item.id } : item,
-        ),
-      );
-    } else {
-      const newItem = {
-        ...itemData,
-        id: Date.now(),
-        orderCount: 0,
-        stock: null,
-        margin: 50,
+  const handleSaveItem = async (itemData) => {
+    setIsSubmitting(true);
+
+    try {
+      // Prepare data for API
+      const apiData = {
+        category_id: itemData.category_id || itemData.category,
+        name: itemData.name,
+        description: itemData.description || "",
+        price: parseFloat(itemData.price),
+        image: itemData.imageUrl || "",
+        status: itemData.available ? "available" : "unavailable",
+        preparation_time: parseInt(itemData.preparation_time) || 15,
+        is_featured: itemData.is_featured || false,
       };
-      setItems([...items, newItem]);
+
+      let result;
+      
+      if (editingItem) {
+        // Update existing item
+        result = await menuService.updateMenuItem(editingItem.id, apiData);
+      } else {
+        // Create new item
+        result = await menuService.createMenuItem(apiData);
+      }
+
+      if (result.success) {
+        // Refresh the list
+        await fetchMenuItems();
+        setIsModalOpen(false);
+        setEditingItem(null);
+        // Show success feedback
+        console.log(editingItem ? "Item updated successfully" : "Item created successfully");
+      } else {
+        alert(result.error || "Failed to save item");
+      }
+    } catch (error) {
+      console.error("[MenuManagement] Error saving item:", error);
+      alert("Failed to save item. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsModalOpen(false);
-    setEditingItem(null);
   };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
 
-  const categories = ["All", ...new Set(items.map((item) => item.category))];
+  // ============================================================
+  // RENDER - LOADING STATE
+  // ============================================================
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
+        <main className="min-h-screen bg-surface">
+          <div className="p-8 max-w-[1200px] w-full mx-auto">
+            {/* Skeleton Header */}
+            <div className="flex justify-between items-end mb-6">
+              <div className="space-y-2">
+                <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-10 w-64 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+              <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+
+            {/* Skeleton Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
+              <div className="md:col-span-8 h-24 bg-gray-200 rounded-xl animate-pulse"></div>
+              <div className="md:col-span-4 h-24 bg-gray-200 rounded-xl animate-pulse"></div>
+            </div>
+
+            {/* Skeleton Search */}
+            <div className="h-12 bg-gray-200 rounded-lg animate-pulse mb-4"></div>
+
+            {/* Skeleton Table */}
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-16 bg-gray-200 rounded-lg animate-pulse"></div>
+              ))}
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ============================================================
+  // RENDER - ERROR STATE
+  // ============================================================
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
+        <main className="min-h-screen bg-surface">
+          <div className="p-8 max-w-[1200px] w-full mx-auto">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
+              <div className="text-red-500 text-6xl mb-4">⚠️</div>
+              <h3 className="text-xl font-semibold text-red-700 mb-2">Unable to Load Menu</h3>
+              <p className="text-red-600 mb-4">{error}</p>
+              <button
+                onClick={fetchMenuItems}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ============================================================
+  // RENDER - SUCCESS STATE
+  // ============================================================
 
   return (
     <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
-
-      {/* Main Content - with ml-64 pt-16 for sidebar and header spacing */}
-      <main className=" min-h-screen bg-surface">
+      <main className="min-h-screen bg-surface">
         <div className="p-8 max-w-[1200px] w-full mx-auto">
           {/* Page Header Actions */}
-          <div className="flex justify-between items-end mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
             <div>
               <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
                 Menu Inventory
               </p>
-              <h2 className="text-black text-5xl font-bold uppercase leading-none">
+              <h2 className="text-black text-3xl md:text-5xl font-bold uppercase leading-none">
                 Manage your dishes
               </h2>
+              <p className="text-gray-500 text-sm mt-1">
+                {items.length} total items • {activeItemsCount} active
+              </p>
             </div>
             <button
               onClick={handleAddItem}
               className="bg-black text-white px-4 py-2 font-medium text-sm rounded hover:bg-neutral-800 transition-colors flex items-center space-x-2"
             >
-              <span className="material-symbols-outlined text-sm">add</span>
+              <span className="text-sm mr-1">+</span>
               <span>menu item</span>
             </button>
           </div>
 
-          {/* Stats Overview (Asymmetric Layout) */}
+          {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
             <div className="md:col-span-8 bg-white border border-neutral-200 p-6 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
-              <div className="flex justify-between items-center mb-md">
-                <span className="font-label-caps text-label-caps text-secondary uppercase">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
                   Availability Pulse
                 </span>
-                <span className="text-xs font-bold text-black px-2 py-1 bg-surface-container rounded-sm">
+                <span className="text-xs font-bold text-black px-2 py-1 bg-gray-100 rounded">
                   LIVE
                 </span>
               </div>
               <div className="flex items-baseline space-x-4">
-                <span className="text-display font-display text-black">
+                <span className="text-4xl font-bold text-black">
                   {activeItemsCount}
                 </span>
-                <span className="text-secondary font-body-md">
+                <span className="text-gray-600">
                   Active Menu Items
                 </span>
               </div>
             </div>
             <div className="md:col-span-4 bg-black text-white p-6 rounded-xl flex flex-col justify-between">
-              <span className="font-label-caps text-label-caps text-neutral-400 uppercase">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
                 Average Order Value
               </span>
               <div className="mt-4">
-                <span className="text-h1 font-h1">
+                <span className="text-3xl font-bold">
                   ${averageOrderValue.toFixed(2)}
                 </span>
-                <p className="text-xs text-neutral-400 mt-1">
-                  +12% from last month
+                <p className="text-xs text-gray-400 mt-1">
+                  Based on current menu prices
                 </p>
               </div>
             </div>
           </div>
 
           {/* Search & Filters */}
-          <div className="mb-4 flex items-center space-x-4">
-            <div className="relative flex-1">
+          <div className="mb-4 flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div className="relative flex-1 w-full">
               <input
-                className="w-full pl-10 pr-4 py-2 border border-neutral-200 rounded-lg focus:border-black focus:ring-0 transition-colors font-body-sm text-on-surface placeholder:text-neutral-400"
+                className="w-full pl-10 pr-4 py-2 border border-neutral-200 rounded-lg focus:border-black focus:ring-0 transition-colors"
                 placeholder="Search by item name or category..."
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
             </div>
             <select
-              className="border border-neutral-200 px-3 py-2 rounded-lg bg-white hover:bg-neutral-50 font-medium text-sm cursor-pointer"
+              className="border border-neutral-200 px-3 py-2 rounded-lg bg-white hover:bg-neutral-50 font-medium text-sm cursor-pointer w-full sm:w-auto"
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
             >
@@ -263,66 +372,82 @@ const MenuManagement = () => {
           />
 
           {/* Pagination */}
-          <div className="px-6 py-4 border-t border-neutral-200 flex items-center justify-between bg-surface-container-low rounded-b-xl mt-4">
-            <span className="font-body-sm text-secondary">
-              Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-              {Math.min(currentPage * itemsPerPage, filteredItems.length)} of{" "}
-              {filteredItems.length} results
-            </span>
-            <div className="flex space-x-2">
-              <button
-                className={`px-3 py-1 border border-neutral-200 rounded-lg ${currentPage === 1 ? "text-neutral-400 cursor-not-allowed" : "bg-white hover:bg-neutral-50 text-black"}`}
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-              <button
-                className={`px-3 py-1 border border-neutral-200 rounded-lg ${currentPage === totalPages ? "text-neutral-400 cursor-not-allowed" : "bg-white hover:bg-neutral-50 text-black"}`}
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
+          {filteredItems.length > 0 && (
+            <div className="px-6 py-4 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between bg-gray-50 rounded-b-xl mt-4 gap-2">
+              <span className="text-sm text-gray-600">
+                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                {Math.min(currentPage * itemsPerPage, filteredItems.length)} of{" "}
+                {filteredItems.length} results
+              </span>
+              <div className="flex space-x-2">
+                <button
+                  className={`px-3 py-1 border border-neutral-200 rounded-lg ${
+                    currentPage === 1
+                      ? "text-gray-400 cursor-not-allowed bg-gray-100"
+                      : "bg-white hover:bg-neutral-50 text-black"
+                  }`}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+                <button
+                  className={`px-3 py-1 border border-neutral-200 rounded-lg ${
+                    currentPage === totalPages
+                      ? "text-gray-400 cursor-not-allowed bg-gray-100"
+                      : "bg-white hover:bg-neutral-50 text-black"
+                  }`}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Contextual Insight Footer */}
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="border-l-2 border-black pl-4">
-              <p className="font-label-caps text-label-caps text-secondary mb-1">
-                MOST POPULAR
-              </p>
-              <p className="font-h3 text-h3 text-black">
-                {mostPopularItem.name}
-              </p>
-              <p className="font-body-sm text-secondary">
-                Ordered {mostPopularItem.orderCount} times this week.
-              </p>
+          {items.length > 0 && (
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="border-l-2 border-black pl-4">
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">
+                  MOST POPULAR
+                </p>
+                <p className="text-xl font-bold text-black">
+                  {mostPopularItem?.name || "N/A"}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Ordered {mostPopularItem?.orderCount || 0} times.
+                </p>
+              </div>
+              <div className="border-l-2 border-gray-300 pl-4">
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">
+                  LOW INVENTORY
+                </p>
+                <p className="text-xl font-bold text-black">
+                  {lowInventoryItem ? lowInventoryItem.name : "N/A"}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {lowInventoryItem
+                    ? `Only ${lowInventoryItem.stock} servings left.`
+                    : "All items well stocked"}
+                </p>
+              </div>
+              <div className="border-l-2 border-gray-300 pl-4">
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">
+                  PROFIT LEADER
+                </p>
+                <p className="text-xl font-bold text-black">
+                  {profitLeader?.name || "N/A"}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {profitLeader
+                    ? `Highest margin item (${profitLeader.margin}%)`
+                    : "No data available"}
+                </p>
+              </div>
             </div>
-            <div className="border-l-2 border-neutral-300 pl-4">
-              <p className="font-label-caps text-label-caps text-secondary mb-1">
-                LOW INVENTORY
-              </p>
-              <p className="font-h3 text-h3 text-black">
-                {lowInventoryItem ? lowInventoryItem.name : "N/A"}
-              </p>
-              <p className="font-body-sm text-secondary">
-                {lowInventoryItem
-                  ? `Only ${lowInventoryItem.stock} servings left.`
-                  : "All items well stocked"}
-              </p>
-            </div>
-            <div className="border-l-2 border-neutral-300 pl-4">
-              <p className="font-label-caps text-label-caps text-secondary mb-1">
-                PROFIT LEADER
-              </p>
-              <p className="font-h3 text-h3 text-black">{profitLeader.name}</p>
-              <p className="font-body-sm text-secondary">
-                Highest margin item ({profitLeader.margin}%).
-              </p>
-            </div>
-          </div>
+          )}
         </div>
       </main>
 
@@ -335,9 +460,11 @@ const MenuManagement = () => {
         }}
         onSave={handleSaveItem}
         initialData={editingItem}
+        isSubmitting={isSubmitting}
+        categories={categories.filter(c => c !== "All")}
       />
     </div>
   );
 };
 
-export default MenuManagement;  
+export default MenuManagement;

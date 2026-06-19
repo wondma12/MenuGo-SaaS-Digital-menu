@@ -40,6 +40,9 @@ const MultiStepRegistration = () => {
     businessLicenseNumber: "",
     tinNumber: "",
     slogan: "",
+    logo: null,
+    banner: null,
+    businessLicenseDocument: null,
   });
 
   const [errors, setErrors] = useState({});
@@ -143,6 +146,7 @@ const MultiStepRegistration = () => {
     if (validateCurrentStep()) {
       if (currentStep < 5) {
         setCurrentStep(currentStep + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
   };
@@ -150,6 +154,7 @@ const MultiStepRegistration = () => {
   const handlePrevious = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -159,21 +164,45 @@ const MultiStepRegistration = () => {
       setSubmitError("");
 
       try {
-        const result = await registrationService.submitRegistration(formData);
+        // Map form data to API expected format
+        const registrationData = {
+          fullName: formData.fullName,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          password: formData.password,
+          restaurantName: formData.restaurantName,
+          businessEmail: formData.businessEmail,
+          businessPhone: formData.businessPhone,
+          country: formData.country,
+          city: formData.city,
+          subCity: formData.subCity,
+          streetAddress: formData.streetAddress,
+          googleMapsLink: formData.googleMapsLink,
+          ownerName: formData.ownerName || formData.fullName,
+          businessLicenseNumber: formData.businessLicenseNumber,
+          tinNumber: formData.tinNumber,
+          slogan: formData.slogan || "",
+          logo: formData.logo || null,
+          banner: formData.banner || null,
+          businessLicenseDocument: formData.businessLicenseDocument || null,
+        };
+
+        const result = await registrationService.submitRegistration(registrationData);
 
         if (result.success) {
           // Registration successful - redirect to login with success message
           navigate("/auth/login", {
             state: {
-              message: result.data.message,
+              message: result.data.message || "Registration successful! Please login.",
               type: "success",
             },
           });
         } else {
-          setSubmitError(result.error);
+          setSubmitError(result.error || "Registration failed. Please try again.");
         }
       } catch (error) {
-        setSubmitError("Registration failed. Please try again.");
+        console.error("Registration error:", error);
+        setSubmitError(error.message || "Registration failed. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -454,7 +483,10 @@ const MultiStepRegistration = () => {
                     <option value="UK">United Kingdom</option>
                     <option value="CA">Canada</option>
                     <option value="AU">Australia</option>
-                    {/* Add more countries */}
+                    <option value="ET">Ethiopia</option>
+                    <option value="KE">Kenya</option>
+                    <option value="NG">Nigeria</option>
+                    <option value="ZA">South Africa</option>
                   </select>
                 </div>
                 {errors.country && (
@@ -795,7 +827,7 @@ const MultiStepRegistration = () => {
                 <div key={step.id} className="flex items-center">
                   <div className="flex flex-col items-center">
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors duration-300 ${
                         isActive
                           ? "bg-black text-white"
                           : isCompleted
@@ -823,7 +855,7 @@ const MultiStepRegistration = () => {
                   </div>
                   {index < steps.length - 1 && (
                     <div
-                      className={`flex-1 h-0.5 mx-4 ${
+                      className={`flex-1 h-0.5 mx-4 transition-colors duration-300 ${
                         currentStep > step.id ? "bg-green-900" : "bg-gray-200"
                       }`}
                     />
@@ -846,7 +878,7 @@ const MultiStepRegistration = () => {
               type="button"
               onClick={handlePrevious}
               disabled={currentStep === 1}
-              className="flex items-center gap-2 px-6 py-2 border bg-black border-gray-30  text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 hover-lift btn-micro"
+              className="flex items-center gap-2 px-6 py-2 border bg-white border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 hover-lift btn-micro"
             >
               <ChevronLeft className="w-4 h-4" />
               Previous
