@@ -1,18 +1,44 @@
 // services/authservice.js
 import { authAPI } from './api.js';
 
-const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
-
+/**
+ * Auth Service
+ * Handles all authentication-related operations including login, registration,
+ * user management, role checks, and navigation redirects.
+ */
 const authService = {
-  // =========================
-  // LOGIN
-  // =========================
+  // ============================================================
+  // AUTHENTICATION OPERATIONS
+  // ============================================================
+
+  /**
+   * Login user with email and password
+   * @param {string} email - User's email address
+   * @param {string} password - User's password
+   * @returns {Promise<Object>} { success, data: { token, user }, error }
+   */
   async login(email, password) {
     try {
       const result = await authAPI.login(email, password);
-      return result;
+
+      if (result.success) {
+        return {
+          success: true,
+          data: {
+            token: result.token,
+            user: result.user,
+          },
+          error: null,
+        };
+      }
+
+      return {
+        success: false,
+        data: null,
+        error: result.error || 'Invalid email or password',
+      };
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('[AuthService] Login error:', error);
       return {
         success: false,
         data: null,
@@ -21,15 +47,17 @@ const authService = {
     }
   },
 
-  // =========================
-  // REGISTER
-  // =========================
+  /**
+   * Register a new user
+   * @param {Object} userData - User registration data
+   * @returns {Promise<Object>} { success, data, error }
+   */
   async register(userData) {
     try {
       const result = await authAPI.register(userData);
       return result;
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('[AuthService] Registration error:', error);
       return {
         success: false,
         data: null,
@@ -38,15 +66,16 @@ const authService = {
     }
   },
 
-  // =========================
-  // CURRENT USER
-  // =========================
+  /**
+   * Get current authenticated user
+   * @returns {Promise<Object>} { success, user, error }
+   */
   async getCurrentUser() {
     try {
       const result = await authAPI.getCurrentUser();
       return result;
     } catch (error) {
-      console.error('Get current user error:', error);
+      console.error('[AuthService] Get current user error:', error);
       return {
         success: false,
         data: null,
@@ -55,70 +84,114 @@ const authService = {
     }
   },
 
-  // =========================
-  // LOGOUT
-  // =========================
+  /**
+   * Logout user - clears all stored auth data
+   * @returns {Object} { success: true }
+   */
   logout() {
-    return authAPI.logout();
+    authAPI.logout();
+    return { success: true };
   },
 
-  // =========================
-  // ROLE CHECK
-  // =========================
+  // ============================================================
+  // STORAGE HELPERS
+  // ============================================================
+
+  /**
+   * Get current user from localStorage
+   * @returns {Object|null} User object or null if not found
+   */
+  getCurrentUserFromStorage() {
+    return authAPI.getUser();
+  },
+
+  /**
+   * Check if user is authenticated
+   * @returns {boolean} True if token exists
+   */
+  isAuthenticated() {
+    return authAPI.isAuthenticated();
+  },
+
+  /**
+   * Get auth token from localStorage
+   * @returns {string|null} Token or null if not found
+   */
+  getToken() {
+    return authAPI.getToken();
+  },
+
+  // ============================================================
+  // ROLE & PERMISSION CHECKS
+  // ============================================================
+
+  /**
+   * Role hierarchy levels for permission checking
+   */
+  _roleHierarchy: {
+    platform_admin: 3,
+    restaurant_admin: 2,
+    waiter: 1,
+  },
+
+  /**
+   * Check if user has required role level
+   * @param {string} userRole - Current user's role
+   * @param {string} requiredRole - Required role to check
+   * @returns {boolean} True if user has sufficient role level
+   */
   hasRole(userRole, requiredRole) {
-    const roleHierarchy = {
-      platform_admin: 3,
-      restaurant_admin: 2,
-      waiter: 1,
-    };
-
-    return roleHierarchy[userRole] >= roleHierarchy[requiredRole];
+    const userLevel = this._roleHierarchy[userRole] || 0;
+    const requiredLevel = this._roleHierarchy[requiredRole] || 0;
+    return userLevel >= requiredLevel;
   },
 
-  // =========================
-  // RESTAURANT ACCESS
-  // =========================
+  /**
+   * Check if user can access a specific restaurant
+   * @param {Object} user - User object
+   * @param {string} restaurantId - Restaurant ID to check
+   * @returns {boolean} True if user has access
+   */
   canAccessRestaurant(user, restaurantId) {
-    // Platform admin can access everything
+    // Platform admin has access to all restaurants
     if (user.role === 'platform_admin') {
       return true;
     }
-
-    // Restaurant users only access their own restaurant
+    // Others can only access their own restaurant
     return user.restaurant_id === restaurantId;
   },
 
-  // =========================
-  // REDIRECTS
-  // =========================
+  // ============================================================
+  // NAVIGATION HELPERS
+  // ============================================================
+
+  /**
+   * Get redirect path based on user role
+   * @param {Object} user - User object
+   * @returns {string} Redirect path URL
+   */
   getRestaurantRedirectPath(user) {
-    // Platform admin
-    if (user.role === 'platform_admin') {
-      return '/platform/dashboard';
-    }
+    const redirectMap = {
+      platform_admin: '/admin/dashboard',
+      restaurant_admin: `/Restaurant_admin/dashboard/${user.restaurant_id}`,
+      waiter: `/waiter/orders/${user.restaurant_id}`,
+    };
 
-    // Restaurant admin
-    if (user.role === 'restaurant_admin') {
-      return `/Restaurant_admin/dashboard/${user.restaurant_id}`;
-    }
-
-    // Waiter
-    if (user.role === 'waiter') {
-      return `/waiter/orders/${user.restaurant_id}`;
-    }
-
-    return '/';
+    return redirectMap[user.role] || '/';
   },
 
-  // =========================
-  // GET USER RESTAURANT
-  // =========================
+  /**
+   * Get user's restaurant data
+   * @param {Object} user - User object
+   * @returns {Promise<Object|null>} Restaurant data or null
+   */
   async getRestaurantByUser(user) {
-    try {
-      if (user.role === 'platform_admin' || !user.restaurant_id) {
-        return null;
-      }
+    // Platform admin or users without restaurant don't have a restaurant
+    if (user.role === 'platform_admin' || !user.restaurant_id) {
+      return null;
+    }
 
+    try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/restaurants/${user.restaurant_id}`
       );
@@ -130,31 +203,10 @@ const authService = {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Restaurant fetch error:', error);
+      console.error('[AuthService] Restaurant fetch error:', error);
       return null;
     }
   },
-
-  // =========================
-  // GET CURRENT USER FROM STORAGE
-  // =========================
-  getCurrentUserFromStorage() {
-    return authAPI.getUser();
-  },
-
-  // =========================
-  // IS AUTHENTICATED
-  // =========================
-  isAuthenticated() {
-    return authAPI.isAuthenticated();
-  },
-
-  // =========================
-  // GET TOKEN
-  // =========================
-  getToken() {
-    return authAPI.getToken();
-  }
 };
 
 export default authService;

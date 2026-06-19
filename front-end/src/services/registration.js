@@ -1,8 +1,6 @@
 // services/registration.js
 import { authAPI, restaurantAPI, verificationAPI, locationAPI } from './api.js';
 
-const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const registrationService = {
   // =========================================
   // SUBMIT RESTAURANT REGISTRATION
@@ -11,10 +9,10 @@ const registrationService = {
     try {
       // 1. Register the user
       const userResult = await authAPI.register({
-        name: registrationData.owner_name,
+        name: registrationData.fullName,
         email: registrationData.email,
         password: registrationData.password,
-        phone: registrationData.phone,
+        phone: registrationData.phoneNumber,
         role: 'restaurant_admin',
       });
 
@@ -30,13 +28,12 @@ const registrationService = {
 
       // 2. Create the restaurant
       const restaurantResult = await restaurantAPI.create({
-        name: registrationData.restaurant_name,
-        email: registrationData.business_email,
-        phone: registrationData.business_phone,
-        description: registrationData.description || '',
+        name: registrationData.restaurantName,
+        email: registrationData.businessEmail,
+        phone: registrationData.businessPhone,
+        description: registrationData.slogan || '',
         logo: registrationData.logo || '',
         banner: registrationData.banner || '',
-        qr_code: registrationData.qr_code || '',
         // The backend will set status to 'pending' by default
       });
 
@@ -55,9 +52,9 @@ const registrationService = {
         restaurant_id: restaurant.id,
         country: registrationData.country,
         city: registrationData.city,
-        sub_city: registrationData.sub_city,
-        street_address: registrationData.street_address,
-        map_link: registrationData.map_link,
+        sub_city: registrationData.subCity,
+        street_address: registrationData.streetAddress,
+        map_link: registrationData.googleMapsLink,
         latitude: registrationData.latitude || null,
         longitude: registrationData.longitude || null,
       });
@@ -73,11 +70,11 @@ const registrationService = {
       // 4. Submit verification
       const verificationResult = await verificationAPI.submit({
         restaurant_id: restaurant.id,
-        owner_name: registrationData.owner_name,
-        business_license_number: registrationData.business_license_number,
-        tin_number: registrationData.tin_number,
-        business_license_document: registrationData.business_license_document || '',
-        legal_document: registrationData.legal_document || '',
+        owner_name: registrationData.ownerName || registrationData.fullName,
+        business_license_number: registrationData.businessLicenseNumber,
+        tin_number: registrationData.tinNumber,
+        business_license_document: registrationData.businessLicenseDocument || '',
+        legal_document: registrationData.legalDocument || '',
       });
 
       if (!verificationResult.success) {
@@ -98,7 +95,7 @@ const registrationService = {
           restaurant,
           location: locationResult,
           verification: verificationResult,
-          message: 'Restaurant registration submitted successfully.',
+          message: 'Restaurant registration submitted successfully. Please wait for approval.',
         },
         error: null,
       };
@@ -218,7 +215,7 @@ const registrationService = {
         error: error.message || 'Failed to reject registration',
       };
     }
-  },
+  }
 };
 
 export default registrationService;
