@@ -7,4 +7,5 @@ export { default as restaurantService } from './restaurantService.js';
 export { default as analyticsService } from './analyticsService.js';
 export { default as staffService } from './staffServices.js';
 export { default as customerAuth } from './customerauth.js';
+export { qrCodeAPI } from './api.js';
 export { default as registrationService } from './registration.js';

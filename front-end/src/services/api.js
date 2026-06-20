@@ -44,9 +44,15 @@ api.interceptors.response.use(
 );
 
 // ============================================================
-// Helper function for consistent response format
+// HELPER FUNCTIONS
 // ============================================================
 
+/**
+ * Standard response handler - extracts data from API response
+ * @param {Object} response - Axios response object
+ * @returns {*} - The data from the response
+ * @throws {Error} - If the response indicates failure
+ */
 const handleResponse = (response) => {
   console.log('[API] handleResponse - Response:', response);
   
@@ -62,21 +68,30 @@ const handleResponse = (response) => {
   
   console.log('[API] response.data:', response.data);
   
+  // If the response has success: true, return the data
   if (response.data.success === true) {
     return response.data.data;
   }
   
+  // If the response has success: false, throw the error
   if (response.data.success === false) {
     throw new Error(response.data.message || 'Request failed');
   }
   
+  // If success is not provided but there's data, return it
   if (response.data.data) {
     return response.data.data;
   }
   
+  // Fallback: return the whole response data
   return response.data;
 };
 
+/**
+ * Standard error handler - extracts error message from API error
+ * @param {Error} error - Axios error object
+ * @throws {Error} - Re-throws the error with a consistent message
+ */
 const handleError = (error) => {
   console.error('[API] handleError - Error:', error);
   console.error('[API] Error response:', error.response);
@@ -88,8 +103,31 @@ const handleError = (error) => {
   throw new Error(message);
 };
 
+/**
+ * Wrapper for API calls that returns { success, data, error } format
+ * @param {Function} apiCall - The API call function
+ * @returns {Promise<Object>} - { success, data, error }
+ */
+const wrapApiCall = async (apiCall) => {
+  try {
+    const result = await apiCall();
+    return {
+      success: true,
+      data: result,
+      error: null,
+    };
+  } catch (error) {
+    console.error('[API] API call failed:', error);
+    return {
+      success: false,
+      data: null,
+      error: error.message || 'Request failed',
+    };
+  }
+};
+
 // ===============================
-// ✅ AUTH API - ADD THIS
+// AUTH API
 // ===============================
 
 export const authAPI = {
@@ -114,7 +152,10 @@ export const authAPI = {
   register: async (userData) => {
     try {
       const response = await api.post("/auth/register", userData);
-      return { success: true, data: response.data.data };
+      if (response.data.success) {
+        return { success: true, data: response.data.data };
+      }
+      return { success: false, error: response.data.message };
     } catch (error) {
       return {
         success: false,
@@ -126,7 +167,10 @@ export const authAPI = {
   getCurrentUser: async () => {
     try {
       const response = await api.get("/auth/me");
-      return { success: true, user: response.data.data };
+      if (response.data.success) {
+        return { success: true, user: response.data.data };
+      }
+      return { success: false, error: response.data.message };
     } catch (error) {
       return {
         success: false,
@@ -165,7 +209,7 @@ export const restaurantAPI = {
       const response = await api.get("/restaurants/all", { params });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -174,7 +218,7 @@ export const restaurantAPI = {
       const response = await api.get(`/restaurants/${id}`);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -183,7 +227,7 @@ export const restaurantAPI = {
       const response = await api.get("/restaurants/my-restaurant");
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -191,18 +235,21 @@ export const restaurantAPI = {
     try {
       console.log('[restaurantAPI.create] Sending data:', data);
       const response = await api.post("/restaurants", data);
-      console.log('[restaurantAPI.create] Raw response:', response);
       console.log('[restaurantAPI.create] Response data:', response.data);
       
-      if (!response) {
+      if (!response || !response.data) {
         throw new Error('No response from server');
       }
       
-      if (!response.data) {
-        console.error('[restaurantAPI.create] No data in response');
-        throw new Error('No data received from server');
+      // Handle success response
+      if (response.data.success === true) {
+        return {
+          success: true,
+          data: response.data.data,
+        };
       }
       
+      // If there's data but no success flag, assume success
       if (response.data.data) {
         return {
           success: true,
@@ -210,20 +257,15 @@ export const restaurantAPI = {
         };
       }
       
-      if (response.data.id || response.data.name) {
+      // If the response itself is the data (has id)
+      if (response.data.id) {
         return {
           success: true,
           data: response.data,
         };
       }
       
-      if (response.data.success === true) {
-        return {
-          success: true,
-          data: response.data.data || response.data,
-        };
-      }
-      
+      // Handle error response
       if (response.data.success === false) {
         return {
           success: false,
@@ -232,6 +274,7 @@ export const restaurantAPI = {
         };
       }
       
+      // Fallback
       return {
         success: true,
         data: response.data,
@@ -239,9 +282,6 @@ export const restaurantAPI = {
       
     } catch (error) {
       console.error('[restaurantAPI.create] Error:', error);
-      console.error('[restaurantAPI.create] Error response:', error.response);
-      console.error('[restaurantAPI.create] Error data:', error.response?.data);
-      
       return {
         success: false,
         data: null,
@@ -255,7 +295,7 @@ export const restaurantAPI = {
       const response = await api.put(`/restaurants/${id}`, data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -264,13 +304,13 @@ export const restaurantAPI = {
       const response = await api.put(`/restaurants/${id}/status`, { status });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 };
 
 // ===============================
-// STAFF API - ADD THIS
+// STAFF API
 // ===============================
 
 export const staffAPI = {
@@ -279,7 +319,7 @@ export const staffAPI = {
       const response = await api.get("/users", { params });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -288,7 +328,7 @@ export const staffAPI = {
       const response = await api.get(`/users?restaurant_id=${restaurantId}`);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -297,7 +337,7 @@ export const staffAPI = {
       const response = await api.post("/users", data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -306,7 +346,7 @@ export const staffAPI = {
       const response = await api.put(`/users/${id}`, data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -315,7 +355,7 @@ export const staffAPI = {
       const response = await api.delete(`/users/${id}`);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 };
@@ -325,12 +365,13 @@ export const staffAPI = {
 // ===============================
 
 export const menuAPI = {
+  // Categories
   getCategories: async () => {
     try {
       const response = await api.get("/menu/categories");
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -339,7 +380,7 @@ export const menuAPI = {
       const response = await api.get(`/menu/categories/${id}`);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -348,7 +389,7 @@ export const menuAPI = {
       const response = await api.post("/menu/categories", data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -357,7 +398,7 @@ export const menuAPI = {
       const response = await api.put(`/menu/categories/${id}`, data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -366,16 +407,17 @@ export const menuAPI = {
       const response = await api.delete(`/menu/categories/${id}`);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
+  // Menu Items
   getMenuItems: async (params = {}) => {
     try {
       const response = await api.get("/menu/items", { params });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -384,7 +426,7 @@ export const menuAPI = {
       const response = await api.get(`/menu/items/${id}`);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -393,7 +435,7 @@ export const menuAPI = {
       const response = await api.post("/menu/items", data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -402,7 +444,7 @@ export const menuAPI = {
       const response = await api.put(`/menu/items/${id}`, data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -411,7 +453,7 @@ export const menuAPI = {
       const response = await api.delete(`/menu/items/${id}`);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -420,7 +462,7 @@ export const menuAPI = {
       const response = await api.patch(`/menu/items/${id}/status`, { status });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -429,7 +471,7 @@ export const menuAPI = {
       const response = await api.get("/menu/items/featured", { params: { limit } });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -438,7 +480,7 @@ export const menuAPI = {
       const response = await api.get("/menu/items/menu-by-category");
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -447,7 +489,7 @@ export const menuAPI = {
       const response = await api.get(`/menu/public/${restaurantId}`);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 };
@@ -462,7 +504,7 @@ export const orderAPI = {
       const response = await api.get("/orders", { params });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -471,7 +513,7 @@ export const orderAPI = {
       const response = await api.get("/orders/active");
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -480,7 +522,7 @@ export const orderAPI = {
       const response = await api.get("/orders/history", { params });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -489,7 +531,7 @@ export const orderAPI = {
       const response = await api.get("/orders/today");
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -498,7 +540,7 @@ export const orderAPI = {
       const response = await api.get("/orders/kitchen-display");
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -507,7 +549,7 @@ export const orderAPI = {
       const response = await api.get(`/orders/${id}`);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -516,7 +558,7 @@ export const orderAPI = {
       const response = await api.post("/orders", data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -525,7 +567,7 @@ export const orderAPI = {
       const response = await api.patch(`/orders/${id}/status`, { status });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -534,7 +576,7 @@ export const orderAPI = {
       const response = await api.put(`/orders/${id}/assign-waiter`, { waiter_id: waiterId });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -543,22 +585,76 @@ export const orderAPI = {
       const response = await api.get(`/orders/track/${orderNumber}`);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 };
 
 // ===============================
-// QR CODE API
+// QR CODE API - FIXED
 // ===============================
 
 export const qrCodeAPI = {
   generate: async (data) => {
     try {
+      console.log('[qrCodeAPI.generate] Sending data:', data);
       const response = await api.post("/qrcodes/generate", data);
-      return handleResponse(response);
+      console.log('[qrCodeAPI.generate] Response:', response.data);
+      
+      if (!response || !response.data) {
+        return {
+          success: false,
+          data: null,
+          error: 'No response from server',
+        };
+      }
+      
+      // Handle success response
+      if (response.data.success === true) {
+        return {
+          success: true,
+          data: response.data.data,
+        };
+      }
+      
+      // If there's data but no success flag, assume success
+      if (response.data.data) {
+        return {
+          success: true,
+          data: response.data.data,
+        };
+      }
+      
+      // If the response has an id, assume success
+      if (response.data.id) {
+        return {
+          success: true,
+          data: response.data,
+        };
+      }
+      
+      // Handle error response
+      if (response.data.success === false) {
+        return {
+          success: false,
+          data: null,
+          error: response.data.message || 'Request failed',
+        };
+      }
+      
+      // Fallback
+      return {
+        success: true,
+        data: response.data,
+      };
+      
     } catch (error) {
-      handleError(error);
+      console.error('[qrCodeAPI.generate] Error:', error);
+      return {
+        success: false,
+        data: null,
+        error: error.response?.data?.message || error.message || 'Request failed',
+      };
     }
   },
 
@@ -567,16 +663,60 @@ export const qrCodeAPI = {
       const response = await api.post("/qrcodes/generate-tables", { table_numbers: tableNumbers });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
   getAll: async (params = {}) => {
     try {
       const response = await api.get("/qrcodes", { params });
-      return handleResponse(response);
+      console.log('[qrCodeAPI.getAll] Response:', response.data);
+      
+      if (!response || !response.data) {
+        return {
+          success: false,
+          data: [],
+          error: 'No response from server',
+        };
+      }
+      
+      // Handle success response
+      if (response.data.success === true) {
+        return {
+          success: true,
+          data: response.data.data || [],
+        };
+      }
+      
+      // If there's data but no success flag
+      if (response.data.data) {
+        return {
+          success: true,
+          data: response.data.data,
+        };
+      }
+      
+      // If the response is an array
+      if (Array.isArray(response.data)) {
+        return {
+          success: true,
+          data: response.data,
+        };
+      }
+      
+      // Fallback
+      return {
+        success: true,
+        data: response.data || [],
+      };
+      
     } catch (error) {
-      handleError(error);
+      console.error('[qrCodeAPI.getAll] Error:', error);
+      return {
+        success: false,
+        data: [],
+        error: error.response?.data?.message || error.message || 'Failed to fetch QR codes',
+      };
     }
   },
 
@@ -585,7 +725,7 @@ export const qrCodeAPI = {
       const response = await api.patch(`/qrcodes/${id}/status`, { is_active: isActive });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -594,7 +734,7 @@ export const qrCodeAPI = {
       const response = await api.delete(`/qrcodes/${id}`);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 };
@@ -609,7 +749,7 @@ export const feedbackAPI = {
       const response = await api.get("/feedbacks", { params });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -618,7 +758,7 @@ export const feedbackAPI = {
       const response = await api.post(`/feedbacks/public/${restaurantId}`, data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -627,7 +767,7 @@ export const feedbackAPI = {
       const response = await api.delete(`/feedbacks/${id}`);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 };
@@ -642,7 +782,7 @@ export const analyticsAPI = {
       const response = await api.get("/analytics/dashboard");
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -651,7 +791,7 @@ export const analyticsAPI = {
       const response = await api.get("/analytics/revenue-chart", { params: { days } });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -660,7 +800,7 @@ export const analyticsAPI = {
       const response = await api.get("/analytics/order-distribution");
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 };
@@ -675,7 +815,7 @@ export const verificationAPI = {
       const response = await api.post("/verification/submit", data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -684,7 +824,7 @@ export const verificationAPI = {
       const response = await api.get("/verification/my-status");
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -693,7 +833,7 @@ export const verificationAPI = {
       const response = await api.get("/verification/all", { params });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -702,7 +842,7 @@ export const verificationAPI = {
       const response = await api.put(`/verification/${id}/review`, { status, notes });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 };
@@ -717,7 +857,7 @@ export const locationAPI = {
       const response = await api.post("/locations", data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -726,7 +866,7 @@ export const locationAPI = {
       const response = await api.put("/locations", data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -735,7 +875,7 @@ export const locationAPI = {
       const response = await api.get("/locations");
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -744,7 +884,7 @@ export const locationAPI = {
       const response = await api.get("/locations/nearby", { params: { latitude, longitude, radius } });
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 };
@@ -759,7 +899,7 @@ export const settingsAPI = {
       const response = await api.get("/settings");
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 
@@ -768,7 +908,7 @@ export const settingsAPI = {
       const response = await api.put("/settings", data);
       return handleResponse(response);
     } catch (error) {
-      handleError(error);
+      return handleError(error);
     }
   },
 };

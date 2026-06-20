@@ -12,6 +12,7 @@ import { menuService } from "../../services/index.js";
 import { staffService } from "../../services/index.js";
 import { restaurantService } from "../../services/index.js";
 import { analyticsService } from "../../services/index.js";
+import { qrCodeAPI } from "../../services/api.js";
 
 const Dashboard = () => {
   const { restaurantId } = useParams();
@@ -35,6 +36,7 @@ const Dashboard = () => {
   const [orders, setOrders] = useState([]);
   const [staff, setStaff] = useState([]);
   const [restaurant, setRestaurant] = useState(null);
+  const [qrCodes, setQrCodes] = useState([]);
   const [inventoryAlerts, setInventoryAlerts] = useState([]);
 
   // ============================================================
@@ -47,7 +49,7 @@ const Dashboard = () => {
         setLoading(true);
         setError(null);
 
-        const restaurantId = getRestaurantId();
+        const currentRestaurantId = getRestaurantId();
 
         // Fetch all data in parallel
         const [
@@ -56,12 +58,14 @@ const Dashboard = () => {
           staffResult,
           restaurantResult,
           analyticsResult,
+          qrResult,
         ] = await Promise.all([
           menuService.getMenuItems(),
           orderService.getAllOrders(),
-          staffService.getAll(restaurantId),
+          staffService.getAll(currentRestaurantId),
           restaurantService.getMyRestaurant(),
-           analyticsService.getDashboardStats(),
+          analyticsService.getDashboardStats(),
+          qrCodeAPI.getAll(),
         ]);
 
         // Process menu items
@@ -71,13 +75,11 @@ const Dashboard = () => {
         // Process orders
         const ordersData = ordersResult.success ? ordersResult.data : [];
         const totalOrders = ordersData.length || 0;
-        const todayOrders = ordersData.filter(
-          (order) => {
-            const today = new Date().toDateString();
-            const orderDate = new Date(order.created_at).toDateString();
-            return orderDate === today;
-          }
-        ).length || 0;
+        const todayOrders = ordersData.filter((order) => {
+          const today = new Date().toDateString();
+          const orderDate = new Date(order.created_at).toDateString();
+          return orderDate === today;
+        }).length || 0;
 
         // Process staff
         const staffData = staffResult.success ? staffResult.data : [];
@@ -88,6 +90,9 @@ const Dashboard = () => {
 
         // Process analytics
         const analyticsData = analyticsResult.success ? analyticsResult.data : null;
+
+        // Process QR codes
+        const qrData = qrResult.success ? qrResult : [];
 
         // Update stats
         setStats({
@@ -106,6 +111,9 @@ const Dashboard = () => {
 
         // Set restaurant
         setRestaurant(restaurantData);
+
+        // Set QR codes
+        setQrCodes(qrData);
 
         // Set inventory alerts (mock for now - will be replaced when inventory API is ready)
         setInventoryAlerts([
@@ -141,7 +149,82 @@ const Dashboard = () => {
   };
 
   // ============================================================
-  // HANDLERS
+  // QR CODE HANDLERS
+  // ============================================================
+
+  const handleDownloadQR = async () => {
+    try {
+      const currentRestaurantId = getRestaurantId();
+      
+      if (!currentRestaurantId) {
+        alert('No restaurant found. Please ensure you are logged in.');
+        return;
+      }
+
+      // Get the QR code URL from the restaurant data
+      const restaurantResult = await restaurantService.getMyRestaurant();
+      
+      if (!restaurantResult.success || !restaurantResult.data) {
+        alert('Failed to get restaurant QR code');
+        return;
+      }
+
+      const restaurant = restaurantResult.data;
+      const qrImageUrl = restaurant.qr_code;
+
+      if (!qrImageUrl) {
+        alert('No QR code found for this restaurant. Please generate one first.');
+        return;
+      }
+
+      // Download the QR code image
+      await downloadQRCode(qrImageUrl, `${restaurant.name}-qr-code`);
+      
+    } catch (error) {
+      console.error('[Dashboard] Error downloading QR code:', error);
+      alert('Failed to download QR code. Please try again.');
+    }
+  };
+
+  const downloadQRCode = async (imageUrl, fileName) => {
+    try {
+      // If the image is a data URL (starts with data:image)
+      if (imageUrl.startsWith('data:image')) {
+        const link = document.createElement('a');
+        link.href = imageUrl;
+        link.download = `${fileName}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+      }
+
+      // If the image is a URL
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${fileName}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Cleanup
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      }, 100);
+      
+    } catch (error) {
+      console.error('[Dashboard] Error downloading QR code:', error);
+      throw new Error('Failed to download QR code');
+    }
+  };
+
+  // ============================================================
+  // OTHER HANDLERS
   // ============================================================
 
   const handleViewAllOrders = () => {
@@ -160,11 +243,6 @@ const Dashboard = () => {
     } else {
       navigate('/waiter/order-for-customer');
     }
-  };
-
-  const handleDownloadQR = () => {
-    console.log("Download QR codes - Coming soon");
-    // Will integrate with QR code service
   };
 
   const handleManageShift = () => {
@@ -336,6 +414,7 @@ const Dashboard = () => {
               <QRCard 
                 onDownload={handleDownloadQR} 
                 restaurantId={getRestaurantId()}
+                qrCodes={qrCodes}
               />
               <StaffOnDuty 
                 staff={staff} 
