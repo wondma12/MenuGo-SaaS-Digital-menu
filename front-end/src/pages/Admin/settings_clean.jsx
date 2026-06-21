@@ -143,7 +143,7 @@ const Settings = () => {
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
         <Sidebar role="Platform_admin" />
         <TopHeader role="Platform_admin" title="Settings" />
-        <main className="ml-64 pt-16 min-h-screen bg-background">
+        <main className=" min-h-screen bg-background">
           <div className="p-8 max-w-[1200px]">
             <div className="flex flex-col gap-10">
               {[1, 2, 3, 4].map((i) => (
@@ -177,7 +177,7 @@ const Settings = () => {
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
         <Sidebar role="Platform_admin" />
         <TopHeader role="Platform_admin" title="Settings" />
-        <main className="ml-64 pt-16 min-h-screen bg-background">
+        <main className=" min-h-screen bg-background">
           <div className="p-8 max-w-[1200px]">
             <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
               <div className="text-red-500 text-5xl mb-4">⚠️</div>
@@ -205,7 +205,7 @@ const Settings = () => {
       <Sidebar role="Platform_admin" />
       <TopHeader role="Platform_admin" title="Settings" />
 
-      <main className="ml-64 pt-16 min-h-screen bg-background">
+      <main className=" min-h-screen bg-background">
         <div className="p-8 max-w-[1200px]">
           {/* Page Header */}
           <div className="mb-8">
