@@ -8,11 +8,9 @@ const router = express.Router();
 // All restaurant routes require authentication
 router.use(authenticate);
 
-// Platform admin only routes
 router.get('/all', authorize('platform_admin'), restaurantController.getAllRestaurants);
 router.put('/:id/status', authorize('platform_admin'), restaurantController.updateRestaurantStatus);
 
-// Restaurant owner/waiter routes
 router.post('/', validate(createRestaurantValidation), restaurantController.createRestaurant);
 router.get('/my-restaurant', restaurantController.getMyRestaurant);
 router.get('/:id', checkRestaurantAccess, restaurantController.getRestaurantById);

@@ -9,10 +9,8 @@ const router = express.Router();
 // Public route (no authentication needed for customers)
 router.get('/public/:restaurantId', menuController.getPublicMenu);
 
-// All routes below require authentication
 router.use(authenticate);
 
-// ============= CATEGORY ROUTES =============
 router.post('/categories',
   validate([
     body('name').notEmpty().withMessage('Category name is required'),
@@ -26,7 +24,6 @@ router.get('/categories/:id', menuController.getCategoryById);
 router.put('/categories/:id', menuController.updateCategory);
 router.delete('/categories/:id', menuController.deleteCategory);
 
-// ============= MENU ITEM ROUTES =============
 router.post('/items',
   validate([
     body('category_id').notEmpty().withMessage('Category ID is required'),

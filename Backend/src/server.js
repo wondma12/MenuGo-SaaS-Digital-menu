@@ -22,14 +22,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Security middleware
 app.use(helmet());
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
   credentials: true
 }));
 
-// Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
@@ -37,11 +35,9 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
 // app.use("/api/auth", authRoutes);
 // app.use("/api/restaurants", restaurantRoutes);
 // app.use("/api/menu", menuRoutes);
@@ -54,12 +50,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", routes);
 
-// Health check
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date() });
 });
 
-// Home route
 app.get("/", (req, res) => {
   res.json({ 
     message: "MenuGo Digital Menu API",
@@ -72,7 +66,6 @@ app.get("/", (req, res) => {
 });
 
 
-// 404 handler
 app.use((req, res) => {
   res.status(404).json({ 
     success: false, 
@@ -80,7 +73,6 @@ app.use((req, res) => {
   });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ 
@@ -90,7 +82,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Database connection and server start
 async function startServer() {
   try {
     await prisma.$connect();
@@ -106,7 +97,6 @@ async function startServer() {
   }
 }
 
-// Graceful shutdown
 process.on('SIGINT', async () => {
   await prisma.$disconnect();
   console.log('Database disconnected');

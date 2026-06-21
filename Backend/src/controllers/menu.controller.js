@@ -1,7 +1,6 @@
 import * as menuService from '../services/menu.service.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 
-// ============= CATEGORY CONTROLLERS =============
 
 export const createCategory = async (req, res) => {
   try {
@@ -92,7 +91,6 @@ export const deleteCategory = async (req, res) => {
   }
 };
 
-// ============= MENU ITEM CONTROLLERS =============
 
 export const createMenuItem = async (req, res) => {
   try {

@@ -1,11 +1,11 @@
 // src/pages/Admin/AdminDashboard.jsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 // import Sidebar from "../../components/layout/sidebar";
 // import TopHeader from "../../components/layout/TopHeader";
 import SummaryCards from "../../components/Admin/Dashboard/SummaryCards";
 import RecentRegistrations from "../../components/Admin/Dashboard/RecentRegistrations";
-import { analyticsAPI } from "../../services/api"; // Changed from adminAPI to analyticsAPI
+import { analyticsAPI } from "../../services/api";
 import { AdminDashboardSkeleton } from "../../components/layout/DashboardSkeleton";
 
 const AdminDashboard = () => {
@@ -13,30 +13,54 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch dashboard stats from API
-  useEffect(() => {
-    const fetchDashboardStats = async () => {
-      try {
-        setLoading(true);
-        // Use analyticsAPI.getDashboard() from your new API
-        const data = await analyticsAPI.getDashboard();
-        setStats(data);
-      } catch (err) {
-        console.error("Error fetching dashboard stats:", err);
-        setError(err.message || "Failed to load dashboard statistics");
-      } finally {
-        setLoading(false);
-      }
-    };
+  // ============================================================
+  // FETCH DASHBOARD STATS
+  // ============================================================
 
-    fetchDashboardStats();
+  const fetchDashboardStats = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log('[AdminDashboard] Fetching dashboard stats...');
+      
+      // ✅ Use analyticsAPI.getDashboard()
+      const result = await analyticsAPI.getDashboard();
+      console.log('[AdminDashboard] Raw result:', result);
+      
+      // ✅ Extract data correctly
+      let dashboardData = {};
+      if (result && typeof result === 'object') {
+        // If result has a data property, use it
+        if (result.data) {
+          dashboardData = result.data;
+        } else {
+          dashboardData = result;
+        }
+      }
+      
+      console.log('[AdminDashboard] Processed stats:', dashboardData);
+      setStats(dashboardData);
+      
+    } catch (err) {
+      console.error("[AdminDashboard] Error fetching dashboard stats:", err);
+      setError(err.message || "Failed to load dashboard statistics");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchDashboardStats();
+  }, [fetchDashboardStats]);
+
+  // ============================================================
+  // RENDER - LOADING
+  // ============================================================
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
-        {/* <Sidebar role="Platform_admin" /> */}
-        {/* <TopHeader role="Platform_admin" title="Dashboard" /> */}
         <main className="min-h-screen bg-background">
           <div className="max-w-[1200px] mx-auto p-12">
             <AdminDashboardSkeleton />
@@ -46,21 +70,26 @@ const AdminDashboard = () => {
     );
   }
 
+  // ============================================================
+  // RENDER - ERROR
+  // ============================================================
+
   if (error) {
     return (
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
-        {/* <Sidebar role="Platform_admin" /> */}
-        {/* <TopHeader role="Platform_admin" title="Dashboard" /> */}
         <main className="min-h-screen bg-background">
           <div className="max-w-[1200px] mx-auto p-12">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-              <p className="text-red-600 font-semibold">Error Loading Dashboard</p>
-              <p className="text-red-500 text-sm mt-2">{error}</p>
-              <button 
-                onClick={() => window.location.reload()}
-                className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
+              <div className="text-red-500 text-5xl mb-4">⚠️</div>
+              <h3 className="text-xl font-semibold text-red-700 mb-2">
+                Unable to Load Dashboard
+              </h3>
+              <p className="text-red-600 mb-4">{error}</p>
+              <button
+                onClick={fetchDashboardStats}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
-                Retry
+                Try Again
               </button>
             </div>
           </div>
@@ -69,11 +98,12 @@ const AdminDashboard = () => {
     );
   }
 
+  // ============================================================
+  // RENDER - SUCCESS
+  // ============================================================
+
   return (
     <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
-      {/* <Sidebar role="Platform_admin" /> */}
-      {/* <TopHeader role="Platform_admin" title="Dashboard" /> */}
-
       <main className="min-h-screen bg-background">
         <div className="max-w-[1200px] mx-auto p-12">
           {/* Welcome Header */}
@@ -84,13 +114,18 @@ const AdminDashboard = () => {
             <h2 className="text-black text-5xl font-bold uppercase leading-none">
               Global Snapshot
             </h2>
+            <p className="text-gray-400 text-sm mt-2">
+              Last updated: {new Date().toLocaleString()}
+            </p>
           </div>
 
-          {/* Summary Cards */}
+          {/* Summary Cards - ✅ Pass stats properly */}
           <SummaryCards stats={stats} />
 
-          {/* Recent Registrations Section */}
-          <RecentRegistrations stats={stats} />
+          {/* Recent Registrations - ✅ No need to pass stats */}
+          <div className="mt-12">
+            <RecentRegistrations />
+          </div>
         </div>
       </main>
     </div>

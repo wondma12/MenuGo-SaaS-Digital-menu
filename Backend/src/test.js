@@ -1,4 +1,3 @@
-// src/test-db.js
 
 import prisma from "./config/prisma.js";
 

@@ -9,10 +9,8 @@ const router = express.Router();
 // Public route for order tracking
 router.get('/track/:orderNumber', orderController.trackOrder);
 
-// All routes below require authentication
 router.use(authenticate);
 
-// Order management routes
 router.post('/',
   validate([
     body('items').isArray({ min: 1 }).withMessage('At least one item is required'),

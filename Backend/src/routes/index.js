@@ -4,10 +4,8 @@ import docsRoutes from './docs.routes.js';
 
 const router = express.Router();
 
-// API documentation
 router.use('/docs', docsRoutes);
 
-// Health check
 router.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
@@ -16,7 +14,6 @@ router.get('/health', (req, res) => {
   });
 });
 
-// API root
 router.get('/', (req, res) => {
   res.status(200).json({
     name: 'MenuGo Digital Menu API',
@@ -26,7 +23,6 @@ router.get('/', (req, res) => {
   });
 });
 
-// Version 1 routes
 router.use('/v1', v1Routes);
 
 export default router;

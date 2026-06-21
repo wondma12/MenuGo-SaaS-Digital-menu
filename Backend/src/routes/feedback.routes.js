@@ -7,7 +7,6 @@ const router = express.Router();
 // Public route for customers
 router.post('/public/:restaurantId', feedbackController.createPublicFeedback);
 
-// Protected routes
 router.use(authenticate);
 
 router.get('/', feedbackController.getAllFeedbacks);

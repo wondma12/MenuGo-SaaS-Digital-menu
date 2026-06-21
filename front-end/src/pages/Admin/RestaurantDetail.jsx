@@ -1,6 +1,6 @@
 // src/pages/Admin/RestaurantDetail.jsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/layout/sidebar";
 import TopHeader from "../../components/layout/TopHeader";
@@ -8,7 +8,7 @@ import IdentitySection from "../../components/Admin/RestaurantDetail/IdentitySec
 import StaffOverview from "../../components/Admin/RestaurantDetail/StaffOverview";
 import LocationCard from "../../components/Admin/RestaurantDetail/LocationCard";
 import QRCodeCard from "../../components/Admin/RestaurantDetail/QRCodeCard";
-import { restaurantAPI, verificationAPI, staffAPI } from "../../services/api"; // Updated imports
+import { restaurantAPI, verificationAPI, staffAPI } from "../../services/api";
 
 const RestaurantDetail = () => {
   const { id } = useParams();
@@ -18,59 +18,76 @@ const RestaurantDetail = () => {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Fetch restaurant details from API
-  useEffect(() => {
-    const fetchRestaurantDetails = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch restaurant details using the new API
-        const restaurantData = await restaurantAPI.getById(id);
-        
-        // Fetch staff for this restaurant
-        let staffData = [];
-        try {
-          const staffResult = await staffAPI.getByRestaurant(id);
-          staffData = staffResult || [];
-        } catch (staffErr) {
-          console.warn("Could not fetch staff:", staffErr);
-        }
-        
-        // Fetch verification status
-        let verificationData = null;
-        try {
-          const verificationResult = await verificationAPI.getAll({ restaurant_id: id });
-          verificationData = verificationResult?.verifications?.[0] || null;
-        } catch (verificationErr) {
-          console.warn("Could not fetch verification:", verificationErr);
-        }
-        
-        // Combine all data
-        const combinedData = {
-          ...restaurantData,
-          staff: staffData,
-          verification: verificationData,
-          location: restaurantData.location || null,
-        };
-        
-        setRestaurant(combinedData);
-      } catch (err) {
-        console.error("Error fetching restaurant details:", err);
-        setError(err.message || "Failed to load restaurant details");
-      } finally {
-        setLoading(false);
-      }
-    };
+  // ============================================================
+  // FETCH RESTAURANT DETAILS
+  // ============================================================
 
-    if (id) {
-      fetchRestaurantDetails();
+  const fetchRestaurantDetails = useCallback(async () => {
+    if (!id) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log('[RestaurantDetail] Fetching restaurant:', id);
+      
+      // Fetch restaurant details
+      const restaurantData = await restaurantAPI.getById(id);
+      console.log('[RestaurantDetail] Restaurant data:', restaurantData);
+      
+      // Fetch staff for this restaurant
+      let staffData = [];
+      try {
+        const staffResult = await staffAPI.getByRestaurant(id);
+        staffData = staffResult || [];
+        console.log('[RestaurantDetail] Staff data:', staffData);
+      } catch (staffErr) {
+        console.warn("Could not fetch staff:", staffErr);
+      }
+      
+      // Fetch verification status
+      let verificationData = null;
+      try {
+        const verificationResult = await verificationAPI.getAll({ restaurant_id: id });
+        verificationData = verificationResult?.data?.[0] || 
+                          verificationResult?.verifications?.[0] || 
+                          null;
+        console.log('[RestaurantDetail] Verification data:', verificationData);
+      } catch (verificationErr) {
+        console.warn("Could not fetch verification:", verificationErr);
+      }
+      
+      // Combine all data
+      const combinedData = {
+        ...restaurantData,
+        staff: staffData,
+        verification: verificationData,
+        location: restaurantData.location || null,
+        qr_code: restaurantData.qr_code || null,
+      };
+      
+      console.log('[RestaurantDetail] Combined data:', combinedData);
+      setRestaurant(combinedData);
+      
+    } catch (err) {
+      console.error("[RestaurantDetail] Error fetching restaurant details:", err);
+      setError(err.message || "Failed to load restaurant details");
+    } finally {
+      setLoading(false);
     }
   }, [id]);
+
+  useEffect(() => {
+    fetchRestaurantDetails();
+  }, [fetchRestaurantDetails]);
+
+  // ============================================================
+  // HANDLE ACTIONS (Approve/Suspend)
+  // ============================================================
 
   const handleAction = async (action) => {
     if (!restaurant) return;
 
-    // Get current user from authAPI
     const userStr = localStorage.getItem("user");
     const currentUser = userStr ? JSON.parse(userStr) : null;
     const reviewedBy = currentUser?.id;
@@ -79,16 +96,17 @@ const RestaurantDetail = () => {
       setActionLoading(true);
 
       if (action === "approve") {
-        // First find the verification record
+        // Find verification record
         const verifications = await verificationAPI.getAll({ restaurant_id: restaurant.id });
-        const verification = verifications?.verifications?.[0];
+        const verification = verifications?.data?.[0] || 
+                           verifications?.verifications?.[0];
         
         if (!verification) {
           alert("No verification record found for this restaurant");
           return;
         }
         
-        // Approve the verification
+        // Approve verification
         const result = await verificationAPI.review(
           verification.id,
           'approved',
@@ -96,27 +114,24 @@ const RestaurantDetail = () => {
         );
         
         if (result) {
-          // Also update restaurant status to active
           await restaurantAPI.updateStatus(restaurant.id, 'active');
           alert("✅ Restaurant approved and activated successfully!");
-          // Refresh data
-          window.location.reload();
+          await fetchRestaurantDetails();
         } else {
           alert("❌ Failed to approve restaurant");
         }
       } else if (action === "suspend") {
         const reason = prompt("Please enter reason for suspension:");
         if (reason) {
-          // Find verification record
           const verifications = await verificationAPI.getAll({ restaurant_id: restaurant.id });
-          const verification = verifications?.verifications?.[0];
+          const verification = verifications?.data?.[0] || 
+                             verifications?.verifications?.[0];
           
           if (!verification) {
             alert("No verification record found for this restaurant");
             return;
           }
           
-          // Reject the verification
           const result = await verificationAPI.review(
             verification.id,
             'rejected',
@@ -124,24 +139,26 @@ const RestaurantDetail = () => {
           );
           
           if (result) {
-            // Also update restaurant status to suspended
             await restaurantAPI.updateStatus(restaurant.id, 'suspended');
             alert("⛔ Restaurant suspended successfully!");
-            window.location.reload();
+            await fetchRestaurantDetails();
           } else {
             alert("❌ Failed to suspend restaurant");
           }
         }
       }
     } catch (error) {
-      console.error("Action error:", error);
+      console.error("[RestaurantDetail] Action error:", error);
       alert(`Action failed: ${error.message || "Please try again."}`);
     } finally {
       setActionLoading(false);
     }
   };
 
-  // Loading state
+  // ============================================================
+  // RENDER - LOADING
+  // ============================================================
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
@@ -166,7 +183,10 @@ const RestaurantDetail = () => {
     );
   }
 
-  // Error state
+  // ============================================================
+  // RENDER - ERROR
+  // ============================================================
+
   if (error) {
     return (
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
@@ -180,10 +200,11 @@ const RestaurantDetail = () => {
         <main className="ml-64 pt-16 min-h-screen bg-background">
           <div className="max-w-7xl mx-auto p-8">
             <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
+              <div className="text-red-500 text-5xl mb-4">⚠️</div>
               <p className="text-red-600 font-semibold text-lg">Error Loading Restaurant</p>
               <p className="text-red-500 mt-2">{error}</p>
               <button
-                onClick={() => window.location.reload()}
+                onClick={fetchRestaurantDetails}
                 className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
                 Retry
@@ -195,7 +216,10 @@ const RestaurantDetail = () => {
     );
   }
 
-  // No restaurant found
+  // ============================================================
+  // RENDER - NOT FOUND
+  // ============================================================
+
   if (!restaurant) {
     return (
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
@@ -209,6 +233,7 @@ const RestaurantDetail = () => {
         <main className="ml-64 pt-16 min-h-screen bg-background">
           <div className="max-w-7xl mx-auto p-8">
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
+              <div className="text-yellow-500 text-5xl mb-4">🔍</div>
               <p className="text-yellow-600 font-semibold text-lg">Restaurant Not Found</p>
               <p className="text-yellow-500 mt-2">The restaurant you're looking for doesn't exist.</p>
               <button
@@ -223,6 +248,10 @@ const RestaurantDetail = () => {
       </div>
     );
   }
+
+  // ============================================================
+  // RENDER - SUCCESS
+  // ============================================================
 
   return (
     <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
@@ -263,7 +292,7 @@ const RestaurantDetail = () => {
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
                   <p className="font-body-md text-zinc-500">
-                    {restaurant.type || "Restaurant"}
+                    {restaurant.slogan || restaurant.description || "Restaurant"}
                   </p>
                   <span className="w-1 h-1 bg-zinc-300 rounded-full"></span>
                   <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
@@ -276,7 +305,7 @@ const RestaurantDetail = () => {
                 </div>
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
               {restaurant.status !== 'suspended' && (
                 <button
                   onClick={() => handleAction("suspend")}
@@ -309,7 +338,11 @@ const RestaurantDetail = () => {
             {/* Right Column: Location & Insights */}
             <div className="col-span-12 lg:col-span-4 space-y-8">
               <LocationCard location={restaurant.location} />
-              <QRCodeCard restaurantName={restaurant.name} />
+              <QRCodeCard 
+                restaurantName={restaurant.name}
+                restaurantId={restaurant.id}
+                qrCode={restaurant.qr_code || null}
+              />
             </div>
           </div>
         </div>

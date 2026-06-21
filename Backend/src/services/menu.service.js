@@ -1,6 +1,5 @@
 import prisma from '../config/prisma.js';
 
-// ============= CATEGORY SERVICES =============
 
 export const createCategory = async (categoryData, userId, restaurantId) => {
   const { name, display_order = 0 } = categoryData;
@@ -165,7 +164,6 @@ export const deleteCategory = async (categoryId, restaurantId) => {
   return { message: 'Category deleted successfully' };
 };
 
-// ============= MENU ITEM SERVICES =============
 
 export const createMenuItem = async (itemData, userId, restaurantId) => {
   const { 

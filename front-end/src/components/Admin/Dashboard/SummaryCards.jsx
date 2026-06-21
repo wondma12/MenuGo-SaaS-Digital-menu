@@ -1,12 +1,21 @@
+// src/components/Admin/Dashboard/SummaryCards.jsx
+
 import React from "react";
 import SummaryCard from "../../ui/SummaryCard";
 import { UtensilsCrossed, Clock, Check, X } from "lucide-react";
 
 const SummaryCards = ({ stats }) => {
+  // ✅ Handle loading state
   if (!stats) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mb-8">
-        <div className="text-center text-zinc-500">Loading statistics...</div>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+            <div className="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+          </div>
+        ))}
       </div>
     );
   }
