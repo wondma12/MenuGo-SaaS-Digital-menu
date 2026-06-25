@@ -779,7 +779,16 @@ export const feedbackAPI = {
 export const analyticsAPI = {
   getDashboard: async () => {
     try {
-      const response = await api.get("/analytics/dashboard");
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      // ✅ Platform admin uses admin endpoint
+      let endpoint = '/analytics/dashboard';
+      if (user.role === 'platform_admin') {
+        endpoint = '/admin/dashboard';
+      }
+      
+      console.log('[analyticsAPI] Calling endpoint:', endpoint);
+      const response = await api.get(endpoint);
       return handleResponse(response);
     } catch (error) {
       return handleError(error);
@@ -788,7 +797,14 @@ export const analyticsAPI = {
 
   getRevenueChart: async (days = 30) => {
     try {
-      const response = await api.get("/analytics/revenue-chart", { params: { days } });
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      let endpoint = '/analytics/revenue-chart';
+      if (user.role === 'platform_admin') {
+        endpoint = '/admin/revenue-chart';
+      }
+      
+      const response = await api.get(endpoint, { params: { days } });
       return handleResponse(response);
     } catch (error) {
       return handleError(error);
@@ -797,7 +813,14 @@ export const analyticsAPI = {
 
   getOrderDistribution: async () => {
     try {
-      const response = await api.get("/analytics/order-distribution");
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      let endpoint = '/analytics/order-distribution';
+      if (user.role === 'platform_admin') {
+        endpoint = '/admin/order-distribution';
+      }
+      
+      const response = await api.get(endpoint);
       return handleResponse(response);
     } catch (error) {
       return handleError(error);

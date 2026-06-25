@@ -1,20 +1,41 @@
+// Backend/src/services/qrCode.service.js
+
 import prisma from '../config/prisma.js';
 import QRCode from 'qrcode';
 
 export const generateQRCode = async (restaurantId, tableNumber = null, qrType = 'menu') => {
+  // ✅ First, deactivate any existing active QR code for this restaurant
+  await prisma.qr_codes.updateMany({
+    where: {
+      restaurant_id: restaurantId,
+      is_active: true
+    },
+    data: {
+      is_active: false
+    }
+  });
+  
   // Generate unique identifier
   const qrIdentifier = `${restaurantId}-${tableNumber || 'menu'}-${Date.now()}`;
   
   // Create QR code data URL (for restaurant menu)
-  const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
   const qrData = tableNumber 
-    ? `${baseUrl}/menu/${restaurantId}?table=${tableNumber}`
-    : `${baseUrl}/menu/${restaurantId}`;
+    ? `${baseUrl}/customer/${restaurantId}?table=${tableNumber}`
+    : `${baseUrl}/customer/${restaurantId}`;
   
   // Generate QR code as data URL
-  const qrImageUrl = await QRCode.toDataURL(qrData);
-  
-  // Save to database
+// Generate high-quality QR code
+const qrImageUrl = await QRCode.toDataURL(qrData, {
+  errorCorrectionLevel: 'H',
+  margin: 2,
+  width: 500,
+  color: {
+    dark: '#000000',
+    light: '#FFFFFF',
+  },
+});
+  // Save to database (always active since we deactivated others)
   const qrCode = await prisma.qr_codes.create({
     data: {
       restaurant_id: restaurantId,
@@ -53,6 +74,17 @@ export const getAllQRCodes = async (restaurantId, page = 1, limit = 50) => {
   };
 };
 
+export const getActiveQRCode = async (restaurantId) => {
+  const qrCode = await prisma.qr_codes.findFirst({
+    where: {
+      restaurant_id: restaurantId,
+      is_active: true
+    }
+  });
+  
+  return qrCode;
+};
+
 export const getQRCodeById = async (qrId, restaurantId) => {
   const qrCode = await prisma.qr_codes.findFirst({
     where: {
@@ -78,6 +110,20 @@ export const updateQRCodeStatus = async (qrId, restaurantId, isActive) => {
   
   if (!qrCode) {
     throw new Error('QR code not found');
+  }
+  
+  // ✅ If activating this QR code, deactivate all others first
+  if (isActive === true) {
+    await prisma.qr_codes.updateMany({
+      where: {
+        restaurant_id: restaurantId,
+        is_active: true,
+        id: { not: qrId }
+      },
+      data: {
+        is_active: false
+      }
+    });
   }
   
   const updated = await prisma.qr_codes.update({

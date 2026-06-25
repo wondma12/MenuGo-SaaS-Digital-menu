@@ -3,63 +3,59 @@
 import React, { useState, useEffect } from "react";
 import Table from "../../ui/Table";
 import { UtensilsCrossed } from "lucide-react";
-import registrationService from "../../../services/registration";
+import { analyticsService } from "../../../services/index.js";
 
-const RecentRegistrations = () => {
+const RecentRegistrations = ({ stats }) => {
   const [restaurants, setRestaurants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // =========================================
-  // FETCH RECENT PENDING REGISTRATIONS
-  // =========================================
   useEffect(() => {
     const fetchPendingRegistrations = async () => {
       try {
         setIsLoading(true);
         setError(null);
 
-        const result = await registrationService.getPendingRegistrations();
-        console.log('[RecentRegistrations] Result:', result);
+        // ✅ FIRST: Check if stats has pendingRegistrations
+        if (stats?.pendingRegistrations && Array.isArray(stats.pendingRegistrations) && stats.pendingRegistrations.length > 0) {
+          console.log('[RecentRegistrations] Using stats from parent:', stats.pendingRegistrations);
+          const registrations = stats.pendingRegistrations.slice(0, 4);
+          setRestaurants(registrations);
+          setIsLoading(false);
+          return;
+        }
 
-        if (result.success) {
-          // ✅ Get the data (handle different response formats)
-          let registrations = result.data || [];
-          
-          // If it's an object with a data property, extract it
-          if (registrations.data && Array.isArray(registrations.data)) {
-            registrations = registrations.data;
-          }
-          
-          // Ensure it's an array
-          if (!Array.isArray(registrations)) {
-            registrations = [];
-          }
-
-          // ✅ Get last 4 recent pending registrations
-          const recentRegistrations = registrations
-            .slice(-4)
-            .reverse();
-
-          console.log('[RecentRegistrations] Recent registrations:', recentRegistrations);
-          setRestaurants(recentRegistrations);
+        // ✅ SECOND: If no data in stats, try fetching directly
+        console.log('[RecentRegistrations] No data in stats, fetching from API...');
+        const result = await analyticsService.getPlatformDashboard();
+        console.log('[RecentRegistrations] API result:', result);
+        
+        if (result.success && result.data?.pendingRegistrations) {
+          const registrations = result.data.pendingRegistrations.slice(0, 4);
+          setRestaurants(registrations);
+        } else if (result.data?.data?.pendingRegistrations) {
+          // Handle nested data structure
+          const registrations = result.data.data.pendingRegistrations.slice(0, 4);
+          setRestaurants(registrations);
         } else {
-          setError(result.error || "Failed to fetch registrations");
+          setRestaurants([]);
         }
       } catch (error) {
-        console.error("[RecentRegistrations] Error fetching registrations:", error);
+        console.error("[RecentRegistrations] Error:", error);
         setError(error.message || "Failed to load recent registrations");
+        setRestaurants([]);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false);  // ✅ ALWAYS set loading to false
       }
     };
 
     fetchPendingRegistrations();
-  }, []);
+  }, [stats]);
 
   // =========================================
-  // LOADING STATE - FIXED
+  // LOADING STATE
   // =========================================
+
   if (isLoading) {
     return (
       <section className="w-full">
@@ -70,7 +66,6 @@ const RecentRegistrations = () => {
           </div>
           <div className="h-10 w-24 bg-gray-200 rounded animate-pulse"></div>
         </div>
-
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
           <div className="p-6 space-y-4">
             {[1, 2, 3, 4].map((i) => (
@@ -96,20 +91,24 @@ const RecentRegistrations = () => {
   }
 
   // =========================================
-  // ERROR STATE - FIXED
+  // ERROR STATE
   // =========================================
+
   if (error) {
     return (
       <section className="w-full">
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <h3 className="text-2xl font-bold tracking-tight text-zinc-900">Recent Registrations</h3>
+            <p className="text-sm text-zinc-500 mt-1">Latest restaurants waiting for platform approval.</p>
+          </div>
+          <button className="px-5 py-2 border border-black text-xs font-semibold uppercase tracking-wider hover:bg-black hover:text-white transition-all duration-200 rounded-md">
+            View All
+          </button>
+        </div>
         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
           <p className="text-red-600 font-semibold">Unable to Load Registrations</p>
           <p className="text-red-500 text-sm mt-1">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-          >
-            Retry
-          </button>
         </div>
       </section>
     );
@@ -118,23 +117,19 @@ const RecentRegistrations = () => {
   // =========================================
   // EMPTY STATE
   // =========================================
+
   if (restaurants.length === 0) {
     return (
       <section className="w-full">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <h3 className="text-2xl font-bold tracking-tight text-zinc-900">
-              Recent Registrations
-            </h3>
-            <p className="text-sm text-zinc-500 mt-1">
-              Latest restaurants waiting for platform approval.
-            </p>
+            <h3 className="text-2xl font-bold tracking-tight text-zinc-900">Recent Registrations</h3>
+            <p className="text-sm text-zinc-500 mt-1">Latest restaurants waiting for platform approval.</p>
           </div>
           <button className="px-5 py-2 border border-black text-xs font-semibold uppercase tracking-wider hover:bg-black hover:text-white transition-all duration-200 rounded-md">
             View All
           </button>
         </div>
-
         <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
           <div className="text-4xl mb-3">🎉</div>
           <p className="text-gray-500 font-medium">No Pending Registrations</p>
@@ -147,6 +142,7 @@ const RecentRegistrations = () => {
   // =========================================
   // TABLE HEADERS
   // =========================================
+
   const tableHeaders = [
     { label: "Restaurant" },
     { label: "Location" },
@@ -158,6 +154,7 @@ const RecentRegistrations = () => {
   // =========================================
   // FORMAT DATE
   // =========================================
+
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     try {
@@ -174,6 +171,7 @@ const RecentRegistrations = () => {
   // =========================================
   // STATUS STYLE
   // =========================================
+
   const getStatusStyle = (status) => {
     switch (status?.toLowerCase()) {
       case "pending":
@@ -203,60 +201,39 @@ const RecentRegistrations = () => {
   // =========================================
   // TABLE ROW
   // =========================================
+
   const renderTableRow = (restaurant, index) => (
-    <tr
-      key={restaurant.id || index}
-      className="border-b border-zinc-100 hover:bg-zinc-50 transition-colors"
-    >
-      {/* RESTAURANT */}
+    <tr key={restaurant.id || index} className="border-b border-zinc-100 hover:bg-zinc-50 transition-colors">
       <td className="px-6 py-5">
         <div className="flex items-center gap-4">
           <div className="w-11 h-11 rounded-lg bg-zinc-100 flex items-center justify-center">
             <UtensilsCrossed className="w-5 h-5 text-zinc-500" />
           </div>
-
           <div>
             <p className="font-semibold text-sm text-zinc-900">
-              {restaurant.name || restaurant.restaurant_name || "Unknown"}
+              {restaurant.name || "Unknown"}
             </p>
-
             <p className="text-xs text-zinc-500">
-              {restaurant.email || restaurant.business_email || "-"}
+              {restaurant.email || "No email"}
             </p>
           </div>
         </div>
       </td>
-
-      {/* LOCATION */}
       <td className="px-6 py-5 text-sm text-zinc-600">
-        {restaurant.location
+        {restaurant.location 
           ? `${restaurant.location.city || ""}, ${restaurant.location.country || ""}`
-          : restaurant.city 
-            ? `${restaurant.city}, ${restaurant.country || ""}`
-            : "-"}
+          : "-"}
       </td>
-
-      {/* OWNER */}
       <td className="px-6 py-5 text-sm text-zinc-600">
-        {restaurant.owner?.name || restaurant.owner_name || restaurant.ownerName || "-"}
+        {restaurant.owner?.name || restaurant.owner_name || "-"}
       </td>
-
-      {/* CREATED AT */}
       <td className="px-6 py-5 text-sm text-zinc-600">
-        {formatDate(restaurant.created_at || restaurant.createdAt)}
+        {formatDate(restaurant.created_at)}
       </td>
-
-      {/* STATUS */}
       <td className="px-6 py-5 text-right">
-        <span
-          className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusStyle(
-            restaurant.status
-          )}`}
-        >
-          <span
-            className={`w-2 h-2 rounded-full ${getStatusDot(restaurant.status)}`}
-          />
-          {restaurant.status || "pending"}
+        <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusStyle(restaurant.status)}`}>
+          <span className={`w-2 h-2 rounded-full ${getStatusDot(restaurant.status)}`} />
+          {restaurant.status || 'pending'}
         </span>
       </td>
     </tr>
@@ -265,6 +242,7 @@ const RecentRegistrations = () => {
   // =========================================
   // RENDER
   // =========================================
+
   return (
     <section className="w-full">
       {/* HEADER */}
@@ -273,12 +251,10 @@ const RecentRegistrations = () => {
           <h3 className="text-2xl font-bold tracking-tight text-zinc-900">
             Recent Registrations
           </h3>
-
           <p className="text-sm text-zinc-500 mt-1">
             Latest restaurants waiting for platform approval.
           </p>
         </div>
-
         <button className="px-5 py-2 border border-black text-xs font-semibold uppercase tracking-wider hover:bg-black hover:text-white transition-all duration-200 rounded-md">
           View All
         </button>

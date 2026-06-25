@@ -1,4 +1,5 @@
 // services/analyticsService.js
+
 import api from './api.js';
 
 /**
@@ -12,12 +13,42 @@ const analyticsService = {
   // ============================================================
 
   /**
-   * Get dashboard statistics
+   * Get dashboard statistics - auto-detects user role
    * @returns {Promise<Object>} { success, data, error }
    */
   async getDashboardStats() {
     try {
-      const response = await api.get('/analytics/dashboard');
+      // ✅ Get user from localStorage with proper parsing
+      const userStr = localStorage.getItem('user');
+      let user = {};
+      try {
+        user = userStr ? JSON.parse(userStr) : {};
+      } catch (e) {
+        console.warn('[AnalyticsService] Failed to parse user:', e);
+      }
+      
+      // ✅ Check multiple possible role values
+      const isPlatformAdmin = 
+        user.role === 'platform_admin' || 
+        user.role === 'Platform_admin' ||
+        user.role === 'Platform Admin' ||
+        user.userRole === 'platform_admin' ||
+        user.type === 'platform_admin';
+      
+      console.log('[AnalyticsService] User object:', user);
+      console.log('[AnalyticsService] User role:', user.role);
+      console.log('[AnalyticsService] Is Platform Admin?', isPlatformAdmin);
+      
+      // ✅ Choose endpoint based on role
+      let endpoint = '/analytics/dashboard';
+      if (isPlatformAdmin) {
+        endpoint = '/admin/dashboard';
+      }
+      
+      console.log('[AnalyticsService] Calling endpoint:', endpoint);
+      const response = await api.get(endpoint);
+      console.log('[AnalyticsService] Response data:', response.data);
+      
       return {
         success: true,
         data: response.data.data,
@@ -34,13 +65,58 @@ const analyticsService = {
   },
 
   /**
-   * Get revenue chart data
-   * @param {number} days - Number of days to include (default: 30)
+   * Get platform dashboard (Admin only)
    * @returns {Promise<Object>} { success, data, error }
    */
-  async getRevenueChart(days = 30) {
+  async getPlatformDashboard() {
     try {
-      const response = await api.get('/analytics/revenue-chart', {
+      console.log('[AnalyticsService] Fetching platform dashboard...');
+      const response = await api.get('/admin/dashboard');
+      console.log('[AnalyticsService] Platform dashboard response:', response.data);
+      
+      return {
+        success: true,
+        data: response.data.data,
+        error: null,
+      };
+    } catch (error) {
+      console.error('[AnalyticsService] Get platform dashboard error:', error);
+      return {
+        success: false,
+        data: null,
+        error: error.response?.data?.message || 'Failed to fetch platform dashboard',
+      };
+    }
+  },
+
+  /**
+   * Get revenue chart data
+   * @param {number} days - Number of days to include (default: 30)
+   * @param {boolean} isPlatform - If true, gets platform-wide data
+   * @returns {Promise<Object>} { success, data, error }
+   */
+  async getRevenueChart(days = 30, isPlatform = false) {
+    try {
+      // ✅ Auto-detect platform if not specified
+      if (isPlatform === false) {
+        const userStr = localStorage.getItem('user');
+        let user = {};
+        try {
+          user = userStr ? JSON.parse(userStr) : {};
+        } catch (e) {}
+        
+        const isPlatformAdmin = 
+          user.role === 'platform_admin' || 
+          user.role === 'Platform_admin' ||
+          user.role === 'Platform Admin';
+        
+        isPlatform = isPlatformAdmin;
+      }
+      
+      const endpoint = isPlatform ? '/admin/revenue-chart' : '/analytics/revenue-chart';
+      console.log('[AnalyticsService] Revenue chart endpoint:', endpoint);
+      
+      const response = await api.get(endpoint, {
         params: { days },
       });
       return {
@@ -60,11 +136,31 @@ const analyticsService = {
 
   /**
    * Get order status distribution
+   * @param {boolean} isPlatform - If true, gets platform-wide data
    * @returns {Promise<Object>} { success, data, error }
    */
-  async getOrderDistribution() {
+  async getOrderDistribution(isPlatform = false) {
     try {
-      const response = await api.get('/analytics/order-distribution');
+      // ✅ Auto-detect platform if not specified
+      if (isPlatform === false) {
+        const userStr = localStorage.getItem('user');
+        let user = {};
+        try {
+          user = userStr ? JSON.parse(userStr) : {};
+        } catch (e) {}
+        
+        const isPlatformAdmin = 
+          user.role === 'platform_admin' || 
+          user.role === 'Platform_admin' ||
+          user.role === 'Platform Admin';
+        
+        isPlatform = isPlatformAdmin;
+      }
+      
+      const endpoint = isPlatform ? '/admin/order-distribution' : '/analytics/order-distribution';
+      console.log('[AnalyticsService] Order distribution endpoint:', endpoint);
+      
+      const response = await api.get(endpoint);
       return {
         success: true,
         data: response.data.data,
@@ -76,6 +172,53 @@ const analyticsService = {
         success: false,
         data: null,
         error: error.response?.data?.message || 'Failed to fetch order distribution',
+      };
+    }
+  },
+
+  /**
+   * Get all restaurants analytics (Admin only)
+   * @returns {Promise<Object>} { success, data, error }
+   */
+  async getAllRestaurantsAnalytics() {
+    try {
+      console.log('[AnalyticsService] Fetching all restaurants analytics...');
+      const response = await api.get('/admin/restaurants');
+      return {
+        success: true,
+        data: response.data.data,
+        error: null,
+      };
+    } catch (error) {
+      console.error('[AnalyticsService] Get all restaurants analytics error:', error);
+      return {
+        success: false,
+        data: null,
+        error: error.response?.data?.message || 'Failed to fetch restaurants analytics',
+      };
+    }
+  },
+
+  /**
+   * Get top restaurants by revenue (Admin only)
+   * @param {number} limit - Number of restaurants to return
+   * @returns {Promise<Object>} { success, data, error }
+   */
+  async getTopRestaurants(limit = 10) {
+    try {
+      console.log('[AnalyticsService] Fetching top restaurants...');
+      const response = await api.get('/admin/top-restaurants', { params: { limit } });
+      return {
+        success: true,
+        data: response.data.data,
+        error: null,
+      };
+    } catch (error) {
+      console.error('[AnalyticsService] Get top restaurants error:', error);
+      return {
+        success: false,
+        data: null,
+        error: error.response?.data?.message || 'Failed to fetch top restaurants',
       };
     }
   },

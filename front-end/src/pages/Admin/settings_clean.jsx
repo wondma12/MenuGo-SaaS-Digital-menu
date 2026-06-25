@@ -52,12 +52,12 @@ const Settings = () => {
           supportEmail: result.support_email || result.supportEmail || "",
           contactPhone: result.contact_phone || result.contactPhone || "",
           defaultRestaurantStatus: result.default_restaurant_status || result.defaultRestaurantStatus || "pending",
-          allowSelfRegistration: result.allow_self_registration !== undefined ? result.allow_self_registration : result.allowSelfRegistration !== undefined ? result.allowSelfRegistration : true,
-          requireVerification: result.require_verification_documents !== undefined ? result.require_verification_documents : result.requireVerification !== undefined ? result.requireVerification : false,
+          allowSelfRegistration: result.allow_self_registration !== undefined ? result.allow_self_registration : true,
+          requireVerification: result.require_verification_documents !== undefined ? result.require_verification_documents : false,
           minPasswordLength: result.minimum_password_length || result.minPasswordLength || 12,
           sessionTimeout: result.session_timeout || result.sessionTimeout || 60,
-          enableEmailVerification: result.enable_email_verification !== undefined ? result.enable_email_verification : result.enableEmailVerification !== undefined ? result.enableEmailVerification : true,
-          enableAccountSuspension: result.enable_account_suspension !== undefined ? result.enable_account_suspension : result.enableAccountSuspension !== undefined ? result.enableAccountSuspension : true,
+          enableEmailVerification: true,
+          enableAccountSuspension: true,
         });
       }
     } catch (err) {
@@ -89,7 +89,6 @@ const Settings = () => {
 
   const handleFileSelect = (type) => (file) => {
     console.log(`Selected ${type}:`, file);
-    // Handle file upload - convert to base64 or upload to cloud
   };
 
   const handleReset = async () => {
@@ -106,23 +105,22 @@ const Settings = () => {
       setError(null);
       setSuccessMessage("");
 
+      // ✅ ONLY include fields that exist in the Prisma schema
       const payload = {
         platform_name: formData.platformName,
         support_email: formData.supportEmail,
         contact_phone: formData.contactPhone,
-        default_restaurant_status: formData.defaultRestaurantStatus,
         allow_self_registration: formData.allowSelfRegistration,
         require_verification_documents: formData.requireVerification,
         minimum_password_length: parseInt(formData.minPasswordLength),
         session_timeout: parseInt(formData.sessionTimeout),
-        enable_email_verification: formData.enableEmailVerification,
-        enable_account_suspension: formData.enableAccountSuspension,
       };
+
+      console.log("Saving payload:", payload);
 
       await settingsAPI.update(payload);
       setSuccessMessage("Settings saved successfully!");
 
-      // Refresh data
       await fetchSettings();
 
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -143,7 +141,7 @@ const Settings = () => {
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
         <Sidebar role="Platform_admin" />
         <TopHeader role="Platform_admin" title="Settings" />
-        <main className=" min-h-screen bg-background">
+        <main className="min-h-screen bg-background">
           <div className="p-8 max-w-[1200px]">
             <div className="flex flex-col gap-10">
               {[1, 2, 3, 4].map((i) => (
@@ -177,7 +175,7 @@ const Settings = () => {
       <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
         <Sidebar role="Platform_admin" />
         <TopHeader role="Platform_admin" title="Settings" />
-        <main className=" min-h-screen bg-background">
+        <main className="min-h-screen bg-background">
           <div className="p-8 max-w-[1200px]">
             <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
               <div className="text-red-500 text-5xl mb-4">⚠️</div>
@@ -205,7 +203,7 @@ const Settings = () => {
       <Sidebar role="Platform_admin" />
       <TopHeader role="Platform_admin" title="Settings" />
 
-      <main className=" min-h-screen bg-background">
+      <main className="min-h-screen bg-background">
         <div className="p-8 max-w-[1200px]">
           {/* Page Header */}
           <div className="mb-8">

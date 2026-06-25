@@ -10,6 +10,8 @@ import analyticsRoutes from "../analytics.routes.js";
 import settingsRoutes from "../settings.routes.js";
 import locationRoutes from "../location.routes.js";
 import openApiRoutes from "../openapi.routes.js";
+import adminRoutes from "../admin.routes.js";
+import usersRoutes from "../users.routes.js";
 
 const router = express.Router();
 router.use("/docs", openApiRoutes);
@@ -21,7 +23,9 @@ router.use("/qrcodes", qrCodeRoutes);
 router.use("/verification", verificationRoutes);
 router.use("/feedbacks", feedbackRoutes);
 router.use("/analytics", analyticsRoutes);
+router.use("/admin", adminRoutes);
 router.use("/settings", settingsRoutes);
 router.use("/locations", locationRoutes);
+router.use("/users", usersRoutes);
 
 export default router;

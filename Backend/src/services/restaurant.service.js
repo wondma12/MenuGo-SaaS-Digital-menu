@@ -1,3 +1,5 @@
+// Backend/src/services/restaurant.service.js
+
 import prisma from '../config/prisma.js';
 
 export const createRestaurant = async (restaurantData, ownerId) => {
@@ -55,8 +57,8 @@ export const getAllRestaurants = async (page = 1, limit = 10, status = null) => 
         _count: {
           select: {
             categories: true,
-            menu_items: true,
             orders: true
+            // ✅ menu_items REMOVED - doesn't exist in _count
           }
         }
       },
@@ -111,9 +113,9 @@ export const getRestaurantById = async (restaurantId, userId, userRole) => {
       },
       _count: {
         select: {
-          menu_items: true,
           orders: true,
           qr_codes: true
+          // ✅ menu_items REMOVED - doesn't exist in _count
         }
       }
     }

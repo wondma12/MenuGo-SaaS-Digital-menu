@@ -68,11 +68,13 @@ const Dashboard = () => {
           qrCodeAPI.getAll(),
         ]);
 
-        // Process menu items
+        console.log('[Dashboard] Staff result:', staffResult);
+
+        // ✅ Process menu items
         const menuItems = menuItemsResult.success ? menuItemsResult.data : [];
         const totalMenuItems = menuItems.length || 0;
 
-        // Process orders
+        // ✅ Process orders
         const ordersData = ordersResult.success ? ordersResult.data : [];
         const totalOrders = ordersData.length || 0;
         const todayOrders = ordersData.filter((order) => {
@@ -81,20 +83,37 @@ const Dashboard = () => {
           return orderDate === today;
         }).length || 0;
 
-        // Process staff
-        const staffData = staffResult.success ? staffResult.data : [];
+        // ✅ Process staff - FIXED
+        let staffData = [];
+        if (staffResult && staffResult.success) {
+          staffData = Array.isArray(staffResult.data) ? staffResult.data : [];
+        } else if (Array.isArray(staffResult)) {
+          staffData = staffResult;
+        } else if (staffResult && Array.isArray(staffResult.data)) {
+          staffData = staffResult.data;
+        } else {
+          staffData = [];
+        }
+        console.log('[Dashboard] Staff data:', staffData);
         const totalStaff = staffData.length || 0;
 
-        // Process restaurant
+        // ✅ Process restaurant
         const restaurantData = restaurantResult.success ? restaurantResult.data : null;
 
-        // Process analytics
+        // ✅ Process analytics
         const analyticsData = analyticsResult.success ? analyticsResult.data : null;
 
-        // Process QR codes
-        const qrData = qrResult.success ? qrResult : [];
+        // ✅ Process QR codes
+        let qrData = [];
+        if (qrResult && qrResult.success) {
+          qrData = Array.isArray(qrResult.data) ? qrResult.data : [];
+        } else if (Array.isArray(qrResult)) {
+          qrData = qrResult;
+        } else {
+          qrData = [];
+        }
 
-        // Update stats
+        // ✅ Update stats
         setStats({
           totalMenuItems,
           totalOrders,
@@ -103,19 +122,19 @@ const Dashboard = () => {
           revenue: analyticsData?.overview?.today_revenue || 0,
         });
 
-        // Set orders (limit to recent 5)
+        // ✅ Set orders (limit to recent 5)
         setOrders(ordersData.slice(0, 5));
 
-        // Set staff (limit to recent/on-duty staff)
+        // ✅ Set staff (limit to recent/on-duty staff)
         setStaff(staffData.slice(0, 3));
 
-        // Set restaurant
+        // ✅ Set restaurant
         setRestaurant(restaurantData);
 
-        // Set QR codes
+        // ✅ Set QR codes
         setQrCodes(qrData);
 
-        // Set inventory alerts (mock for now - will be replaced when inventory API is ready)
+        // ✅ Set inventory alerts (mock for now - will be replaced when inventory API is ready)
         setInventoryAlerts([
           { id: 1, item: "Chicken Breast", quantity: 5, threshold: 10 },
           { id: 2, item: "Tomatoes", quantity: 3, threshold: 8 },
@@ -138,13 +157,9 @@ const Dashboard = () => {
   // ============================================================
 
   const getRestaurantId = () => {
-    // Try to get from URL params
     if (restaurantId) return restaurantId;
-
-    // Try to get from localStorage
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (user.restaurant_id) return user.restaurant_id;
-
     return null;
   };
 
@@ -161,7 +176,6 @@ const Dashboard = () => {
         return;
       }
 
-      // Get the QR code URL from the restaurant data
       const restaurantResult = await restaurantService.getMyRestaurant();
       
       if (!restaurantResult.success || !restaurantResult.data) {
@@ -177,7 +191,6 @@ const Dashboard = () => {
         return;
       }
 
-      // Download the QR code image
       await downloadQRCode(qrImageUrl, `${restaurant.name}-qr-code`);
       
     } catch (error) {
@@ -188,7 +201,6 @@ const Dashboard = () => {
 
   const downloadQRCode = async (imageUrl, fileName) => {
     try {
-      // If the image is a data URL (starts with data:image)
       if (imageUrl.startsWith('data:image')) {
         const link = document.createElement('a');
         link.href = imageUrl;
@@ -199,7 +211,6 @@ const Dashboard = () => {
         return;
       }
 
-      // If the image is a URL
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
@@ -211,7 +222,6 @@ const Dashboard = () => {
       link.click();
       document.body.removeChild(link);
       
-      // Cleanup
       setTimeout(() => {
         URL.revokeObjectURL(url);
         document.body.removeChild(link);
@@ -247,7 +257,6 @@ const Dashboard = () => {
 
   const handleManageShift = () => {
     console.log("Open shift management - Coming soon");
-    // Will integrate with staff service
   };
 
   const handleDismissInventory = (id) => {
@@ -256,7 +265,6 @@ const Dashboard = () => {
 
   const handleRestock = (item) => {
     console.log("Navigate to restock page for:", item);
-    // Will integrate with inventory service
   };
 
   // ============================================================
@@ -268,7 +276,6 @@ const Dashboard = () => {
       <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
         <main className="min-h-screen bg-surface">
           <div className="p-8 space-y-6 max-w-[1200px]">
-            {/* Skeleton Header */}
             <div className="flex items-end justify-between">
               <div className="space-y-2">
                 <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
@@ -276,8 +283,6 @@ const Dashboard = () => {
               </div>
               <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
             </div>
-
-            {/* Skeleton Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -289,8 +294,6 @@ const Dashboard = () => {
                 </div>
               ))}
             </div>
-
-            {/* Skeleton Orders Table */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">

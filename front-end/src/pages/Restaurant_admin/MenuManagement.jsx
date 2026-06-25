@@ -1,13 +1,11 @@
-// src/pages/Restaurant_admin/MenuManagement.jsx
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import Sidebar from "../../components/layout/sidebar";
-import TopHeader from "../../components/layout/TopHeader";
 import MenuItemList from "../../components/Restaurant_admin/menu/MenuItemList";
 import CreateMenuItemModal from "../../components/Restaurant_admin/menu/CreateMenuItemModal";
+import CategoryManagementModal from "../../components/Restaurant_admin/menu/CategoryManagementModal";
 import menuService from "../../services/menuService";
-
+import { FolderOpen } from "lucide-react";
 const MenuManagement = () => {
   const { restaurantId } = useParams();
 
@@ -22,6 +20,7 @@ const MenuManagement = () => {
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -39,7 +38,6 @@ const MenuManagement = () => {
       const result = await menuService.getMenuItems();
       
       if (result.success) {
-        // Transform API data to match component format
         const transformedItems = result.data.map((item) => ({
           id: item.id,
           name: item.name,
@@ -74,13 +72,11 @@ const MenuManagement = () => {
   // FILTERS & PAGINATION
   // ============================================================
 
-  // Get unique categories
   const categories = useMemo(() => {
     const cats = ["All", ...new Set(items.map((item) => item.category))];
     return cats;
   }, [items]);
 
-  // Filter items based on search and category
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
       const matchesSearch =
@@ -92,21 +88,18 @@ const MenuManagement = () => {
     });
   }, [items, searchTerm, categoryFilter]);
 
-  // Pagination
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = filteredItems.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
 
-  // Stats calculations
   const activeItemsCount = items.filter((item) => item.available).length;
   const averageOrderValue =
     items.length > 0
       ? items.reduce((sum, item) => sum + item.price, 0) / items.length
       : 0;
 
-  // Insights calculations
   const mostPopularItem = items.length > 0
     ? items.reduce((prev, current) =>
         current.orderCount > prev.orderCount ? current : prev,
@@ -148,9 +141,7 @@ const MenuManagement = () => {
       const result = await menuService.deleteMenuItem(id);
       
       if (result.success) {
-        // Remove item from state
         setItems(items.filter((item) => item.id !== id));
-        // Show success feedback (you can add toast notifications here)
         console.log("Item deleted successfully");
       } else {
         alert(result.error || "Failed to delete item");
@@ -165,7 +156,6 @@ const MenuManagement = () => {
     setIsSubmitting(true);
 
     try {
-      // Prepare data for API
       const apiData = {
         category_id: itemData.category_id || itemData.category,
         name: itemData.name,
@@ -180,19 +170,15 @@ const MenuManagement = () => {
       let result;
       
       if (editingItem) {
-        // Update existing item
         result = await menuService.updateMenuItem(editingItem.id, apiData);
       } else {
-        // Create new item
         result = await menuService.createMenuItem(apiData);
       }
 
       if (result.success) {
-        // Refresh the list
         await fetchMenuItems();
         setIsModalOpen(false);
         setEditingItem(null);
-        // Show success feedback
         console.log(editingItem ? "Item updated successfully" : "Item created successfully");
       } else {
         alert(result.error || "Failed to save item");
@@ -209,6 +195,10 @@ const MenuManagement = () => {
     setCurrentPage(newPage);
   };
 
+  const handleCategoryChange = async () => {
+    await fetchMenuItems();
+  };
+
   // ============================================================
   // RENDER - LOADING STATE
   // ============================================================
@@ -218,7 +208,6 @@ const MenuManagement = () => {
       <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
         <main className="min-h-screen bg-surface">
           <div className="p-8 max-w-[1200px] w-full mx-auto">
-            {/* Skeleton Header */}
             <div className="flex justify-between items-end mb-6">
               <div className="space-y-2">
                 <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
@@ -226,17 +215,11 @@ const MenuManagement = () => {
               </div>
               <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
             </div>
-
-            {/* Skeleton Stats */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
               <div className="md:col-span-8 h-24 bg-gray-200 rounded-xl animate-pulse"></div>
               <div className="md:col-span-4 h-24 bg-gray-200 rounded-xl animate-pulse"></div>
             </div>
-
-            {/* Skeleton Search */}
             <div className="h-12 bg-gray-200 rounded-lg animate-pulse mb-4"></div>
-
-            {/* Skeleton Table */}
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="h-16 bg-gray-200 rounded-lg animate-pulse"></div>
@@ -339,7 +322,7 @@ const MenuManagement = () => {
             </div>
           </div>
 
-          {/* Search & Filters */}
+          {/* Search & Filters - UPDATED with Manage Categories button */}
           <div className="mb-4 flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
             <div className="relative flex-1 w-full">
               <input
@@ -362,6 +345,14 @@ const MenuManagement = () => {
                 </option>
               ))}
             </select>
+            {/* ✅ NEW: Manage Categories Button */}
+            <button
+              onClick={() => setIsCategoryModalOpen(true)}
+              className="px-4 py-2 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors text-sm font-medium flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <FolderOpen className="w-4 h-4" />
+              Manage Categories
+            </button>
           </div>
 
           {/* Table Container */}
@@ -451,7 +442,7 @@ const MenuManagement = () => {
         </div>
       </main>
 
-      {/* Modal */}
+      {/* Create/Edit Item Modal */}
       <CreateMenuItemModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -462,6 +453,13 @@ const MenuManagement = () => {
         initialData={editingItem}
         isSubmitting={isSubmitting}
         categories={categories.filter(c => c !== "All")}
+      />
+
+      {/* ✅ NEW: Category Management Modal */}
+      <CategoryManagementModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        onCategoryChange={handleCategoryChange}
       />
     </div>
   );

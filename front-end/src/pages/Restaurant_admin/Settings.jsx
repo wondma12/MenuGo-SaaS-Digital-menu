@@ -114,28 +114,51 @@ const Settings = () => {
     }
   };
 
-// src/pages/Restaurant_admin/Settings.jsx - Update loadQRCodes
-
-const loadQRCodes = async () => {
-  try {
-    console.log('[Settings] Loading QR codes...');
-    const result = await qrCodeAPI.getAll();
-    console.log('[Settings] QR codes result:', result);
-    
-    if (result.success) {
-      // ✅ Ensure we're setting an array
-      const qrCodesData = result.data || [];
-      setQrCodes(Array.isArray(qrCodesData) ? qrCodesData : []);
-      console.log('[Settings] QR codes set:', qrCodesData);
-    } else {
-      console.warn('[Settings] Failed to load QR codes:', result.error);
+  // ✅ FIXED: loadQRCodes - correctly extracts qrCodes array from nested response
+  const loadQRCodes = async () => {
+    try {
+      console.log('[Settings] 🔍 Loading QR codes...');
+      const result = await qrCodeAPI.getAll();
+      console.log('[Settings] 📦 Raw QR result:', result);
+      
+      let qrCodesArray = [];
+      
+      if (result.success) {
+        // ✅ The data structure is: { qrCodes: [...], pagination: {...} }
+        // We need to extract the qrCodes array
+        if (result.data && result.data.qrCodes) {
+          qrCodesArray = Array.isArray(result.data.qrCodes) ? result.data.qrCodes : [];
+          console.log('[Settings] ✅ Extracted qrCodes from data.qrCodes:', qrCodesArray);
+        } else if (Array.isArray(result.data)) {
+          qrCodesArray = result.data;
+          console.log('[Settings] ✅ result.data is array:', qrCodesArray);
+        } else if (result.data && typeof result.data === 'object') {
+          // Fallback: try to find any array in the data
+          const possibleArray = Object.values(result.data).find(val => Array.isArray(val));
+          qrCodesArray = possibleArray || [];
+          console.log('[Settings] ✅ Found array in data object:', qrCodesArray);
+        }
+      }
+      
+      // ✅ Ensure it's an array
+      const finalData = Array.isArray(qrCodesArray) ? qrCodesArray : [];
+      console.log('[Settings] ✅ Final QR codes set:', finalData);
+      setQrCodes(finalData);
+      
+      // ✅ Also update visual assets if there's an active QR code
+      const activeQR = finalData.find(q => q.is_active !== false);
+      if (activeQR && activeQR.qr_image_url) {
+        setVisualAssets(prev => ({
+          ...prev,
+          qr_code: activeQR.qr_image_url,
+        }));
+      }
+      
+    } catch (error) {
+      console.error("[Settings] ❌ Error loading QR codes:", error);
       setQrCodes([]);
     }
-  } catch (error) {
-    console.error("[Settings] Error loading QR codes:", error);
-    setQrCodes([]);
-  }
-};
+  };
 
   // ============================================================
   // QR CODE HANDLERS
@@ -149,15 +172,21 @@ const loadQRCodes = async () => {
 
     try {
       setIsGeneratingQR(true);
+      console.log('[Settings] 🚀 Generating QR for restaurant:', restaurant.id);
       
       const result = await qrCodeAPI.generate({
         restaurant_id: restaurant.id,
         qr_type: 'menu',
       });
       
+      console.log('[Settings] 📦 QR generation result:', result);
+      
       if (result.success) {
         showToastMessage("QR Code generated successfully!", "success");
-        await loadQRCodes(); // Refresh QR codes list
+        
+        // ✅ Refresh QR codes list
+        await loadQRCodes();
+        
         // Update visual assets with new QR code
         if (result.data && result.data.qr_image_url) {
           setVisualAssets(prev => ({
@@ -169,7 +198,7 @@ const loadQRCodes = async () => {
         showToastMessage(result.error || "Failed to generate QR code", "error");
       }
     } catch (error) {
-      console.error("[Settings] Error generating QR:", error);
+      console.error("[Settings] ❌ Error generating QR:", error);
       showToastMessage("Failed to generate QR code. Please try again.", "error");
     } finally {
       setIsGeneratingQR(false);

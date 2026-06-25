@@ -169,7 +169,7 @@ const RestaurantDetail = () => {
           subtitle="Loading..."
           breadcrumbs={["Command Center", "Restaurants"]}
         />
-        <main className="ml-64 pt-16 min-h-screen bg-background">
+        <main className="min-h-screen bg-background">
           <div className="max-w-7xl mx-auto p-8">
             <div className="flex items-center justify-center min-h-[400px]">
               <div className="text-center">
@@ -197,7 +197,7 @@ const RestaurantDetail = () => {
           subtitle="Error"
           breadcrumbs={["Command Center", "Restaurants"]}
         />
-        <main className="ml-64 pt-16 min-h-screen bg-background">
+        <main className=" min-h-screen bg-background">
           <div className="max-w-7xl mx-auto p-8">
             <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
               <div className="text-red-500 text-5xl mb-4">⚠️</div>
@@ -230,7 +230,7 @@ const RestaurantDetail = () => {
           subtitle="Not Found"
           breadcrumbs={["Command Center", "Restaurants"]}
         />
-        <main className="ml-64 pt-16 min-h-screen bg-background">
+        <main className=" min-h-screen bg-background">
           <div className="max-w-7xl mx-auto p-8">
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
               <div className="text-yellow-500 text-5xl mb-4">🔍</div>
@@ -263,7 +263,7 @@ const RestaurantDetail = () => {
         breadcrumbs={["Command Center", "Restaurants", restaurant.name]}
       />
 
-      <main className="ml-64 pt-16 min-h-screen bg-background">
+      <main className=" min-h-screen bg-background">
         <div className="max-w-7xl mx-auto p-8">
           {/* Page Header & Action Panel */}
           <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-8 border-b border-zinc-200">
