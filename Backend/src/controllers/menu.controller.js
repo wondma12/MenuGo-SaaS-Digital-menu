@@ -1,6 +1,12 @@
+// Backend/src/controllers/menu.controller.js
+
+import prisma from '../config/prisma.js';  // ✅ ADDED
 import * as menuService from '../services/menu.service.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 
+// ============================================================
+// CATEGORY CONTROLLERS
+// ============================================================
 
 export const createCategory = async (req, res) => {
   try {
@@ -91,6 +97,9 @@ export const deleteCategory = async (req, res) => {
   }
 };
 
+// ============================================================
+// MENU ITEM CONTROLLERS
+// ============================================================
 
 export const createMenuItem = async (req, res) => {
   try {
@@ -233,7 +242,10 @@ export const getMenuByCategory = async (req, res) => {
   }
 };
 
-// Public endpoint for customers (no auth required)
+// ============================================================
+// PUBLIC ENDPOINT - NO AUTHENTICATION REQUIRED
+// ============================================================
+
 export const getPublicMenu = async (req, res) => {
   try {
     const { restaurantId } = req.params;
@@ -242,18 +254,46 @@ export const getPublicMenu = async (req, res) => {
       return errorResponse(res, 'Restaurant ID is required', null, 400);
     }
 
+    // ✅ Now prisma is defined because we imported it
     // Verify restaurant exists and is active
     const restaurant = await prisma.restaurants.findUnique({
-      where: { id: restaurantId, status: 'active' }
+      where: { id: restaurantId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        logo: true,
+        banner: true,
+        slogan: true,
+        description: true,
+        status: true,
+        restaurant_location: {
+          select: {
+            country: true,
+            city: true,
+            sub_city: true,
+            street_address: true,
+            map_link: true
+          }
+        }
+      }
     });
 
     if (!restaurant) {
       return errorResponse(res, 'Restaurant not found or inactive', null, 404);
     }
 
+    // Get menu by category
     const menu = await menuService.getMenuByCategory(restaurantId);
-    successResponse(res, 'Menu retrieved successfully', { restaurant, menu });
+    
+    // Return restaurant info and menu
+    successResponse(res, 'Menu retrieved successfully', { 
+      restaurant, 
+      categories: menu 
+    });
   } catch (error) {
+    console.error('[PublicMenu] Error:', error);
     errorResponse(res, error.message, null, 500);
   }
 };

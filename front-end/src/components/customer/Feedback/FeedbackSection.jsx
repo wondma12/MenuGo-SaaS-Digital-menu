@@ -1,15 +1,56 @@
+// src/components/customer/Feedback/FeedbackSection.jsx
+
 import React, { useState } from 'react';
 import { Star } from 'lucide-react';
+import { feedbackAPI } from '../../../services/api';
 
-const FeedbackSection = () => {
+const FeedbackSection = ({ restaurantId }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [customerName, setCustomerName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`Thank you! Rating: ${rating}, Comment: ${comment}`);
-    setRating(0);
-    setComment('');
+    
+    if (rating === 0) {
+      alert('Please select a rating');
+      return;
+    }
+
+    if (!restaurantId) {
+      alert('Restaurant not found');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+    setSubmitSuccess(false);
+
+    try {
+      const result = await feedbackAPI.submitPublic(restaurantId, {
+        customer_name: customerName || 'Anonymous',
+        rating: rating,
+        comment: comment
+      });
+
+      if (result.success) {
+        setSubmitSuccess(true);
+        setRating(0);
+        setComment('');
+        setCustomerName('');
+        setTimeout(() => setSubmitSuccess(false), 5000);
+      } else {
+        setSubmitError(result.error || 'Failed to submit feedback');
+      }
+    } catch (error) {
+      console.error('[FeedbackSection] Error submitting feedback:', error);
+      setSubmitError(error.message || 'Failed to submit feedback');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -19,34 +60,79 @@ const FeedbackSection = () => {
         <p className="font-body-md text-secondary mb-4">
           How was your dining experience today? Your insights help us maintain our standard of excellence.
         </p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex gap-3 mb-4">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                onClick={() => setRating(star)}
-                aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
-                aria-pressed={star <= rating}
-                className="p-1 rounded-sm focus:outline-none focus:ring-2 focus:ring-offset-1"
-              >
-                <Star
-                  className={`h-6 w-6 ${star <= rating ? 'text-black' : 'text-secondary'}`}
-                  fill={star <= rating ? 'currentColor' : 'none'}
-                  strokeWidth={1.5}
-                />
-              </button>
-            ))}
+        
+        {submitSuccess && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+            Thank you for your feedback! 🎉
           </div>
-          <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            className="w-full bg-white border border-surface-variant p-3 font-body-sm focus:border-primary outline-none transition-colors rounded-md"
-            placeholder="Write your thoughts..."
-            rows="3"
-          />
-          <button type="submit" className="bg-black text-white font-button text-button px-6 py-2 uppercase rounded-md">
-            Submit
+        )}
+        
+        {submitError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            {submitError}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Your Name (optional)
+            </label>
+            <input
+              type="text"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              placeholder="Enter your name"
+              className="w-full bg-white border border-surface-variant p-3 font-body-sm focus:border-primary outline-none transition-colors rounded-md"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Rating
+            </label>
+            <div className="flex gap-3">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setRating(star)}
+                  aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+                  aria-pressed={star <= rating}
+                  className="p-1 rounded-sm focus:outline-none focus:ring-2 focus:ring-offset-1"
+                >
+                  <Star
+                    className={`h-6 w-6 ${star <= rating ? 'text-black' : 'text-secondary'}`}
+                    fill={star <= rating ? 'currentColor' : 'none'}
+                    strokeWidth={1.5}
+                  />
+                </button>
+              ))}
+            </div>
+            {rating === 0 && (
+              <p className="text-xs text-red-500 mt-1">Please select a rating</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Comment
+            </label>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className="w-full bg-white border border-surface-variant p-3 font-body-sm focus:border-primary outline-none transition-colors rounded-md"
+              placeholder="Write your thoughts..."
+              rows="3"
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="bg-black text-white font-button text-button px-6 py-2 uppercase rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-800 transition-colors"
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit'}
           </button>
         </form>
       </div>

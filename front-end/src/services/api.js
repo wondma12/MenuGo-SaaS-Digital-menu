@@ -484,11 +484,15 @@ export const menuAPI = {
     }
   },
 
+  // ✅ PUBLIC MENU - NO AUTHENTICATION REQUIRED
   getPublicMenu: async (restaurantId) => {
     try {
+      console.log('[menuAPI] Fetching public menu for restaurant:', restaurantId);
       const response = await api.get(`/menu/public/${restaurantId}`);
+      console.log('[menuAPI] Public menu response:', response.data);
       return handleResponse(response);
     } catch (error) {
+      console.error('[menuAPI] Public menu error:', error);
       return handleError(error);
     }
   },

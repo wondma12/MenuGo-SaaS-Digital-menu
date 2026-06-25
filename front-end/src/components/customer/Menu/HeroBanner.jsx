@@ -1,3 +1,5 @@
+// src/components/customer/Menu/HeroBanner.jsx
+
 import React from "react";
 
 const HeroBanner = ({ restaurant }) => {
@@ -18,15 +20,31 @@ const HeroBanner = ({ restaurant }) => {
         alt={`${restaurant.name} interior`}
         src={
           restaurant.banner ||
+          restaurant.cover_image ||
           "https://cdn.dribbble.com/userupload/33502197/file/original-d173b422cc193eee821db0baf7ba055d.jpg?resize=400x0"
         }
+        onError={(e) => {
+          e.target.src = "https://cdn.dribbble.com/userupload/33502197/file/original-d173b422cc193eee821db0baf7ba055d.jpg?resize=400x0";
+        }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-6 md:p-12 text-white">
-        <span className="font-label-caps text-label-caps mb-2 uppercase tracking-[0.16em]">
-          {restaurant.name || "Restaurant"}
-        </span>
+        <div className="flex items-center gap-3 mb-2">
+          {restaurant.logo && (
+            <img 
+              src={restaurant.logo} 
+              alt={restaurant.name} 
+              className="w-12 h-12 rounded-full object-cover border-2 border-white/50"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          )}
+          <span className="font-label-caps text-label-caps uppercase tracking-[0.16em]">
+            {restaurant.name || "Restaurant"}
+          </span>
+        </div>
         <h2 className="font-display text-h1 md:text-display mb-2">
-          {restaurant.slogan || "Welcome to our restaurant"}
+          {restaurant.slogan || restaurant.description || "Welcome to our restaurant"}
         </h2>
         <p className="font-body-md max-w-xl opacity-90">
           {restaurant.status === "active"

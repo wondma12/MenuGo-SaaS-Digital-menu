@@ -1,3 +1,5 @@
+// src/components/layout/CustomerNav.jsx
+
 import React from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
@@ -5,6 +7,7 @@ const CustomerHeader = ({
   cartCount = 0,
   showMobileMenu = true,
   onMobileMenuClick,
+  restaurant = null,  // ✅ Add restaurant prop
 }) => {
   const location = useLocation();
   const { restaurantId } = useParams();
@@ -12,6 +15,11 @@ const CustomerHeader = ({
   const isActiveLink = (path) => {
     return location.pathname === path;
   };
+
+  // ✅ Get restaurant name or fallback
+  const restaurantName = restaurant?.name || "MenuGo";
+  const restaurantLogo = restaurant?.logo || null;
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 md:px-12 bg-white border-b border-neutral-200">
       <div className="flex items-center gap-4">
@@ -26,9 +34,21 @@ const CustomerHeader = ({
           </button>
         )}
         <Link to={restaurantId ? `/customer/${restaurantId}` : "/customer"}>
-          <h1 className="text-lg font-black tracking-tighter text-neutral-900 uppercase">
-            LUMIÈRE DINING
-          </h1>
+          <div className="flex items-center gap-2">
+            {restaurantLogo ? (
+              <img 
+                src={restaurantLogo} 
+                alt={restaurantName} 
+                className="h-8 w-8 object-contain rounded-full"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+            ) : null}
+            <h1 className="text-lg font-black tracking-tighter text-neutral-900 uppercase">
+              {restaurantName}
+            </h1>
+          </div>
         </Link>
       </div>
 
@@ -77,7 +97,6 @@ const CustomerHeader = ({
           <span className="material-symbols-outlined"></span>
           <span className="font-label-caps text-label-caps">Orders</span>
 
-          {/* The Animated Underline for Orders */}
           <span
             className={`absolute bottom-0 left-0 h-[2px] w-full bg-neutral-900 transition-transform duration-300 ease-in-out ${
               isActiveLink(
@@ -89,7 +108,7 @@ const CustomerHeader = ({
           />
 
           {cartCount > 0 && (
-            <span className="absolute -top-2 -right-4 bg-primary text-on-primary text-[11px] font-bold px-2 py-0.5 rounded-full z-10">
+            <span className="absolute -top-2 -right-4 bg-black text-white text-[11px] font-bold px-2 py-0.5 rounded-full z-10">
               {cartCount}
             </span>
           )}
@@ -100,7 +119,7 @@ const CustomerHeader = ({
 };
 
 // Bottom Navigation Component (mobile only)
-const BottomNav = ({ cartCount = 0 }) => {
+const BottomNav = ({ cartCount = 0, restaurant = null }) => {
   const location = useLocation();
   const { restaurantId } = useParams();
 
@@ -153,7 +172,7 @@ const BottomNav = ({ cartCount = 0 }) => {
           Orders
         </span>
         {cartCount > 0 && (
-          <span className="absolute -top-1 right-8 bg-primary text-on-primary text-[11px] font-bold px-2 py-0.5 rounded-full">
+          <span className="absolute -top-1 right-8 bg-black text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
             {cartCount}
           </span>
         )}
