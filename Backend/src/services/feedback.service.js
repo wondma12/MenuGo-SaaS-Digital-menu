@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js';
 
+
 export const createFeedback = async (restaurantId, feedbackData) => {
   const { customer_name, rating, comment } = feedbackData;
   
