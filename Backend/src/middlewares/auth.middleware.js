@@ -52,21 +52,30 @@ export const authorize = (...roles) => {
 
 export const checkRestaurantAccess = async (req, res, next) => {
   try {
-    const { restaurantId } = req.params;
+    const restaurantId = req.params.id;   // <-- FIX
+
     const user = req.user;
 
-    // Platform admin can access all restaurants
     if (user.role === 'platform_admin') {
       return next();
     }
 
-    // Restaurant admin and waiter can only access their own restaurant
     if (user.restaurant_id !== restaurantId) {
-      return errorResponse(res, 'Access denied. You can only access your own restaurant', null, 403);
+      return errorResponse(
+        res,
+        'Access denied. You can only access your own restaurant',
+        null,
+        403
+      );
     }
 
     next();
   } catch (error) {
-    return errorResponse(res, 'Restaurant access check failed', error, 403);
+    return errorResponse(
+      res,
+      'Restaurant access check failed',
+      error,
+      403
+    );
   }
 };

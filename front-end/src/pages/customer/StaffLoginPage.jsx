@@ -1,13 +1,17 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+// src/pages/customer/StaffLoginPage.jsx
+
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import Input from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import Footer from "../../components/layout/Footer";
 import authService from "../../services/authservice";
+import { restaurantAPI } from "../../services/api";
 
 const StaffLoginPage = () => {
   const navigate = useNavigate();
+  const { restaurantId } = useParams();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -16,6 +20,43 @@ const StaffLoginPage = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [restaurant, setRestaurant] = useState(null);
+
+  // ✅ Load restaurant data for footer
+  useEffect(() => {
+    const loadRestaurant = async () => {
+      if (!restaurantId) {
+        // Try to get from localStorage or use default
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.restaurant_id) {
+          try {
+            const result = await restaurantAPI.getById(user.restaurant_id);
+            if (result) setRestaurant(result);
+          } catch (e) {
+            console.error("Error loading restaurant:", e);
+          }
+        }
+        return;
+      }
+
+      try {
+        // Try public endpoint first, fallback to authenticated
+        let result;
+        try {
+          result = await restaurantAPI.getPublicRestaurant?.(restaurantId);
+        } catch {
+          result = await restaurantAPI.getById(restaurantId);
+        }
+        if (result) {
+          setRestaurant(result);
+        }
+      } catch (error) {
+        console.error("Error loading restaurant:", error);
+      }
+    };
+
+    loadRestaurant();
+  }, [restaurantId]);
 
   const validate = () => {
     const validationErrors = {};
@@ -47,33 +88,36 @@ const StaffLoginPage = () => {
       const result = await authService.login(formData.email, formData.password);
 
       if (result.success) {
-        localStorage.setItem("authToken", result.data.token);
-        localStorage.setItem("user", JSON.stringify(result.data.user));
+        const { user, token } = result.data;
+        
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
 
-        if (
-          result.data.user.role === "restaurant_admin" ||
-          result.data.user.role === "waiter"
-        ) {
-          const redirectPath = authService.getRestaurantRedirectPath(
-            result.data.user,
-          );
+        // ✅ Redirect based on role
+        if (user.role === "restaurant_admin" || user.role === "waiter") {
+          const redirectPath = authService.getRestaurantRedirectPath(user);
           if (redirectPath) {
             navigate(redirectPath);
           } else {
-            setLoginError("Invalid user role");
+            setLoginError("Unable to determine redirect path");
           }
         } else {
           setLoginError("Access denied. Staff accounts only.");
         }
       } else {
-        setLoginError(result.error);
+        setLoginError(result.error || "Invalid credentials");
       }
     } catch (error) {
+      console.error("[StaffLogin] Error:", error);
       setLoginError("Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  // ✅ Get restaurant name for display
+  const restaurantName = restaurant?.name || "LUMIÈRE DINING";
 
   return (
     <div className="min-h-screen bg-white animate-slide-in-right">
@@ -81,7 +125,7 @@ const StaffLoginPage = () => {
         <div className="max-w-md w-full space-y-8 animate-scale-in">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              LUMIÈRE DINING
+              {restaurantName}
             </h1>
             <h2 className="text-2xl font-semibold text-gray-900">
               Staff Login
@@ -98,6 +142,7 @@ const StaffLoginPage = () => {
                 {loginError}
               </div>
             )}
+            
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -169,7 +214,7 @@ const StaffLoginPage = () => {
                 <span className="text-sm text-gray-600">Remember me</span>
               </label>
               <Link
-                to="/forgot-password"
+                to="/auth/forgot-password"
                 className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
               >
                 Forgot password?
@@ -189,7 +234,7 @@ const StaffLoginPage = () => {
           {/* Back to Menu Link */}
           <div className="text-center pt-6 border-t border-gray-200">
             <Link
-              to="/customer/1"
+              to={restaurantId ? `/customer/${restaurantId}` : "/customer"}
               className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -198,7 +243,7 @@ const StaffLoginPage = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer restaurant={restaurant} />
     </div>
   );
 };

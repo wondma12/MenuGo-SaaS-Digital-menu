@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import MenuItemList from "../../components/Restaurant_admin/menu/MenuItemList";
@@ -36,7 +35,7 @@ const MenuManagement = () => {
       setError(null);
 
       const result = await menuService.getMenuItems();
-      
+
       if (result.success) {
         const transformedItems = result.data.map((item) => ({
           id: item.id,
@@ -45,13 +44,15 @@ const MenuManagement = () => {
           category: item.categories?.name || "Uncategorized",
           price: parseFloat(item.price),
           available: item.status === "available",
-          imageUrl: item.image || "https://images.unsplash.com/photo-1547592180-85f173990554?w=100&h=100&fit=crop",
+          imageUrl:
+            item.image ||
+            "https://images.unsplash.com/photo-1547592180-85f173990554?w=100&h=100&fit=crop",
           orderCount: item.order_count || 0,
           stock: item.stock || null,
           margin: item.margin || 50,
           category_id: item.category_id,
         }));
-        
+
         setItems(transformedItems);
       } else {
         setError(result.error || "Failed to fetch menu items");
@@ -100,23 +101,26 @@ const MenuManagement = () => {
       ? items.reduce((sum, item) => sum + item.price, 0) / items.length
       : 0;
 
-  const mostPopularItem = items.length > 0
-    ? items.reduce((prev, current) =>
-        current.orderCount > prev.orderCount ? current : prev,
-        items[0]
-      )
-    : null;
-    
+  const mostPopularItem =
+    items.length > 0
+      ? items.reduce(
+          (prev, current) =>
+            current.orderCount > prev.orderCount ? current : prev,
+          items[0],
+        )
+      : null;
+
   const lowInventoryItem = items.find(
     (item) => item.stock !== null && item.stock < 20 && item.available,
   );
-  
-  const profitLeader = items.length > 0
-    ? items.reduce((prev, current) =>
-        current.margin > prev.margin ? current : prev,
-        items[0]
-      )
-    : null;
+
+  const profitLeader =
+    items.length > 0
+      ? items.reduce(
+          (prev, current) => (current.margin > prev.margin ? current : prev),
+          items[0],
+        )
+      : null;
 
   // ============================================================
   // CRUD OPERATIONS
@@ -139,7 +143,7 @@ const MenuManagement = () => {
 
     try {
       const result = await menuService.deleteMenuItem(id);
-      
+
       if (result.success) {
         setItems(items.filter((item) => item.id !== id));
         console.log("Item deleted successfully");
@@ -168,7 +172,7 @@ const MenuManagement = () => {
       };
 
       let result;
-      
+
       if (editingItem) {
         result = await menuService.updateMenuItem(editingItem.id, apiData);
       } else {
@@ -179,7 +183,11 @@ const MenuManagement = () => {
         await fetchMenuItems();
         setIsModalOpen(false);
         setEditingItem(null);
-        console.log(editingItem ? "Item updated successfully" : "Item created successfully");
+        console.log(
+          editingItem
+            ? "Item updated successfully"
+            : "Item created successfully",
+        );
       } else {
         alert(result.error || "Failed to save item");
       }
@@ -222,7 +230,10 @@ const MenuManagement = () => {
             <div className="h-12 bg-gray-200 rounded-lg animate-pulse mb-4"></div>
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-16 bg-gray-200 rounded-lg animate-pulse"></div>
+                <div
+                  key={i}
+                  className="h-16 bg-gray-200 rounded-lg animate-pulse"
+                ></div>
               ))}
             </div>
           </div>
@@ -242,7 +253,9 @@ const MenuManagement = () => {
           <div className="p-8 max-w-[1200px] w-full mx-auto">
             <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
               <div className="text-red-500 text-6xl mb-4">⚠️</div>
-              <h3 className="text-xl font-semibold text-red-700 mb-2">Unable to Load Menu</h3>
+              <h3 className="text-xl font-semibold text-red-700 mb-2">
+                Unable to Load Menu
+              </h3>
               <p className="text-red-600 mb-4">{error}</p>
               <button
                 onClick={fetchMenuItems}
@@ -302,9 +315,7 @@ const MenuManagement = () => {
                 <span className="text-4xl font-bold text-black">
                   {activeItemsCount}
                 </span>
-                <span className="text-gray-600">
-                  Active Menu Items
-                </span>
+                <span className="text-gray-600">Active Menu Items</span>
               </div>
             </div>
             <div className="md:col-span-4 bg-black text-white p-6 rounded-xl flex flex-col justify-between">
@@ -332,7 +343,9 @@ const MenuManagement = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                🔍
+              </span>
             </div>
             <select
               className="border border-neutral-200 px-3 py-2 rounded-lg bg-white hover:bg-neutral-50 font-medium text-sm cursor-pointer w-full sm:w-auto"
@@ -452,14 +465,17 @@ const MenuManagement = () => {
         onSave={handleSaveItem}
         initialData={editingItem}
         isSubmitting={isSubmitting}
-        categories={categories.filter(c => c !== "All")}
+        categories={categories.filter((c) => c !== "All")}
+         restaurantId={restaurantId}
       />
 
       {/* ✅ NEW: Category Management Modal */}
+      {/* Category Management Modal */}
       <CategoryManagementModal
         isOpen={isCategoryModalOpen}
         onClose={() => setIsCategoryModalOpen(false)}
         onCategoryChange={handleCategoryChange}
+        restaurantId={restaurantId}
       />
     </div>
   );

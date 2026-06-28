@@ -30,23 +30,37 @@ const MenuPage = () => {
     }
   });
 
-  const addToCart = (item) => {
-    setCart((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
-      const updated = existing
-        ? prev.map((i) =>
-            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-          )
-        : [...prev, { ...item, quantity: 1 }];
-      try {
-        sessionStorage.setItem("menugo_cart", JSON.stringify(updated));
-        setCartCount(updated.reduce((s, it) => s + it.quantity, 0));
-      } catch (e) {
-        // ignore storage errors
-      }
-      return updated;
-    });
+const addToCart = (item) => {
+  const itemWithRestaurant = { 
+    ...item, 
+    restaurantId: restaurantId,
+    restaurant_id: restaurantId
   };
+
+  console.log("[MenuPage] Adding to cart:", itemWithRestaurant);
+
+  setCart((prev) => {
+    const existing = prev.find((i) => i.id === item.id);
+    const updated = existing
+      ? prev.map((i) =>
+          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+        )
+      : [...prev, { ...itemWithRestaurant, quantity: 1 }];
+    
+    try {
+      sessionStorage.setItem("menugo_cart", JSON.stringify(updated));
+      setCartCount(updated.reduce((s, it) => s + it.quantity, 0));
+      
+      const custom = new CustomEvent("menugo_cart_updated", {
+        detail: updated,
+      });
+      window.dispatchEvent(custom);
+    } catch (e) {
+      // ignore storage errors
+    }
+    return updated;
+  });
+};
 
   const getCartCount = () => cart.reduce((sum, i) => sum + i.quantity, 0);
   const getCartTotal = () =>
@@ -68,68 +82,57 @@ const MenuPage = () => {
         console.log("[MenuPage] Public Menu Result:", menuResult);
 
         if (menuResult) {
+          // ✅ Extract data from the correct structure
+          const data = menuResult.data || menuResult;
+          
           let restaurantData = null;
           let categoriesData = [];
           let itemsData = [];
 
-          if (menuResult.restaurant) {
-            restaurantData = menuResult.restaurant;
-          } else if (menuResult.data && menuResult.data.restaurant) {
-            restaurantData = menuResult.data.restaurant;
+          // ✅ Extract restaurant
+          if (data.restaurant) {
+            restaurantData = data.restaurant;
           }
 
-          if (menuResult.categories && Array.isArray(menuResult.categories)) {
-            categoriesData = menuResult.categories;
-            menuResult.categories.forEach(cat => {
-              if (cat.items && Array.isArray(cat.items)) {
-                itemsData = [...itemsData, ...cat.items.map(item => ({
-                  ...item,
-                  categoryId: cat.id,
-                  categoryName: cat.name
-                }))];
-              }
-            });
-          } else if (menuResult.menu_items && Array.isArray(menuResult.menu_items)) {
-            itemsData = menuResult.menu_items;
-            const uniqueCategories = [...new Set(itemsData.map(item => item.category_id))];
-            categoriesData = uniqueCategories.map(id => ({ id, name: `Category ${id}` }));
-          } else if (menuResult.data) {
-            const data = menuResult.data;
-            if (data.restaurant) {
-              restaurantData = data.restaurant;
-            }
-            if (data.categories && Array.isArray(data.categories)) {
-              categoriesData = data.categories;
-              data.categories.forEach(cat => {
-                if (cat.items && Array.isArray(cat.items)) {
-                  itemsData = [...itemsData, ...cat.items.map(item => ({
+          // ✅ Extract categories and items
+          if (data.categories && Array.isArray(data.categories)) {
+            categoriesData = data.categories;
+            
+            // ✅ Extract items from each category
+            data.categories.forEach(cat => {
+              if (cat.menu_items && Array.isArray(cat.menu_items)) {
+                cat.menu_items.forEach(item => {
+                  itemsData.push({
                     ...item,
                     categoryId: cat.id,
                     categoryName: cat.name
-                  }))];
-                }
-              });
-            }
+                  });
+                });
+              }
+            });
           }
 
+          // ✅ Set restaurant data
           setRestaurant(restaurantData || null);
 
+          // ✅ Format categories for CategoryTabs
           const formattedCategories = [
             { id: "ALL", name: "ALL" },
             ...categoriesData.map(cat => ({
-              id: cat.id?.toString() || cat._id?.toString() || cat,
-              name: cat.name || cat
+              id: cat.id,
+              name: cat.name
             }))
           ];
           setCategories(formattedCategories);
 
+          // ✅ Transform menu items
           const transformedItems = itemsData.map(item => ({
-            id: item.id || item._id,
+            id: item.id,
             name: item.name,
             description: item.description || "",
             price: typeof item.price === 'string' ? parseFloat(item.price) : item.price || 0,
-            image: item.image || item.imageUrl || "",
-            categoryId: item.category_id?.toString() || item.categoryId?.toString() || "",
+            image: item.image || "",
+            categoryId: item.category_id || item.categoryId || "",
             categoryName: item.category_name || item.categoryName || "",
             status: item.status || "available",
             isAvailable: item.status === "available",
@@ -137,6 +140,7 @@ const MenuPage = () => {
             is_featured: item.is_featured || false,
           }));
 
+          console.log("[MenuPage] Transformed items:", transformedItems);
           setMenuItems(transformedItems);
         }
 
@@ -196,10 +200,15 @@ const MenuPage = () => {
     };
   }, []);
 
+  // ✅ Filter items based on active category
   const filteredItems = menuItems.filter((item) => {
     if (activeCategory === "ALL") return true;
-    return item.categoryId === activeCategory || item.category_id === activeCategory;
+    return item.categoryId === activeCategory;
   });
+
+  console.log("[MenuPage] Active category:", activeCategory);
+  console.log("[MenuPage] Filtered items:", filteredItems);
+  console.log("[MenuPage] Total menu items:", menuItems.length);
 
   const FloatingCartButton = () => {
     const count = getCartCount();
@@ -266,7 +275,7 @@ const MenuPage = () => {
         />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredItems.length > 0 ? (
-            filteredItems.map((item, index) => (
+            filteredItems.map((item) => (
               <MenuItemCard
                 key={item.id}
                 item={item}

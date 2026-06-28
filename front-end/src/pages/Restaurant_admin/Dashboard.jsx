@@ -68,7 +68,7 @@ const Dashboard = () => {
           qrCodeAPI.getAll(),
         ]);
 
-        console.log('[Dashboard] Staff result:', staffResult);
+        console.log("[Dashboard] Staff result:", staffResult);
 
         // ✅ Process menu items
         const menuItems = menuItemsResult.success ? menuItemsResult.data : [];
@@ -77,11 +77,12 @@ const Dashboard = () => {
         // ✅ Process orders
         const ordersData = ordersResult.success ? ordersResult.data : [];
         const totalOrders = ordersData.length || 0;
-        const todayOrders = ordersData.filter((order) => {
-          const today = new Date().toDateString();
-          const orderDate = new Date(order.created_at).toDateString();
-          return orderDate === today;
-        }).length || 0;
+        const todayOrders =
+          ordersData.filter((order) => {
+            const today = new Date().toDateString();
+            const orderDate = new Date(order.created_at).toDateString();
+            return orderDate === today;
+          }).length || 0;
 
         // ✅ Process staff - FIXED
         let staffData = [];
@@ -94,24 +95,42 @@ const Dashboard = () => {
         } else {
           staffData = [];
         }
-        console.log('[Dashboard] Staff data:', staffData);
+        console.log("[Dashboard] Staff data:", staffData);
         const totalStaff = staffData.length || 0;
 
         // ✅ Process restaurant
-        const restaurantData = restaurantResult.success ? restaurantResult.data : null;
+        const restaurantData = restaurantResult.success
+          ? restaurantResult.data
+          : null;
 
         // ✅ Process analytics
-        const analyticsData = analyticsResult.success ? analyticsResult.data : null;
+        const analyticsData = analyticsResult.success
+          ? analyticsResult.data
+          : null;
 
         // ✅ Process QR codes
-        let qrData = [];
-        if (qrResult && qrResult.success) {
-          qrData = Array.isArray(qrResult.data) ? qrResult.data : [];
-        } else if (Array.isArray(qrResult)) {
-          qrData = qrResult;
-        } else {
-          qrData = [];
-        }
+  let qrData = [];
+
+if (Array.isArray(qrResult)) {
+  qrData = qrResult;
+}
+else if (qrResult?.success) {
+
+  if (Array.isArray(qrResult.data)) {
+    qrData = qrResult.data;
+  }
+
+  else if (Array.isArray(qrResult.data?.qrCodes)) {
+    qrData = qrResult.data.qrCodes;
+  }
+
+  else if (Array.isArray(qrResult.data?.data)) {
+    qrData = qrResult.data.data;
+  }
+
+}
+
+console.log("QR DATA:", qrData);
 
         // ✅ Update stats
         setStats({
@@ -140,7 +159,6 @@ const Dashboard = () => {
           { id: 2, item: "Tomatoes", quantity: 3, threshold: 8 },
           { id: 3, item: "Onions", quantity: 2, threshold: 6 },
         ]);
-
       } catch (err) {
         console.error("[Dashboard] Error fetching data:", err);
         setError(err.message || "Failed to load dashboard data");
@@ -158,7 +176,7 @@ const Dashboard = () => {
 
   const getRestaurantId = () => {
     if (restaurantId) return restaurantId;
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
     if (user.restaurant_id) return user.restaurant_id;
     return null;
   };
@@ -170,16 +188,16 @@ const Dashboard = () => {
   const handleDownloadQR = async () => {
     try {
       const currentRestaurantId = getRestaurantId();
-      
+
       if (!currentRestaurantId) {
-        alert('No restaurant found. Please ensure you are logged in.');
+        alert("No restaurant found. Please ensure you are logged in.");
         return;
       }
 
       const restaurantResult = await restaurantService.getMyRestaurant();
-      
+
       if (!restaurantResult.success || !restaurantResult.data) {
-        alert('Failed to get restaurant QR code');
+        alert("Failed to get restaurant QR code");
         return;
       }
 
@@ -187,22 +205,23 @@ const Dashboard = () => {
       const qrImageUrl = restaurant.qr_code;
 
       if (!qrImageUrl) {
-        alert('No QR code found for this restaurant. Please generate one first.');
+        alert(
+          "No QR code found for this restaurant. Please generate one first.",
+        );
         return;
       }
 
       await downloadQRCode(qrImageUrl, `${restaurant.name}-qr-code`);
-      
     } catch (error) {
-      console.error('[Dashboard] Error downloading QR code:', error);
-      alert('Failed to download QR code. Please try again.');
+      console.error("[Dashboard] Error downloading QR code:", error);
+      alert("Failed to download QR code. Please try again.");
     }
   };
 
   const downloadQRCode = async (imageUrl, fileName) => {
     try {
-      if (imageUrl.startsWith('data:image')) {
-        const link = document.createElement('a');
+      if (imageUrl.startsWith("data:image")) {
+        const link = document.createElement("a");
         link.href = imageUrl;
         link.download = `${fileName}.png`;
         document.body.appendChild(link);
@@ -214,22 +233,21 @@ const Dashboard = () => {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
+
+      const link = document.createElement("a");
       link.href = url;
       link.download = `${fileName}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       setTimeout(() => {
         URL.revokeObjectURL(url);
         document.body.removeChild(link);
       }, 100);
-      
     } catch (error) {
-      console.error('[Dashboard] Error downloading QR code:', error);
-      throw new Error('Failed to download QR code');
+      console.error("[Dashboard] Error downloading QR code:", error);
+      throw new Error("Failed to download QR code");
     }
   };
 
@@ -242,7 +260,7 @@ const Dashboard = () => {
     if (id) {
       navigate(`/Restaurant_admin/orders/${id}`);
     } else {
-      navigate('/Restaurant_admin/orders');
+      navigate("/Restaurant_admin/orders");
     }
   };
 
@@ -251,7 +269,7 @@ const Dashboard = () => {
     if (id) {
       navigate(`/waiter/order-for-customer/${id}`);
     } else {
-      navigate('/waiter/order-for-customer');
+      navigate("/waiter/order-for-customer");
     }
   };
 
@@ -285,7 +303,10 @@ const Dashboard = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div
+                  key={i}
+                  className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
+                >
                   <div className="flex items-center justify-between">
                     <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
                     <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse"></div>
@@ -300,7 +321,10 @@ const Dashboard = () => {
                   <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-4"></div>
                   <div className="space-y-3">
                     {[1, 2, 3, 4, 5].map((i) => (
-                      <div key={i} className="flex justify-between items-center py-3 border-b">
+                      <div
+                        key={i}
+                        className="flex justify-between items-center py-3 border-b"
+                      >
                         <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
                         <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
                         <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
@@ -331,7 +355,9 @@ const Dashboard = () => {
           <div className="p-8 max-w-[1200px] mx-auto">
             <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
               <div className="text-red-500 text-6xl mb-4">⚠️</div>
-              <h3 className="text-xl font-semibold text-red-700 mb-2">Unable to Load Dashboard</h3>
+              <h3 className="text-xl font-semibold text-red-700 mb-2">
+                Unable to Load Dashboard
+              </h3>
               <p className="text-red-600 mb-4">{error}</p>
               <button
                 onClick={() => window.location.reload()}
@@ -361,11 +387,12 @@ const Dashboard = () => {
                 Real-time overview
               </p>
               <h2 className="text-black text-3xl md:text-5xl font-bold uppercase leading-none">
-                {restaurant?.name || 'Restaurant'} Performance
+                {restaurant?.name || "Restaurant"} Performance
               </h2>
               {restaurant && (
                 <p className="text-gray-500 text-sm mt-1">
-                  {restaurant.status === 'active' ? '🟢' : '🔴'} {restaurant.status}
+                  {restaurant.status === "active" ? "🟢" : "🔴"}{" "}
+                  {restaurant.status}
                 </p>
               )}
             </div>
@@ -414,15 +441,13 @@ const Dashboard = () => {
               />
             </div>
             <div className="space-y-6">
-              <QRCard 
-                onDownload={handleDownloadQR} 
+              <QRCard
+                onDownload={handleDownloadQR}
                 restaurantId={getRestaurantId()}
                 qrCodes={qrCodes}
+                restaurant={restaurant} 
               />
-              <StaffOnDuty 
-                staff={staff} 
-                onManageShift={handleManageShift} 
-              />
+              <StaffOnDuty staff={staff} onManageShift={handleManageShift} />
             </div>
           </div>
 

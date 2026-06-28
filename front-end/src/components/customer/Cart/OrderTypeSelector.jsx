@@ -1,42 +1,53 @@
+// src/components/customer/Cart/OrderTypeSelector.jsx
+
 import React from 'react';
 
 const OrderTypeSelector = ({ orderType, setOrderType, tableNumber, setTableNumber }) => {
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-surface-container-low p-6 rounded-xl">
-      <div>
-        <label className="font-label-caps text-label-caps text-on-surface uppercase block mb-md">Order Type</label>
-        <div className="flex bg-white border border-outline-variant p-1 rounded-md">
-          <button
-            onClick={() => setOrderType('Dine-in')}
-            className={`flex-1 py-2 font-button text-button rounded-sm transition-all ${
-              orderType === 'Dine-in' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container'
-            }`}
-          >
-            Dine-in
-          </button>
-          <button
-            onClick={() => setOrderType('Takeaway')}
-            className={`flex-1 py-2 font-button text-button rounded-sm transition-all ${
-              orderType === 'Takeaway' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface-container'
-            }`}
-          >
-            Takeaway
-          </button>
-        </div>
+    <div className="space-y-4">
+      <div className="flex gap-4">
+        <button
+          onClick={() => setOrderType("dine_in")}  // ✅ MUST be "dine_in"
+          className={`px-4 py-2 rounded-lg border ${
+            orderType === "dine_in" 
+              ? "border-black bg-black text-white" 
+              : "border-gray-300 hover:border-black"
+          }`}
+        >
+          Dine-in
+        </button>
+        <button
+          onClick={() => {
+            setOrderType("takeaway");  // ✅ MUST be "takeaway"
+            setTableNumber("");
+          }}
+          className={`px-4 py-2 rounded-lg border ${
+            orderType === "takeaway" 
+              ? "border-black bg-black text-white" 
+              : "border-gray-300 hover:border-black"
+          }`}
+        >
+          Takeaway
+        </button>
       </div>
-      {orderType === 'Dine-in' && (
+      
+      {orderType === "dine_in" && (
         <div>
-          <label className="font-label-caps text-label-caps text-on-surface uppercase block mb-md">Table Number</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Table Number *
+          </label>
           <input
-            type="number"
+            type="text"
             value={tableNumber}
             onChange={(e) => setTableNumber(e.target.value)}
-            placeholder="e.g. 12"
-            className="w-full bg-white border border-outline-variant px-4 py-2 rounded-md focus:border-primary focus:ring-0 transition-all font-body-md"
+            placeholder="Enter table number (e.g., 5, A1, etc.)"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-black focus:ring-0"
+            required
           />
+          <p className="text-xs text-gray-400 mt-1">Required for dine-in orders</p>
         </div>
       )}
-    </section>
+    </div>
   );
 };
 

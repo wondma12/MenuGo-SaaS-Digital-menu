@@ -1,55 +1,78 @@
 // src/components/Restaurant_admin/dashboard/QRCard.jsx
 
 import React from 'react';
+import { Download, QrCode } from 'lucide-react';
 
-const QRCard = ({ onDownload, restaurantId, qrCodes = [] }) => {
-  const hasQrCode = qrCodes && qrCodes.length > 0;
-  const activeQrCode = hasQrCode ? qrCodes.find(q => q.is_active !== false) : null;
+const QRCard = ({ onDownload, restaurantId, qrCodes = [], restaurant }) => {
+  // ✅ Check multiple sources for QR code
+  let qrImageUrl = null;
+  
+  // 1. Check from qrCodes array
+  if (qrCodes && Array.isArray(qrCodes) && qrCodes.length > 0) {
+    const activeQr = qrCodes.find(q => q.is_active !== false);
+    if (activeQr && activeQr.qr_image_url) {
+      qrImageUrl = activeQr.qr_image_url;
+    }
+  }
+  
+  // 2. If not found, check from restaurant data
+  if (!qrImageUrl && restaurant && restaurant.qr_code) {
+    qrImageUrl = restaurant.qr_code;
+  }
+  
+  const hasQrCode = !!qrImageUrl;
+  
 
   return (
     <div className="bg-white border border-neutral-200 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.04)] overflow-hidden">
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-gray-900">QR Codes</h3>
+          <h3 className="font-bold text-gray-900 flex items-center gap-2">
+            <QrCode className="w-5 h-5" />
+            QR Code
+          </h3>
           <span className="text-xs font-medium text-gray-500">
-            {hasQrCode ? `${qrCodes.length} codes` : 'No codes'}
+            {hasQrCode ? 'Active' : 'Not generated'}
           </span>
         </div>
         
-        {/* QR Code Preview */}
         <div className="bg-neutral-50 rounded-lg p-4 mb-4 flex items-center justify-center min-h-[120px]">
-          {activeQrCode ? (
+          {hasQrCode ? (
             <div className="flex flex-col items-center gap-2">
               <img 
-                src={activeQrCode.qr_image_url} 
-                alt="QR Code" 
-                className="w-24 h-24 object-contain"
+                src={qrImageUrl} 
+                alt="Restaurant QR Code" 
+                className="w-24 h-24 object-contain rounded-lg border border-gray-200"
                 onError={(e) => {
-                  e.target.src = '/placeholder-qr.png';
+                  console.error('[QRCard] Failed to load QR image');
+                  e.target.src = '';
+                  e.target.alt = 'QR Code unavailable';
                 }}
               />
-              <p className="text-xs text-gray-500">
-                {activeQrCode.qr_type || 'Menu'} QR Code
-              </p>
-              <p className="text-xs text-gray-400">
-                {activeQrCode.scan_count || 0} scans
+              <p className="text-[10px] text-gray-400">
+                Scan to view menu
               </p>
             </div>
           ) : (
             <div className="text-center text-gray-400">
-              <span className="text-4xl block mb-2">📱</span>
+              <QrCode className="w-12 h-12 mx-auto mb-2 text-gray-300" />
               <p className="text-sm">No QR code generated</p>
-              <p className="text-xs">Generate one from settings</p>
+              <p className="text-xs">Generate one from Settings</p>
             </div>
           )}
         </div>
 
         <button
           onClick={onDownload}
-          disabled={!activeQrCode}
-          className="w-full bg-black text-white text-sm font-medium py-2 rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!hasQrCode}
+          className={`w-full text-sm font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-2 ${
+            hasQrCode 
+              ? 'bg-black text-white hover:bg-neutral-800' 
+              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+          }`}
         >
-          {hasQrCode ? 'Download QR Code' : 'Generate QR Code'}
+          <Download className="w-4 h-4" />
+          {hasQrCode ? 'Download QR Code' : 'No QR to Download'}
         </button>
       </div>
     </div>

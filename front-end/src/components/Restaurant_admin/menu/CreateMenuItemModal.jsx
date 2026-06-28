@@ -1,34 +1,74 @@
-// src/components/admin/menu/CreateMenuItemModal.jsx
-import React, { useState, useEffect } from 'react';
+// src/components/Admin/menu/CreateMenuItemModal.jsx
 
-const CreateMenuItemModal = ({ isOpen, onClose, onSave, initialData }) => {
+import React, { useState, useEffect } from 'react';
+import menuService from '../../../services/menuService';
+
+const CreateMenuItemModal = ({ 
+  isOpen, 
+  onClose, 
+  onSave, 
+  initialData,
+  restaurantId  // ✅ Add restaurantId prop
+}) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: 'Main Course',
+    category_id: '',
     price: '',
     available: true,
     imageUrl: ''
   });
 
-  const categories = ['Main Course', 'Desserts', 'Starters', 'Pasta', 'Beverages'];
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [categoryError, setCategoryError] = useState(null);
 
+  // ✅ Fetch categories from database when modal opens
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (!isOpen) return;
+      
+      try {
+        setLoadingCategories(true);
+        setCategoryError(null);
+        
+        const result = await menuService.getCategories();
+        
+        if (result.success) {
+          setCategories(result.data || []);
+        } else {
+          setCategoryError(result.error || 'Failed to load categories');
+          // ✅ Fallback to empty array
+          setCategories([]);
+        }
+      } catch (error) {
+        console.error('[CreateMenuItemModal] Error fetching categories:', error);
+        setCategoryError('Failed to load categories');
+        setCategories([]);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, [isOpen]);
+
+  // ✅ Reset form when modal opens or initialData changes
   useEffect(() => {
     if (initialData) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
-        name: initialData.name,
-        description: initialData.description,
-        category: initialData.category,
-        price: initialData.price.toString(),
-        available: initialData.available,
+        name: initialData.name || '',
+        description: initialData.description || '',
+        category_id: initialData.category_id || initialData.category || '',
+        price: initialData.price?.toString() || '',
+        available: initialData.available !== undefined ? initialData.available : true,
         imageUrl: initialData.imageUrl || ''
       });
     } else {
       setFormData({
         name: '',
         description: '',
-        category: 'Main Course',
+        category_id: '',
         price: '',
         available: true,
         imageUrl: ''
@@ -47,23 +87,26 @@ const CreateMenuItemModal = ({ isOpen, onClose, onSave, initialData }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Validation
+    // ✅ Validation
     if (!formData.name.trim()) {
-      alert('Please enter an item name');
       return;
     }
     if (!formData.price || parseFloat(formData.price) <= 0) {
-      alert('Please enter a valid price');
       return;
     }
     if (!formData.description.trim()) {
-      alert('Please enter a description');
       return;
     }
+    if (!formData.category_id) {
+      return;
+    }
+
     const newItem = {
       ...formData,
       price: parseFloat(formData.price),
-      imageUrl: formData.imageUrl || 'https://via.placeholder.com/48x48?text=New+Item'
+      imageUrl: formData.imageUrl || 'https://via.placeholder.com/48x48?text=New+Item',
+      // ✅ Ensure category_id is sent correctly
+      category_id: formData.category_id
     };
 
     onSave(newItem);
@@ -129,16 +172,30 @@ const CreateMenuItemModal = ({ isOpen, onClose, onSave, initialData }) => {
                 <label className="block font-label-caps text-label-caps text-secondary mb-2">
                   Category *
                 </label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:border-black focus:ring-0 transition-colors font-body-md"
-                >
-                  {categories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
+                {loadingCategories ? (
+                  <div className="w-full px-3 py-2 border border-neutral-200 rounded-lg bg-gray-50 text-gray-400 text-sm">
+                    Loading categories...
+                  </div>
+                ) : categoryError ? (
+                  <div className="w-full px-3 py-2 border border-red-200 rounded-lg bg-red-50 text-red-500 text-sm">
+                    {categoryError}
+                  </div>
+                ) : (
+                  <select
+                    name="category_id"
+                    value={formData.category_id}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-neutral-200 rounded-lg focus:border-black focus:ring-0 transition-colors font-body-md"
+                    required
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               <div>

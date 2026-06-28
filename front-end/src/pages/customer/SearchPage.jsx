@@ -1,6 +1,8 @@
+// src/pages/customer/SearchPage.jsx
+
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import customerAuth from "../../services/customerauth";
+import { menuAPI } from "../../services/api";
 import MenuItemCard from "../../components/customer/Menu/MenuItemCard";
 import CustomerHeader, { BottomNav } from "../../components/layout/CustomerNav";
 import Footer from "../../components/layout/Footer";
@@ -13,8 +15,8 @@ const SearchPage = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [restaurant, setRestaurant] = useState(null);
 
-  // cart count from sessionStorage for header/footer visibility across pages
   const [cartCount, setCartCount] = useState(() => {
     try {
       const raw = sessionStorage.getItem("menugo_cart");
@@ -30,7 +32,7 @@ const SearchPage = () => {
         try {
           const raw = e.newValue;
           setCartCount(
-            raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0,
+            raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0
           );
         } catch (err) {
           setCartCount(0);
@@ -45,7 +47,7 @@ const SearchPage = () => {
         try {
           const raw = e.newValue;
           setCartCount(
-            raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0,
+            raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0
           );
         } catch (err) {
           // ignore
@@ -72,27 +74,64 @@ const SearchPage = () => {
         setLoading(true);
         setError(null);
 
-        // Check if restaurant is accessible
-        const canAccess = await customerAuth.canAccessRestaurant(restaurantId);
-        if (!canAccess) {
-          setError("Restaurant not available or inactive");
+        // ✅ Use menuAPI.getPublicMenu (same as MenuPage)
+        const menuResult = await menuAPI.getPublicMenu(restaurantId);
+        console.log("[SearchPage] Public Menu Result:", menuResult);
+
+        if (!menuResult) {
+          setError("Failed to load restaurant menu");
           setLoading(false);
           return;
         }
 
-        // Load restaurant menu
-        const menuResult = await customerAuth.getRestaurantMenu(restaurantId);
-        if (!menuResult.success) {
-          setError(menuResult.error);
-          setLoading(false);
-          return;
+        // ✅ Extract data using same structure as MenuPage
+        const data = menuResult.data || menuResult;
+        
+        let restaurantData = null;
+        let itemsData = [];
+
+        // ✅ Extract restaurant
+        if (data.restaurant) {
+          restaurantData = data.restaurant;
+          setRestaurant(restaurantData);
         }
 
-        setItems(menuResult.data.allItems);
+        // ✅ Extract items from categories
+        if (data.categories && Array.isArray(data.categories)) {
+          data.categories.forEach(cat => {
+            if (cat.menu_items && Array.isArray(cat.menu_items)) {
+              cat.menu_items.forEach(item => {
+                itemsData.push({
+                  ...item,
+                  categoryId: cat.id,
+                  categoryName: cat.name
+                });
+              });
+            }
+          });
+        }
+
+        // ✅ Transform menu items
+        const transformedItems = itemsData.map(item => ({
+          id: item.id,
+          name: item.name,
+          description: item.description || "",
+          price: typeof item.price === 'string' ? parseFloat(item.price) : item.price || 0,
+          image: item.image || "",
+          categoryId: item.category_id || item.categoryId || "",
+          categoryName: item.category_name || item.categoryName || "",
+          status: item.status || "available",
+          isAvailable: item.status === "available",
+          preparation_time: item.preparation_time || null,
+          is_featured: item.is_featured || false,
+        }));
+
+        console.log("[SearchPage] Transformed items:", transformedItems);
+        setItems(transformedItems);
         setLoading(false);
       } catch (error) {
-        console.error("Load restaurant menu error:", error);
-        setError("Failed to load restaurant menu");
+        console.error("[SearchPage] Load restaurant menu error:", error);
+        setError(error.message || "Failed to load restaurant menu");
         setLoading(false);
       }
     };
@@ -101,19 +140,17 @@ const SearchPage = () => {
   }, [restaurantId]);
 
   const addToCart = (item) => {
-    // Add restaurantId to the item if not present
     const itemWithRestaurant = { ...item, restaurantId };
 
     setCart((prev) => {
       const existing = prev.find((i) => i.id === item.id);
       const updated = existing
         ? prev.map((i) =>
-            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
+            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
           )
         : [...prev, { ...itemWithRestaurant, quantity: 1 }];
       try {
         sessionStorage.setItem("menugo_cart", JSON.stringify(updated));
-        // dispatch a storage event so other components in this window (header/menu) update immediately
         try {
           const evt = new StorageEvent("storage", {
             key: "menugo_cart",
@@ -121,7 +158,6 @@ const SearchPage = () => {
           });
           window.dispatchEvent(evt);
         } catch (err) {
-          // Fallback: use a custom event if StorageEvent isn't supported
           const custom = new CustomEvent("menugo_cart_updated", {
             detail: updated,
           });
@@ -132,28 +168,26 @@ const SearchPage = () => {
     });
   };
 
+  // ✅ Filter items based on search query
   const filtered = query.trim()
     ? items.filter((it) =>
         (it.name + " " + (it.description || ""))
           .toLowerCase()
-          .includes(query.toLowerCase()),
+          .includes(query.toLowerCase())
       )
     : items;
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background animate-fade-in">
-        <CustomerHeader
-          cartCount={cartCount}
-          className="animate-fade-in-down"
-        />
+        <CustomerHeader cartCount={cartCount} restaurant={restaurant} />
         <main className="pt-24 pb-24 max-w-container-max mx-auto px-6">
           <div className="text-center text-zinc-500">
             Loading restaurant menu...
           </div>
         </main>
-        <BottomNav cartCount={cartCount} />
-        <Footer />
+        <BottomNav cartCount={cartCount} restaurant={restaurant} />
+        <Footer restaurant={restaurant} />
       </div>
     );
   }
@@ -161,22 +195,19 @@ const SearchPage = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-background animate-fade-in">
-        <CustomerHeader
-          cartCount={cartCount}
-          className="animate-fade-in-down"
-        />
+        <CustomerHeader cartCount={cartCount} restaurant={restaurant} />
         <main className="pt-24 pb-24 max-w-container-max mx-auto px-6">
           <div className="text-center text-red-500">{error}</div>
         </main>
-        <BottomNav cartCount={cartCount} />
-        <Footer />
+        <BottomNav cartCount={cartCount} restaurant={restaurant} />
+        <Footer restaurant={restaurant} />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
-      <CustomerHeader cartCount={cartCount} className="animate-fade-in-down" />
+      <CustomerHeader cartCount={cartCount} restaurant={restaurant} />
 
       <main className="pt-24 pb-24 max-w-container-max mx-auto px-6">
         <div className="max-w-3xl mx-auto mb-8">
@@ -186,22 +217,41 @@ const SearchPage = () => {
             placeholder="Search menu items..."
             className="w-full px-4 py-3 border border-outline-variant rounded-md focus:border-primary search-focus animate-fade-in-down stagger-1"
           />
+          {items.length > 0 && (
+            <p className="text-sm text-zinc-500 mt-2">
+              {filtered.length} of {items.length} items
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((item, index) => (
-            <MenuItemCard
-              key={item.id}
-              item={item}
-              onAddToCart={addToCart}
-              className={`animate-fade-in-up stagger-${Math.min(index + 2, 6)}`}
-            />
-          ))}
+          {filtered.length > 0 ? (
+            filtered.map((item, index) => (
+              <MenuItemCard
+                key={item.id}
+                item={item}
+                onAddToCart={addToCart}
+              />
+            ))
+          ) : (
+            <div className="col-span-full text-center text-zinc-500 py-12">
+              {query.trim() ? (
+                <>
+                  <p className="text-lg font-medium">No results found</p>
+                  <p className="text-sm mt-1">
+                    Try adjusting your search terms
+                  </p>
+                </>
+              ) : (
+                <p>Start typing to search menu items</p>
+              )}
+            </div>
+          )}
         </div>
       </main>
 
-      <BottomNav cartCount={cartCount} />
-      <Footer />
+      <BottomNav cartCount={cartCount} restaurant={restaurant} />
+      <Footer restaurant={restaurant} />
     </div>
   );
 };

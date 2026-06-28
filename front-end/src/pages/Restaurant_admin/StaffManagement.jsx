@@ -28,40 +28,57 @@ const StaffManagement = () => {
   // LOAD DATA
   // ============================================================
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Get staff data
-      const staffResult = await staffService.getAll();
-      
-      if (staffResult.success) {
-        setStaff(staffResult.data || []);
-        
-        // Calculate stats from real data
-        const staffData = staffResult.data || [];
-        const total = staffData.length;
-        const admins = staffData.filter(s => s.role === 'restaurant_admin' || s.role === 'admin').length;
-        const waitstaff = staffData.filter(s => s.role === 'waiter').length;
-        const activeNow = staffData.filter(s => s.is_active !== false).length;
-        
-        setStats({
-          totalStaff: total,
-          activeNow,
-          admins,
-          waitstaff,
-        });
+// src/pages/Restaurant_admin/StaffManagement.jsx - Update loadData
+
+const loadData = async () => {
+  try {
+    setLoading(true);
+    setError(null);
+    
+    // Get staff data
+    const staffResult = await staffService.getAll();
+    console.log('[StaffManagement] Staff result:', staffResult);
+    
+    // ✅ Extract staff data properly
+    let staffData = [];
+    if (staffResult && staffResult.success) {
+      staffData = Array.isArray(staffResult.data) ? staffResult.data : [];
+    } else if (Array.isArray(staffResult)) {
+      staffData = staffResult;
+    } else if (staffResult && typeof staffResult === 'object') {
+      // If it's an object with data property
+      if (staffResult.data && Array.isArray(staffResult.data)) {
+        staffData = staffResult.data;
       } else {
-        setError(staffResult.error || 'Failed to load staff');
+        // Try to find any array in the object
+        const possibleArray = Object.values(staffResult).find(val => Array.isArray(val));
+        staffData = possibleArray || [];
       }
-    } catch (err) {
-      console.error('[StaffManagement] Error loading staff:', err);
-      setError(err.message || 'Failed to load staff data');
-    } finally {
-      setLoading(false);
     }
-  };
+    
+    console.log('[StaffManagement] Extracted staff data:', staffData);
+    setStaff(staffData);
+    
+    // Calculate stats from real data
+    const total = staffData.length;
+    const admins = staffData.filter(s => s.role === 'restaurant_admin' || s.role === 'admin').length;
+    const waitstaff = staffData.filter(s => s.role === 'waiter').length;
+    const activeNow = staffData.filter(s => s.is_active !== false).length;
+    
+    setStats({
+      totalStaff: total,
+      activeNow,
+      admins,
+      waitstaff,
+    });
+  } catch (err) {
+    console.error('[StaffManagement] Error loading staff:', err);
+    setError(err.message || 'Failed to load staff data');
+    setStaff([]);  // ✅ Always set to empty array on error
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     loadData();

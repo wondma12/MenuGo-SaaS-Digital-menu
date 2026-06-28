@@ -44,59 +44,151 @@ const menuService = {
     }
   },
 
-  async createMenuItem(itemData) {
-    try {
-      const result = await menuAPI.createMenuItem(itemData);
+// services/menuService.js
+
+// services/menuService.js
+
+async createMenuItem(itemData) {
+  try {
+    const result = await menuAPI.createMenuItem({
+      category_id: itemData.category_id,  
+      name: itemData.name,
+      description: itemData.description,
+      price: itemData.price,
+      image: itemData.imageUrl || null,
+      status: itemData.available ? 'available' : 'unavailable',
+      preparation_time: itemData.preparation_time || 15,
+      is_featured: itemData.is_featured || false,
+    });
+
+    console.log('[menuService] createMenuItem result:', result);
+
+    // ✅ Check if result exists
+    if (!result) {
+      return {
+        success: false,
+        data: null,
+        error: 'No response from server'
+      };
+    }
+
+    // ✅ If result has id (successful creation)
+    if (result.id) {
       return {
         success: true,
         data: result,
-        error: null,
       };
-    } catch (error) {
-      console.error(error);
+    }
+
+    // ✅ If result has success property
+    if (result.success === true) {
+      return {
+        success: true,
+      data: result.data || result,
+      };
+    }
+
+    // ✅ If result has data property
+    if (result.data) {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+
+    // ✅ Fallback - if we got here, assume success
+    return {
+      success: true,
+      data: result,
+    };
+
+  } catch (error) {
+    console.error("[menuService] Error creating menu item:", error);
+    return {
+      success: false,
+      data: null,
+      error: error.message || "Failed to create menu item"
+    };
+  }
+},
+
+async updateMenuItem(id, updatedData) {
+  try {
+    const result = await menuAPI.updateMenuItem(id, updatedData);
+    console.log('[menuService] updateMenuItem result:', result);
+
+    if (!result) {
       return {
         success: false,
         data: null,
-        error: error.message || 'Failed to create menu item',
+        error: 'No response from server'
       };
     }
-  },
 
-  async updateMenuItem(id, updatedData) {
-    try {
-      const result = await menuAPI.updateMenuItem(id, updatedData);
+    if (result.id) {
       return {
         success: true,
         data: result,
-        error: null,
-      };
-    } catch (error) {
-      console.error(error);
-      return {
-        success: false,
-        data: null,
-        error: error.message || 'Failed to update menu item',
       };
     }
-  },
 
-  async deleteMenuItem(id) {
-    try {
-      await menuAPI.deleteMenuItem(id);
+    if (result.success === true) {
       return {
         success: true,
-        data: { id },
-        error: null,
+        data: result.data || result,
       };
-    } catch (error) {
-      console.error(error);
+    }
+
+    if (result.data) {
+      return {
+        success: true,
+        data: result.data,
+      };
+    }
+
+    return {
+      success: true,
+      data: result,
+    };
+
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      data: null,
+      error: error.message || 'Failed to update menu item',
+    };
+  }
+},
+
+async deleteMenuItem(id) {
+  try {
+    const result = await menuAPI.deleteMenuItem(id);
+    console.log('[menuService] deleteMenuItem result:', result);
+
+    if (!result) {
       return {
         success: false,
         data: null,
-        error: error.message || 'Failed to delete menu item',
+        error: 'No response from server'
       };
     }
-  },
+
+    // If we got here, assume success
+    return {
+      success: true,
+      data: { id },
+    };
+
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      data: null,
+      error: error.message || 'Failed to delete menu item',
+    };
+  }
+},
 
   async updateAvailability(id, status) {
     try {

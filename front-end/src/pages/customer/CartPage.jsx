@@ -1,3 +1,5 @@
+// src/pages/customer/CartPage.jsx
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import CartItemRow from "../../components/customer/Cart/CartItemRow";
@@ -5,15 +7,18 @@ import OrderSummary from "../../components/customer/Cart/OrderSummary";
 import OrderTypeSelector from "../../components/customer/Cart/OrderTypeSelector";
 import CustomerHeader, { BottomNav } from "../../components/layout/CustomerNav";
 import Footer from "../../components/layout/Footer";
+import { orderAPI } from "../../services/api";
 
 const CartPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { restaurantId } = useParams();
-  const [cartItems, setCartItems] = useState(location.state?.cart || []);
-  const [orderType, setOrderType] = useState("Dine-in");
+  const [cartItems, setCartItems] = useState([]);
+  const [orderType, setOrderType] = useState("dine_in");
   const [tableNumber, setTableNumber] = useState("");
-  const [restaurant, setRestaurant] = useState(null);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [orderError, setOrderError] = useState(null);
+  
   const [cartCount, setCartCount] = useState(() => {
     try {
       const raw = sessionStorage.getItem("menugo_cart");
@@ -23,40 +28,29 @@ const CartPage = () => {
     }
   });
 
-  // Load restaurant data and filter cart items
+  // ✅ Load cart items from sessionStorage
   useEffect(() => {
-    const loadRestaurantAndFilterCart = async () => {
-      if (restaurantId) {
-        try {
-          // Load restaurant data
-          const response = await fetch(
-            `${process.env.REACT_APP_API_BASE_URL || "http://localhost:3000"}/restaurants`,
-          );
-          const restaurants = await response.json();
-          const currentRestaurant = restaurants.find(
-            (r) => r.id === restaurantId,
-          );
-          setRestaurant(currentRestaurant);
-
-          // Filter cart items to only include items from this restaurant
-          const rawCart = sessionStorage.getItem("menugo_cart");
-          if (rawCart) {
-            const allCartItems = JSON.parse(rawCart);
-            const filteredCart = allCartItems.filter(
-              (item) => item.restaurantId === restaurantId,
-            );
-            setCartItems(filteredCart);
-          }
-        } catch (error) {
-          console.error("Error loading restaurant data:", error);
+    const loadCart = () => {
+      try {
+        const raw = sessionStorage.getItem("menugo_cart");
+        if (raw) {
+          const allItems = JSON.parse(raw);
+          // Filter items for this restaurant
+          const filtered = restaurantId 
+            ? allItems.filter(item => item.restaurantId === restaurantId || item.restaurant_id === restaurantId)
+            : allItems;
+          setCartItems(filtered);
+          console.log("[CartPage] Loaded cart items:", filtered);
         }
+      } catch (e) {
+        console.error("[CartPage] Error loading cart:", e);
       }
     };
 
-    loadRestaurantAndFilterCart();
+    loadCart();
   }, [restaurantId]);
 
-  // Cart count management
+  // ✅ Cart count management
   useEffect(() => {
     const onStorage = (e) => {
       if (e.key === "menugo_cart") {
@@ -65,13 +59,13 @@ const CartPage = () => {
           if (raw && restaurantId) {
             const allCartItems = JSON.parse(raw);
             const filteredCart = allCartItems.filter(
-              (item) => item.restaurantId === restaurantId,
+              (item) => item.restaurantId === restaurantId || item.restaurant_id === restaurantId
             );
             setCartItems(filteredCart);
             setCartCount(filteredCart.reduce((s, i) => s + i.quantity, 0));
           } else {
             setCartCount(
-              raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0,
+              raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0
             );
           }
         } catch (err) {
@@ -79,38 +73,22 @@ const CartPage = () => {
         }
       }
     };
+    
     const onCustom = (e) => {
       const updated = e.detail || (e.newValue ? JSON.parse(e.newValue) : null);
       if (Array.isArray(updated)) {
         if (restaurantId) {
           const filteredCart = updated.filter(
-            (item) => item.restaurantId === restaurantId,
+            (item) => item.restaurantId === restaurantId || item.restaurant_id === restaurantId
           );
           setCartItems(filteredCart);
           setCartCount(filteredCart.reduce((s, i) => s + i.quantity, 0));
         } else {
           setCartCount(updated.reduce((s, i) => s + i.quantity, 0));
         }
-      } else {
-        try {
-          const raw = e.newValue;
-          if (raw && restaurantId) {
-            const allCartItems = JSON.parse(raw);
-            const filteredCart = allCartItems.filter(
-              (item) => item.restaurantId === restaurantId,
-            );
-            setCartItems(filteredCart);
-            setCartCount(filteredCart.reduce((s, i) => s + i.quantity, 0));
-          } else {
-            setCartCount(
-              raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0,
-            );
-          }
-        } catch (err) {
-          // ignore
-        }
       }
     };
+    
     window.addEventListener("storage", onStorage);
     window.addEventListener("menugo_cart_updated", onCustom);
     return () => {
@@ -119,74 +97,133 @@ const CartPage = () => {
     };
   }, [restaurantId]);
 
+  // ✅ Load cart from location state if available
+  useEffect(() => {
+    if (location.state?.cart) {
+      setCartItems(location.state.cart);
+      try {
+        sessionStorage.setItem("menugo_cart", JSON.stringify(location.state.cart));
+      } catch (e) {
+        console.error("Error saving cart to sessionStorage:", e);
+      }
+    }
+  }, [location.state?.cart]);
+
   const updateQuantity = (id, quantity) => {
     if (quantity <= 0) {
       const next = cartItems.filter((item) => item.id !== id);
       setCartItems(next);
-      try {
-        sessionStorage.setItem("menugo_cart", JSON.stringify(next));
-      } catch (e) {}
+      updateSessionStorage(next);
     } else {
       const next = cartItems.map((item) =>
-        item.id === id ? { ...item, quantity } : item,
+        item.id === id ? { ...item, quantity } : item
       );
       setCartItems(next);
-      try {
-        sessionStorage.setItem("menugo_cart", JSON.stringify(next));
-      } catch (e) {}
+      updateSessionStorage(next);
+    }
+  };
+
+  const updateSessionStorage = (items) => {
+    try {
+      // Merge with other restaurant items
+      const raw = sessionStorage.getItem("menugo_cart");
+      let allItems = raw ? JSON.parse(raw) : [];
+      
+      // Remove items from this restaurant
+      allItems = allItems.filter(item => 
+        item.restaurantId !== restaurantId && item.restaurant_id !== restaurantId
+      );
+      
+      // Add updated items
+      allItems = [...allItems, ...items];
+      
+      sessionStorage.setItem("menugo_cart", JSON.stringify(allItems));
+      
+      // Dispatch event
+      const custom = new CustomEvent("menugo_cart_updated", {
+        detail: allItems,
+      });
+      window.dispatchEvent(custom);
+    } catch (e) {
+      console.error("Error updating session storage:", e);
     }
   };
 
   const getSubtotal = () =>
     cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  const handlePlaceOrder = () => {
-    // Build itemized order summary
-    const itemsSummary = cartItems
-      .map(
-        (it) =>
-          `${it.name} x ${it.quantity} — $${(it.price * it.quantity).toFixed(2)}`,
-      )
-      .join("\n");
-    const subtotal = getSubtotal();
-    const summary = `Order placed! ${orderType}${orderType === "Dine-in" ? `, Table ${tableNumber}` : ""}\n\nItems:\n${itemsSummary}\n\nSubtotal: $${subtotal.toFixed(2)}`;
-    // show confirmation (replace with modal if desired)
-    alert(summary);
-    const next = [];
-    setCartItems(next);
-    try {
-      sessionStorage.removeItem("menugo_cart");
-    } catch (e) {}
-    navigate(restaurantId ? `/customer/${restaurantId}` : "/customer");
-  };
+const handlePlaceOrder = async () => {
+  if (cartItems.length === 0) {
+    alert("Your cart is empty");
+    return;
+  }
 
-  // Load cart from sessionStorage if available (direct /cart visits)
-  React.useEffect(() => {
-    if (!location.state?.cart) {
-      try {
-        const raw = sessionStorage.getItem("menugo_cart");
-        if (raw) setCartItems(JSON.parse(raw));
-      } catch (e) {
-        // ignore
-      }
+  // ✅ Validate table number for dine-in
+  if (orderType === "dine_in" && !tableNumber.trim()) {
+    alert("Please enter a table number");
+    return;
+  }
+
+  setIsPlacingOrder(true);
+  setOrderError(null);
+
+  try {
+    // ✅ Build order data with correct values
+    const orderData = {
+      restaurant_id: restaurantId,
+      table_number: orderType === "dine_in" ? tableNumber.trim() : null,
+      order_type: orderType, // ✅ Already "dine_in" or "takeaway"
+      customer_notes: "",
+      items: cartItems.map(item => ({
+        menu_item_id: item.id,
+        quantity: item.quantity
+      }))
+    };
+
+    console.log("[CartPage] Placing order:", orderData);
+
+    const result = await orderAPI.create(orderData);
+    console.log("[CartPage] Order result:", result);
+
+    if (result && result.id) {
+      // Clear cart
+      setCartItems([]);
+      updateSessionStorage([]);
+      
+      alert(`✅ Order placed successfully!\nOrder #: ${result.order_number || result.id}\nTotal: $${getSubtotal().toFixed(2)}`);
+      
+      navigate(restaurantId ? `/customer/${restaurantId}` : "/customer");
     } else {
-      try {
-        sessionStorage.setItem(
-          "menugo_cart",
-          JSON.stringify(location.state.cart),
-        );
-      } catch (e) {}
+      const errorMsg = result?.message || "Failed to place order";
+      setOrderError(errorMsg);
+      
+      if (result?.error && Array.isArray(result.error)) {
+        const errorMessages = result.error.map(e => `${e.field}: ${e.message}`).join("\n");
+        alert(`❌ Validation failed:\n${errorMessages}`);
+      } else {
+        alert(`❌ Failed to place order: ${errorMsg}`);
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  } catch (error) {
+    console.error("[CartPage] Error placing order:", error);
+    const errorMsg = error.response?.data?.message || error.message || "Failed to place order";
+    setOrderError(errorMsg);
+    
+    if (error.response?.data?.error && Array.isArray(error.response.data.error)) {
+      const errorMessages = error.response.data.error.map(e => `${e.field}: ${e.message}`).join("\n");
+      alert(`❌ Validation failed:\n${errorMessages}`);
+    } else {
+      alert(`❌ Failed to place order: ${errorMsg}`);
+    }
+  } finally {
+    setIsPlacingOrder(false);
+  }
+};
 
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-background animate-fade-in">
-        <CustomerHeader
-          cartCount={cartCount}
-          className="animate-fade-in-down"
-        />
+        <CustomerHeader cartCount={cartCount} />
         <main className="pt-32 pb-24 max-w-container-max mx-auto px-6 text-center">
           <span className="material-symbols-outlined text-6xl text-neutral-300 animate-bounce-in">
             shopping_bag
@@ -212,8 +249,14 @@ const CartPage = () => {
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
-      <CustomerHeader cartCount={cartCount} className="animate-fade-in-down" />
+      <CustomerHeader cartCount={cartCount} />
       <main className="pt-24 pb-32 max-w-container-max mx-auto px-6">
+        {orderError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+            {orderError}
+          </div>
+        )}
+        
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-7 space-y-6">
             <header className="animate-fade-in-down stagger-1">
@@ -244,6 +287,7 @@ const CartPage = () => {
             <OrderSummary
               subtotal={getSubtotal()}
               onPlaceOrder={handlePlaceOrder}
+              isPlacingOrder={isPlacingOrder}
               className="animate-scale-in stagger-5"
             />
           </aside>

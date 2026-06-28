@@ -4,7 +4,12 @@ import React, { useState, useEffect } from "react";
 import { X, Plus, Edit2, Trash2, FolderOpen } from "lucide-react";
 import menuService from "../../../services/menuService";
 
-const CategoryManagementModal = ({ isOpen, onClose, onCategoryChange }) => {
+const CategoryManagementModal = ({
+  isOpen,
+  onClose,
+  onCategoryChange,
+  restaurantId,
+}) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,7 +27,7 @@ const CategoryManagementModal = ({ isOpen, onClose, onCategoryChange }) => {
       setLoading(true);
       setError(null);
       const result = await menuService.getCategories();
-      
+
       if (result.success) {
         setCategories(result.data || []);
       } else {
@@ -48,15 +53,15 @@ const CategoryManagementModal = ({ isOpen, onClose, onCategoryChange }) => {
 
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) {
-      alert("Please enter a category name");
       return;
     }
 
     try {
       setIsSubmitting(true);
-      const result = await menuService.createCategory({
+      const result = await menuService.addCategory({
         name: newCategoryName.trim(),
         display_order: categories.length + 1,
+        restaurant_id: restaurantId,
       });
 
       if (result.success) {
@@ -64,11 +69,9 @@ const CategoryManagementModal = ({ isOpen, onClose, onCategoryChange }) => {
         setNewCategoryName("");
         if (onCategoryChange) onCategoryChange();
       } else {
-        alert(result.error || "Failed to create category");
       }
     } catch (error) {
       console.error("[CategoryManagement] Error adding category:", error);
-      alert("Failed to create category. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -104,7 +107,7 @@ const CategoryManagementModal = ({ isOpen, onClose, onCategoryChange }) => {
 
   const handleDeleteCategory = async (category) => {
     const itemCount = category._count?.menu_items || 0;
-    
+
     if (itemCount > 0) {
       const confirmMessage = `This category has ${itemCount} menu item(s). Deleting it will require reassigning or deleting these items. Are you sure?`;
       if (!window.confirm(confirmMessage)) {
@@ -205,7 +208,10 @@ const CategoryManagementModal = ({ isOpen, onClose, onCategoryChange }) => {
           {loading && (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse"></div>
+                <div
+                  key={i}
+                  className="h-12 bg-gray-100 rounded-lg animate-pulse"
+                ></div>
               ))}
             </div>
           )}
@@ -241,7 +247,8 @@ const CategoryManagementModal = ({ isOpen, onClose, onCategoryChange }) => {
                           value={editingName}
                           onChange={(e) => setEditingName(e.target.value)}
                           onKeyDown={(e) => {
-                            if (e.key === "Enter") handleUpdateCategory(category.id);
+                            if (e.key === "Enter")
+                              handleUpdateCategory(category.id);
                             if (e.key === "Escape") cancelEditing();
                           }}
                           className="flex-1 px-3 py-1.5 border border-zinc-200 rounded focus:border-black focus:ring-0 text-sm"
@@ -265,7 +272,9 @@ const CategoryManagementModal = ({ isOpen, onClose, onCategoryChange }) => {
                       <>
                         <div className="flex items-center gap-3">
                           <FolderOpen className="w-4 h-4 text-zinc-400" />
-                          <span className="font-medium text-sm">{category.name}</span>
+                          <span className="font-medium text-sm">
+                            {category.name}
+                          </span>
                           <span className="text-xs text-zinc-400 bg-zinc-100 px-2 py-0.5 rounded-full">
                             {itemCount} {itemCount === 1 ? "item" : "items"}
                           </span>
@@ -303,7 +312,8 @@ const CategoryManagementModal = ({ isOpen, onClose, onCategoryChange }) => {
         {/* Footer */}
         <div className="p-4 border-t border-zinc-200 bg-zinc-50/50 rounded-b-xl">
           <p className="text-xs text-zinc-400">
-            💡 Categories help organize your menu. Items in a category with no items can be safely deleted.
+            💡 Categories help organize your menu. Items in a category with no
+            items can be safely deleted.
           </p>
         </div>
       </div>
