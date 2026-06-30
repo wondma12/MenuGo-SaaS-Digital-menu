@@ -1,7 +1,7 @@
 // src/components/Admin/Security/NetworkWhitelist.jsx
 
 import React, { useState, useEffect } from "react";
-import { Delete, Plus, Network, RefreshCw } from "lucide-react";
+import { Trash2, Plus, Network, RefreshCw } from "lucide-react";
 import { settingsAPI } from "../../../services/api";
 
 const NetworkWhitelist = () => {
@@ -159,7 +159,7 @@ const NetworkWhitelist = () => {
                   onClick={() => handleDeleteIP(index)}
                   className="text-zinc-400 hover:text-red-500 transition-colors"
                 >
-                  <Delete className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               )}
             </div>

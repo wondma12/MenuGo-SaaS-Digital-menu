@@ -1,7 +1,7 @@
 // src/components/Admin/RestaurantDetail/StaffOverview.jsx
 
 import React from "react";
-import { Badge, MoreVertical, User, Users, UserCog } from "lucide-react";
+import { Award, MoreVertical, User, Users, UserCog } from "lucide-react";
 
 const StaffOverview = ({ staff = [] }) => {
   const handleStaffAction = (action, staffMember) => {
@@ -60,7 +60,7 @@ const StaffOverview = ({ staff = [] }) => {
     <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
       <div className="p-8 pb-0">
         <h3 className="text-2xl font-semibold flex items-center gap-2 mb-6">
-          <Badge className="w-6 h-6" />
+          <Award className="w-6 h-6" />
           Staff Overview
         </h3>
 

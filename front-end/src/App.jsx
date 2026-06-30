@@ -7,6 +7,9 @@ import {
 // Layout
 import AdminLayout from "./components/layout/AdminLayout";
 
+// Landing Page
+import Landing from "./pages/Landing";
+
 // Auth Pages
 import Login from "./pages/auth/login/Login";
 import Signup from "./pages/auth/signup/Signup";
@@ -43,12 +46,12 @@ import NotFound from "./components/layout/NotFound";
 function App() {
   return (
     <Routes>
+      {/* LANDING PAGE */}
+      <Route path="/" element={<Landing />} />
+
       {/* AUTH ROUTES */}
       <Route path="/auth/login" element={<Login />} />
       <Route path="/auth/signup" element={<Signup />} />
-
-      {/* Redirect root */}
-      <Route path="/" element={<Navigate to="/auth/login" />} />
 
       {/* ==================== RESTAURANT ADMIN ROUTES ==================== */}
       <Route
