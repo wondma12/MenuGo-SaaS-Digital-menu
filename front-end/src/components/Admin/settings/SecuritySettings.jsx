@@ -1,4 +1,4 @@
-// src/components/Admin/settings/SecuritySettings.jsx
+
 
 import React from 'react';
 import ToggleSwitch from '../../ui/ToggleSwitch';

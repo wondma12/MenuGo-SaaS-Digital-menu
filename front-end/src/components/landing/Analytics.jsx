@@ -57,11 +57,11 @@ const Analytics = () => {
 
   return (
     <section className="py-24 bg-white relative overflow-hidden">
-      {/* Background */}
+      {}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -82,7 +82,7 @@ const Analytics = () => {
           </p>
         </motion.div>
 
-        {/* Dashboard Preview */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -90,7 +90,7 @@ const Analytics = () => {
           transition={{ duration: 0.8 }}
           className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden"
         >
-          {/* Dashboard Header */}
+          {}
           <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -108,9 +108,9 @@ const Analytics = () => {
             </div>
           </div>
 
-          {/* Dashboard Content */}
+          {}
           <div className="p-6 lg:p-8 space-y-8">
-            {/* Stats Grid */}
+            {}
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, index) => (
                 <motion.div
@@ -142,9 +142,9 @@ const Analytics = () => {
               ))}
             </div>
 
-            {/* Chart Area */}
+            {}
             <div className="grid lg:grid-cols-3 gap-6">
-              {/* Main Chart */}
+              {}
               <div className="lg:col-span-2 bg-gray-50 rounded-2xl p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-gray-900">Revenue Overview</h3>
@@ -164,7 +164,7 @@ const Analytics = () => {
                   </div>
                 </div>
 
-                {/* Bar Chart */}
+                {}
                 <div className="flex items-end gap-3 h-48">
                   {chartData.map((item) => (
                     <div key={item.day} className="flex-1 flex flex-col items-center gap-2">
@@ -186,7 +186,7 @@ const Analytics = () => {
                 </div>
               </div>
 
-              {/* Popular Items */}
+              {}
               <div className="bg-gray-50 rounded-2xl p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Popular Items</h3>
                 <div className="space-y-4">
@@ -224,7 +224,7 @@ const Analytics = () => {
               </div>
             </div>
 
-            {/* Live Activity Feed */}
+            {}
             <div className="bg-gray-50 rounded-2xl p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Activity className="w-5 h-5 text-green-500" />

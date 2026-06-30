@@ -1,4 +1,4 @@
-// src/components/Restaurant_admin/dashboard/StatsCard.jsx
+
 
 import React from 'react';
 

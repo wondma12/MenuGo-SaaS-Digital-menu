@@ -1,4 +1,4 @@
-// src/components/customer/Cart/OrderTypeSelector.jsx
+
 
 import React from 'react';
 
@@ -7,7 +7,7 @@ const OrderTypeSelector = ({ orderType, setOrderType, tableNumber, setTableNumbe
     <div className="space-y-4">
       <div className="flex gap-4">
         <button
-          onClick={() => setOrderType("dine_in")}  // ✅ MUST be "dine_in"
+          onClick={() => setOrderType("dine_in")}  
           className={`px-4 py-2 rounded-lg border ${
             orderType === "dine_in" 
               ? "border-black bg-black text-white" 
@@ -18,7 +18,7 @@ const OrderTypeSelector = ({ orderType, setOrderType, tableNumber, setTableNumbe
         </button>
         <button
           onClick={() => {
-            setOrderType("takeaway");  // ✅ MUST be "takeaway"
+            setOrderType("takeaway");  
             setTableNumber("");
           }}
           className={`px-4 py-2 rounded-lg border ${

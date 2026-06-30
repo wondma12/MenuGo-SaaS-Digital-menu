@@ -1,8 +1,10 @@
 // src/components/customer/Menu/HeroBanner.jsx
 
-import React from "react";
+import React, { useState } from 'react';
 
 const HeroBanner = ({ restaurant }) => {
+  const [imageError, setImageError] = useState(false);
+
   if (!restaurant) {
     return (
       <section className="relative w-full h-[300px] md:h-[450px] overflow-hidden rounded-lg mb-8">
@@ -13,23 +15,36 @@ const HeroBanner = ({ restaurant }) => {
     );
   }
 
+  // ✅ Validate banner image URL
+  const bannerUrl = restaurant.banner || restaurant.cover_image || '';
+  const isValidImage = bannerUrl && 
+                       (bannerUrl.startsWith('http://') || 
+                        bannerUrl.startsWith('https://') || 
+                        bannerUrl.startsWith('/')) && 
+                        !bannerUrl.startsWith('data:image/') && 
+                        bannerUrl.length < 5000;
+
+  // ✅ Default fallback image
+  const defaultImage = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=400&fit=crop";
+
+  // ✅ Determine which image to use
+  const imageSrc = (!isValidImage || imageError) ? defaultImage : bannerUrl;
+
   return (
     <section className="relative w-full h-[300px] md:h-[450px] overflow-hidden rounded-lg mb-8">
       <img
         className="w-full h-full object-cover"
-        alt={`${restaurant.name} interior`}
-        src={
-          restaurant.banner ||
-          restaurant.cover_image ||
-          "https://cdn.dribbble.com/userupload/33502197/file/original-d173b422cc193eee821db0baf7ba055d.jpg?resize=400x0"
-        }
+        alt={`${restaurant.name || 'Restaurant'} interior`}
+        src={imageSrc}
         onError={(e) => {
-          e.target.src = "https://cdn.dribbble.com/userupload/33502197/file/original-d173b422cc193eee821db0baf7ba055d.jpg?resize=400x0";
+          console.error('[HeroBanner] Failed to load banner image:', bannerUrl);
+          setImageError(true);
+          e.target.src = defaultImage;
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-6 md:p-12 text-white">
         <div className="flex items-center gap-3 mb-2">
-          {restaurant.logo && (
+          {restaurant.logo && restaurant.logo.startsWith('http') && (
             <img 
               src={restaurant.logo} 
               alt={restaurant.name} 

@@ -6,17 +6,17 @@ import Sidebar from "../../components/layout/sidebar";
 import TopHeader from "../../components/layout/TopHeader";
 import data from "../../demo/data.json";
 
-// Transform data.json to match OrderCard structure
+
 const transformOrders = () => {
   const { orders, orderItems, menuItems } = data;
 
   return orders.map((order) => {
-    // Get order items for this order
+    
     const itemsForOrder = orderItems.filter(
       (item) => item.orderId === order.id,
     );
 
-    // Join with menu items to get full item details
+    
     const transformedItems = itemsForOrder.map((orderItem) => {
       const menuItem = menuItems.find((m) => m.id === orderItem.menuItemId);
       return {
@@ -27,7 +27,7 @@ const transformOrders = () => {
       };
     });
 
-    // Calculate time ago from createdAt
+    
     const createdAt = new Date(order.createdAt);
     const now = new Date();
     const diffMs = now - createdAt;
@@ -48,7 +48,7 @@ const transformOrders = () => {
   });
 };
 
-// Mock kitchen status data
+
 const mockKitchenStatus = [
   { station: "Cold Station", percentage: 45 },
   { station: "Grill Station", percentage: 88, isHigh: true },
@@ -80,7 +80,7 @@ const ActiveOrders = () => {
     console.log("Notify waiter for order:", orderId);
   };
 
-  // Filter orders based on status
+  
   const filteredOrders = orders.filter((order) => {
     if (activeFilter === "all") return true;
     if (activeFilter === "pending") return order.status === "PENDING";
@@ -102,16 +102,16 @@ const ActiveOrders = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
-      {/* Sidebar Navigation */}
+      {}
       <Sidebar role="waiter" />
 
-      {/* Top App Bar */}
+      {}
       <TopHeader role="waiter" title="active" />
 
-      {/* Main Content */}
+      {}
       <main className="ml-64 p-8 pt-20 min-h-screen">
         <div className="max-w-[1200px] mx-auto">
-          {/* Custom Header with Title and Search */}
+          {}
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-4">
               <h2 className="text-xl font-semibold text-gray-900">
@@ -137,7 +137,7 @@ const ActiveOrders = () => {
             </div>
           </div>
 
-          {/* Filter Tabs */}
+          {}
           <div className="flex gap-6 mb-8 border-b border-gray-200">
             <button
               className={`pb-3 font-bold border-b-2 transition-colors ${
@@ -181,9 +181,9 @@ const ActiveOrders = () => {
             </button>
           </div>
 
-          {/* Bento Grid of Order Cards */}
+          {}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {/* Order Cards */}
+            {}
             {filteredOrders.map((order) => (
               <OrderCard
                 key={order.id}
@@ -194,10 +194,10 @@ const ActiveOrders = () => {
               />
             ))}
 
-            {/* New Order Card */}
+            {}
             <NewOrderCard />
 
-            {/* Kitchen Status Card */}
+            {}
             <div className="col-span-1 lg:col-span-2">
               <KitchenStatusCard stations={mockKitchenStatus} />
             </div>

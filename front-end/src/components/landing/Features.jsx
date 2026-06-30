@@ -61,12 +61,12 @@ const Features = () => {
 
   return (
     <section id="features" className="py-24 bg-white relative overflow-hidden">
-      {/* Background Decoration */}
+      {}
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -89,7 +89,7 @@ const Features = () => {
           </p>
         </motion.div>
 
-        {/* Feature Grid */}
+        {}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
             <motion.div
@@ -107,12 +107,12 @@ const Features = () => {
                   : 'border-gray-100 hover:border-primary/30 bg-white hover:shadow-xl'
                 }`}
               >
-                {/* Icon */}
+                {}
                 <div className={`w-14 h-14 rounded-2xl ${feature.bgColor} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                   <feature.icon className={`w-7 h-7 bg-gradient-to-br ${feature.color} bg-clip-text text-transparent`} />
                 </div>
 
-                {/* Content */}
+                {}
                 <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors">
                   {feature.title}
                 </h3>
@@ -120,7 +120,7 @@ const Features = () => {
                   {feature.description}
                 </p>
 
-                {/* Feature Details */}
+                {}
                 <AnimatePresence>
                   {activeFeature === index && (
                     <motion.ul
@@ -146,7 +146,7 @@ const Features = () => {
                   )}
                 </AnimatePresence>
 
-                {/* Learn More Link */}
+                {}
                 <button className="mt-6 text-primary font-semibold text-sm flex items-center gap-1 group/btn">
                   Learn more
                   <span className="group-hover/btn:translate-x-1 transition-transform">→</span>

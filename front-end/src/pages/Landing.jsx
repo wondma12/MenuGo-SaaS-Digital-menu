@@ -1,6 +1,4 @@
-// src/pages/Landing.jsx (if you put it in pages folder)
-// OR
-// src/App.jsx (if you import directly in App)
+
 
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -17,6 +15,7 @@ import FAQ from "../components/landing/FAQ";
 import CTA from "../components/landing/CTA";
 import Footer from "../components/landing/Footer";
 
+//Landing page with scroll navigation and back to top button
 const Landing = () => {
   const location = useLocation();
 
@@ -67,7 +66,7 @@ const Landing = () => {
   );
 };
 
-// Back to Top Button Component
+//Back to top button
 const BackToTop = () => {
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -118,7 +117,7 @@ const BackToTop = () => {
   );
 };
 
-// Scroll Progress Indicator
+
 const ScrollProgress = () => {
   const [scrollProgress, setScrollProgress] = React.useState(0);
 

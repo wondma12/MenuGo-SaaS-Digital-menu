@@ -1,4 +1,4 @@
-// src/components/admin/Staff/RoleBadge.jsx
+
 import React from 'react'
 
 const RoleBadge = ({ role }) => {

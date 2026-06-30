@@ -80,14 +80,14 @@ const HowItWorks = () => {
 
   return (
     <section id="how-it-works" className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
-      {/* Background Elements */}
+      {}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-0 w-72 h-72 bg-primary/5 rounded-full mix-blend-multiply filter blur-3xl" />
         <div className="absolute bottom-20 right-0 w-96 h-96 bg-primary/5 rounded-full mix-blend-multiply filter blur-3xl" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -110,7 +110,7 @@ const HowItWorks = () => {
           </p>
         </motion.div>
 
-        {/* Timeline Process */}
+        {}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -118,7 +118,7 @@ const HowItWorks = () => {
           viewport={{ once: true }}
           className="relative"
         >
-          {/* Vertical Line (Desktop) */}
+          {}
           <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/20 via-primary to-primary/20 transform -translate-x-1/2" />
 
           <div className="space-y-12 lg:space-y-24">
@@ -130,7 +130,7 @@ const HowItWorks = () => {
                   index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
                 }`}
               >
-                {/* Content */}
+                {}
                 <div className={`flex-1 ${index % 2 === 0 ? 'lg:text-right' : 'lg:text-left'}`}>
                   <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 group">
                     <div className={`inline-flex items-center gap-3 mb-4 ${index % 2 === 0 ? 'lg:flex-row-reverse' : ''}`}>
@@ -150,21 +150,21 @@ const HowItWorks = () => {
                   </div>
                 </div>
 
-                {/* Center Node */}
+                {}
                 <div className="hidden lg:flex items-center justify-center relative z-10">
                   <div className="w-16 h-16 bg-white rounded-full shadow-lg border-4 border-primary flex items-center justify-center">
                     <span className="text-2xl">{step.image}</span>
                   </div>
                 </div>
 
-                {/* Spacer for alignment */}
+                {}
                 <div className="flex-1 hidden lg:block" />
               </motion.div>
             ))}
           </div>
         </motion.div>
 
-        {/* CTA */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

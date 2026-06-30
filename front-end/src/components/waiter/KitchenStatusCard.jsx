@@ -1,4 +1,4 @@
-// src/components/waiter/KitchenStatusCard.jsx
+
 import React from "react";
 
 const KitchenStatusCard = ({ stations }) => {
@@ -6,7 +6,7 @@ const KitchenStatusCard = ({ stations }) => {
 
   return (
     <div className="col-span-1 lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6 shadow-sm overflow-hidden">
-      {/* Header */}
+      {}
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold">Live Kitchen Status</h3>
         <div className="flex items-center gap-2">
@@ -19,7 +19,7 @@ const KitchenStatusCard = ({ stations }) => {
         </div>
       </div>
 
-      {/* Station Status List */}
+      {}
       <div className="flex flex-col gap-4">
         {stations.map((station, index) => (
           <div key={index} className="flex justify-between items-center">

@@ -1,4 +1,4 @@
-// src/components/Admin/RestaurantDetail/StaffOverview.jsx
+
 
 import React from "react";
 import { Award, MoreVertical, User, Users, UserCog } from "lucide-react";
@@ -8,15 +8,15 @@ const StaffOverview = ({ staff = [] }) => {
     console.log(`Action: ${action} on staff member:`, staffMember);
   };
 
-  // Ensure staff is an array
+  
   const staffArray = Array.isArray(staff) ? staff : [];
   
-  // Calculate stats
+  
   const totalStaff = staffArray.length;
   const admins = staffArray.filter(s => s.role === 'restaurant_admin' || s.role === 'admin').length;
   const waiters = staffArray.filter(s => s.role === 'waiter').length;
 
-  // Format date
+  
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -30,13 +30,13 @@ const StaffOverview = ({ staff = [] }) => {
     }
   };
 
-  // Get initials from name
+  
   const getInitials = (name) => {
     if (!name) return "U";
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  // Get role badge style
+  
   const getRoleStyle = (role) => {
     const roleMap = {
       'restaurant_admin': 'bg-black text-white',
@@ -46,7 +46,7 @@ const StaffOverview = ({ staff = [] }) => {
     return roleMap[role?.toLowerCase()] || 'bg-zinc-200 text-black';
   };
 
-  // Get role display name
+  
   const getRoleDisplay = (role) => {
     const roleMap = {
       'restaurant_admin': 'ADMIN',

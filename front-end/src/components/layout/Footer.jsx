@@ -1,10 +1,10 @@
-// src/components/layout/Footer.jsx
+
 
 import React from "react";
 import { Link } from "react-router-dom";
 
 const Footer = ({ restaurant = null }) => {
-  // ✅ Get restaurant name or fallback
+  
   const restaurantName = restaurant?.name || "MenuGo";
   const currentYear = new Date().getFullYear();
 

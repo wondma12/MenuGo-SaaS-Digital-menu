@@ -1,4 +1,4 @@
-// src/components/ui/FileUpload.jsx
+
 
 import React, { useState } from "react";
 import { FilePlus, Upload, X } from "lucide-react";
@@ -26,7 +26,7 @@ const FileUpload = ({
   };
 
   const validateAndSetFile = (selectedFile) => {
-    // Validate file size
+    
     if (maxSize) {
       const maxBytes = parseInt(maxSize);
       if (selectedFile.size > maxBytes) {
@@ -35,7 +35,7 @@ const FileUpload = ({
       }
     }
 
-    // Validate file type
+    
     if (accept) {
       const acceptedTypes = accept.split(',').map(t => t.trim());
       const fileType = selectedFile.type;

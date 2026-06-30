@@ -1,4 +1,4 @@
-// src/pages/Restaurant_admin/Orders.jsx
+
 
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/layout/sidebar";
@@ -29,9 +29,9 @@ const Orders = () => {
   const [selectedOrderForView, setSelectedOrderForView] = useState(null);
   const itemsPerPage = 5;
 
-  // ============================================================
-  // LOAD ORDERS
-  // ============================================================
+  
+  
+  
 
   const loadOrders = async () => {
     try {
@@ -41,7 +41,7 @@ const Orders = () => {
       const result = await orderService.getAllOrders();
       
       if (result.success) {
-        // Transform API data to match component format
+        
         const transformedOrders = result.data.map((order) => ({
           id: order.id,
           orderNumber: order.order_number || `#ORD-${order.id.slice(0, 8)}`,
@@ -57,7 +57,7 @@ const Orders = () => {
         
         setOrders(transformedOrders);
         
-        // Calculate stats from real data
+        
         const pending = transformedOrders.filter(o => o.status === 'pending').length;
         const preparing = transformedOrders.filter(o => o.status === 'preparing').length;
         const verified = transformedOrders.filter(o => o.status === 'verified').length;
@@ -83,13 +83,13 @@ const Orders = () => {
     }
   };
 
-  // ============================================================
-  // HELPERS
-  // ============================================================
+  
+  
+  
 
   const calculateAverageTime = (orders) => {
-    // This would need actual timestamps from your backend
-    // For now, return a mock value
+    
+    
     return '18m';
   };
 
@@ -100,15 +100,15 @@ const Orders = () => {
     return `${Math.round((served / total) * 100)}%`;
   };
 
-  // ============================================================
-  // EFFECTS
-  // ============================================================
+  
+  
+  
 
   useEffect(() => {
     loadOrders();
   }, []);
 
-  // Filter and paginate
+  
   useEffect(() => {
     let filtered = orders;
     if (statusFilter !== "all") {
@@ -125,9 +125,9 @@ const Orders = () => {
     setCurrentPage(1);
   }, [orders, statusFilter, searchTerm]);
 
-  // ============================================================
-  // HANDLERS
-  // ============================================================
+  
+  
+  
 
   const handleStatusChange = async (newStatus) => {
     setStatusFilter(newStatus);
@@ -137,7 +137,7 @@ const Orders = () => {
     try {
       const result = await orderService.updateOrderStatus(orderId, newStatus);
       if (result.success) {
-        await loadOrders(); // Refresh the list
+        await loadOrders(); 
       } else {
         alert(result.error || 'Failed to update order status');
       }
@@ -166,9 +166,9 @@ const Orders = () => {
     setSelectedOrderForView(order);
   };
 
-  // ============================================================
-  // PAGINATION
-  // ============================================================
+  
+  
+  
 
   const paginatedOrders = filteredOrders.slice(
     (currentPage - 1) * itemsPerPage,
@@ -176,16 +176,16 @@ const Orders = () => {
   );
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
 
-  // ============================================================
-  // RENDER - LOADING
-  // ============================================================
+  
+  
+  
 
   if (loading) {
     return (
       <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
         <main className="min-h-screen bg-surface">
           <div className="p-8 max-w-[1200px] mx-auto">
-            {/* Skeleton Header */}
+            {}
             <div className="flex justify-between items-end mb-6">
               <div className="space-y-2">
                 <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
@@ -194,17 +194,17 @@ const Orders = () => {
               <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
             </div>
 
-            {/* Skeleton Search */}
+            {}
             <div className="h-12 w-64 bg-gray-200 rounded-lg animate-pulse mb-6"></div>
 
-            {/* Skeleton Stats */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="h-24 bg-gray-200 rounded-lg animate-pulse"></div>
               ))}
             </div>
 
-            {/* Skeleton Table */}
+            {}
             <div className="bg-white border rounded-xl overflow-hidden">
               <div className="p-6 space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -218,9 +218,9 @@ const Orders = () => {
     );
   }
 
-  // ============================================================
-  // RENDER - ERROR
-  // ============================================================
+  
+  
+  
 
   if (error) {
     return (
@@ -244,15 +244,15 @@ const Orders = () => {
     );
   }
 
-  // ============================================================
-  // RENDER - SUCCESS
-  // ============================================================
+  
+  
+  
 
   return (
     <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
       <main className="min-h-screen bg-surface">
         <div className="p-8 max-w-[1200px] mx-auto">
-          {/* Header section */}
+          {}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
             <div>
               <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
@@ -280,7 +280,7 @@ const Orders = () => {
             </div>
           </div>
 
-          {/* Search Bar */}
+          {}
           <div className="mb-6">
             <div className="relative max-w-md">
               <input
@@ -294,7 +294,7 @@ const Orders = () => {
             </div>
           </div>
 
-          {/* Stats Grid */}
+          {}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-6">
             <div className="bg-white p-6 border border-neutral-200 rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
               <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
@@ -322,7 +322,7 @@ const Orders = () => {
             </div>
           </div>
 
-          {/* Orders Table Container */}
+          {}
           <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
             <OrderTable
               orders={paginatedOrders}
@@ -330,7 +330,7 @@ const Orders = () => {
               onUpdateStatus={handleUpdateOrderStatus}
             />
 
-            {/* Pagination */}
+            {}
             {filteredOrders.length > 0 && (
               <div className="px-6 py-4 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between bg-neutral-50/50 gap-2">
                 <p className="text-sm text-gray-500">
@@ -376,7 +376,7 @@ const Orders = () => {
             )}
           </div>
 
-          {/* Asymmetric Layout Section for Insights */}
+          {}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
             <div className="lg:col-span-2 space-y-6">
               <div className="bg-white border border-neutral-200 p-6 rounded-xl">
@@ -448,7 +448,7 @@ const Orders = () => {
         </div>
       </main>
 
-      {/* Modals */}
+      {}
       <CreateOrderModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

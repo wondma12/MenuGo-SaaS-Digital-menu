@@ -13,26 +13,26 @@ const CTA = () => {
 
   return (
     <section className="relative py-24 overflow-hidden">
-      {/* Background Gradient */}
+      {}
       <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-dark to-primary">
-        {/* Animated Pattern */}
+        {}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
         
-        {/* Floating Orbs */}
+        {}
         <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full filter blur-3xl animate-pulse" />
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full filter blur-3xl animate-pulse delay-1000" />
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full filter blur-3xl" />
       </div>
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Main Content */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="space-y-8"
         >
-          {/* Badge */}
+          {}
           <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
             <Zap className="w-4 h-4 text-yellow-300" />
             <span className="text-sm font-semibold text-white">
@@ -40,19 +40,19 @@ const CTA = () => {
             </span>
           </div>
 
-          {/* Heading */}
+          {}
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
             Ready to Transform Your{' '}
             <span className="text-yellow-300">Restaurant</span>?
           </h2>
 
-          {/* Description */}
+          {}
           <p className="text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
             Join 2,500+ restaurants already using MenuGo to streamline operations, 
             boost sales, and delight customers. Start your free trial today.
           </p>
 
-          {/* CTA Buttons */}
+          {}
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Link
               to="/auth/signup"
@@ -69,7 +69,7 @@ const CTA = () => {
             </Link>
           </div>
 
-          {/* Benefits Grid */}
+          {}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
             {benefits.map((benefit, index) => (
               <motion.div
@@ -86,7 +86,7 @@ const CTA = () => {
             ))}
           </div>
 
-          {/* Trust Badge */}
+          {}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}

@@ -1,17 +1,66 @@
-// services/registration.js
+// src/services/registration.js
 import { authAPI, restaurantAPI, verificationAPI, locationAPI } from "./api.js";
 
 const registrationService = {
-  // =========================================
-  // SUBMIT RESTAURANT REGISTRATION
-  // =========================================
+  
+  /**
+   * Upload a single file to the server
+   */
+  async uploadFile(file, type) {
+    try {
+      if (!file || !(file instanceof File)) {
+        console.log(`[Registration] No ${type} file to upload`);
+        return null;
+      }
+
+      console.log(`[Registration] 📤 Uploading ${type}:`, file.name, file.size, file.type);
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', type);
+
+      const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+      const headers = {};
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      // IMPORTANT: Do NOT set Content-Type, browser sets it with boundary
+
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+      
+      const response = await fetch(`${API_BASE_URL}/api/upload`, {
+        method: 'POST',
+        headers: headers,
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to upload ${type}`);
+      }
+
+      const data = await response.json();
+      console.log(`[Registration] ✅ ${type} uploaded successfully:`, data.url || data.filePath);
+      
+      // Return the URL or file path
+      return data.url || data.filePath || data.file_url || null;
+    } catch (error) {
+      console.error(`[Registration] ❌ ${type} upload error:`, error);
+      return null;
+    }
+  },
+
+  /**
+   * Main registration submission
+   */
   async submitRegistration(registrationData) {
     try {
       console.log("[Registration] 🚀 Starting registration process...");
 
-      // =========================================
-      // 1. REGISTER THE USER
-      // =========================================
+      // ============================================================
+      // Step 1: Register the user
+      // ============================================================
       console.log("[Registration] Step 1: Registering user...");
       const userResult = await authAPI.register({
         name: registrationData.fullName,
@@ -22,10 +71,7 @@ const registrationService = {
       });
 
       if (!userResult.success) {
-        console.error(
-          "[Registration] ❌ User registration failed:",
-          userResult.error,
-        );
+        console.error("[Registration] ❌ User registration failed:", userResult.error);
         return {
           success: false,
           data: null,
@@ -36,70 +82,84 @@ const registrationService = {
       const user = userResult.data.user;
       console.log("[Registration] ✅ User created successfully:", user.id);
 
-      // =========================================
-      // 2. LOGIN THE USER TO GET A TOKEN
-      // =========================================
-      console.log(
-        "[Registration] Step 2: Logging in user to get authentication token...",
-      );
+      // ============================================================
+      // Step 2: Login to get auth token
+      // ============================================================
+      console.log("[Registration] Step 2: Logging in to get authentication token...");
       const loginResult = await authAPI.login(
         registrationData.email,
         registrationData.password,
       );
 
       if (!loginResult.success) {
-        console.warn(
-          "[Registration] ⚠️ Auto-login failed, continuing without token",
-        );
+        console.warn("[Registration] ⚠️ Auto-login failed, continuing without token");
       } else {
         console.log("[Registration] ✅ Auto-login successful");
+        // Store token for subsequent API calls
+        if (loginResult.data?.token) {
+          localStorage.setItem('authToken', loginResult.data.token);
+          localStorage.setItem('token', loginResult.data.token);
+        }
       }
 
-      // =========================================
-      // 3. CREATE THE RESTAURANT - FIXED
-      // =========================================
-      console.log("[Registration] Step 3: Creating restaurant...");
+      // ============================================================
+      // Step 3: Upload files (logo, banner, documents)
+      // ============================================================
+      console.log("[Registration] Step 3: Uploading files...");
+      
+      // Upload logo if it's a File object
+      let logoUrl = null;
+      if (registrationData.logo instanceof File) {
+        logoUrl = await this.uploadFile(registrationData.logo, 'logo');
+        console.log("[Registration] Logo URL:", logoUrl);
+      }
 
-      // ✅ FIX 1: Properly define restaurantData
+      // Upload banner if it's a File object
+      let bannerUrl = null;
+      if (registrationData.banner instanceof File) {
+        bannerUrl = await this.uploadFile(registrationData.banner, 'banner');
+        console.log("[Registration] Banner URL:", bannerUrl);
+      }
+
+      // Upload business license document if it's a File object
+      let documentUrl = null;
+      if (registrationData.businessLicenseDocument instanceof File) {
+        documentUrl = await this.uploadFile(
+          registrationData.businessLicenseDocument, 
+          'business_license'
+        );
+        console.log("[Registration] Document URL:", documentUrl);
+      }
+
+      // ============================================================
+      // Step 4: Create restaurant with file URLs
+      // ============================================================
+      console.log("[Registration] Step 4: Creating restaurant...");
+
       const restaurantData = {
         name: registrationData.restaurantName,
         email: registrationData.businessEmail,
         phone: registrationData.businessPhone,
-        description:
-          registrationData.slogan || registrationData.description || "",
-        logo:
-          registrationData.logo && typeof registrationData.logo === "string"
-            ? registrationData.logo
-            : null,
-        banner:
-          registrationData.banner && typeof registrationData.banner === "string"
-            ? registrationData.banner
-            : null,
+        description: registrationData.slogan || registrationData.description || "",
+        // Use the uploaded file URLs, not the File objects
+        logo: logoUrl || null,
+        banner: bannerUrl || null,
         slogan: registrationData.slogan || null,
         website_url: registrationData.websiteUrl || null,
         owner_id: user.id,
         status: "pending",
       };
 
-      console.log("[Registration] Cleaned restaurant data:", {
-        name: restaurantData.name,
-        email: restaurantData.email,
-        owner_id: restaurantData.owner_id,
-        logo_type: typeof restaurantData.logo,
-        banner_type: typeof restaurantData.banner,
-        slogan: restaurantData.slogan,
+      console.log("[Registration] Restaurant data:", {
+        ...restaurantData,
+        logo: logoUrl ? '✅ Uploaded' : '❌ Not provided',
+        banner: bannerUrl ? '✅ Uploaded' : '❌ Not provided',
       });
 
-      // ✅ restaurantResult = { success: true, data: restaurant }
       const restaurantResult = await restaurantAPI.create(restaurantData);
-      console.log("[Registration] Restaurant API response:", restaurantResult);
 
-      // ✅ Check if restaurant creation failed
       if (!restaurantResult || !restaurantResult.success) {
-        console.error(
-          "[Registration] ❌ Restaurant creation failed:",
-          restaurantResult?.error,
-        );
+        console.error("[Registration] ❌ Restaurant creation failed:", restaurantResult?.error);
         return {
           success: false,
           data: null,
@@ -107,17 +167,13 @@ const registrationService = {
         };
       }
 
-      // ✅ FIX 2: Extract restaurant from restaurantResult.data
       const restaurant = restaurantResult.data;
-      console.log(
-        "[Registration] ✅ Restaurant created successfully:",
-        restaurant.id,
-      );
+      console.log("[Registration] ✅ Restaurant created successfully:", restaurant.id);
 
-      // =========================================
-      // 4. ADD LOCATION
-      // =========================================
-      console.log("[Registration] Step 4: Adding restaurant location...");
+      // ============================================================
+      // Step 5: Add location
+      // ============================================================
+      console.log("[Registration] Step 5: Adding restaurant location...");
       const locationData = {
         restaurant_id: restaurant.id,
         country: registrationData.country || "",
@@ -125,62 +181,60 @@ const registrationService = {
         sub_city: registrationData.subCity || "",
         street_address: registrationData.streetAddress || "",
         map_link: registrationData.googleMapsLink || "",
-        latitude: registrationData.latitude
-          ? parseFloat(registrationData.latitude)
-          : null,
-        longitude: registrationData.longitude
-          ? parseFloat(registrationData.longitude)
-          : null,
+        latitude: registrationData.latitude ? parseFloat(registrationData.latitude) : null,
+        longitude: registrationData.longitude ? parseFloat(registrationData.longitude) : null,
       };
 
       const locationResult = await locationAPI.add(locationData);
 
       if (!locationResult.success) {
-        console.warn(
-          "[Registration] ⚠️ Location creation failed, but continuing...",
-        );
+        console.warn("[Registration] ⚠️ Location creation failed, but continuing...");
       } else {
         console.log("[Registration] ✅ Location added successfully");
       }
 
-      // =========================================
-      // 5. SUBMIT VERIFICATION
-      // =========================================
-      console.log(
-        "[Registration] Step 5: Submitting verification documents...",
-      );
+      // ============================================================
+      // Step 6: Submit verification documents
+      // ============================================================
+      console.log("[Registration] Step 6: Submitting verification documents...");
       const verificationData = {
         restaurant_id: restaurant.id,
         owner_name: registrationData.ownerName || registrationData.fullName,
         business_license_number: registrationData.businessLicenseNumber || "",
         tin_number: registrationData.tinNumber || "",
-        // ✅ Convert file to string or send null
-        business_license_document:
-          registrationData.businessLicenseDocument &&
-          typeof registrationData.businessLicenseDocument === "string"
-            ? registrationData.businessLicenseDocument
-            : null,
-        legal_document:
-          registrationData.legalDocument &&
-          typeof registrationData.legalDocument === "string"
-            ? registrationData.legalDocument
-            : null,
+        // Use the uploaded document URL
+        business_license_document: documentUrl || null,
+        legal_document: null,
       };
+
+      console.log("[Registration] Verification data:", {
+        ...verificationData,
+        business_license_document: documentUrl ? '✅ Uploaded' : '❌ Not provided',
+      });
 
       const verificationResult = await verificationAPI.submit(verificationData);
 
       if (!verificationResult.success) {
-        console.warn(
-          "[Registration] ⚠️ Verification submission failed, but continuing...",
-        );
+        console.warn("[Registration] ⚠️ Verification submission failed, but continuing...");
       } else {
         console.log("[Registration] ✅ Verification submitted successfully");
       }
 
-      // Remove password from response
+      // ============================================================
+      // Success!
+      // ============================================================
       const { password: _, ...safeUser } = user;
 
       console.log("[Registration] 🎉 Registration completed successfully!");
+      console.log("[Registration] Summary:", {
+        user: user.id,
+        restaurant: restaurant.id,
+        logo: logoUrl ? '✅' : '❌',
+        banner: bannerUrl ? '✅' : '❌',
+        document: documentUrl ? '✅' : '❌',
+        location: locationResult.success ? '✅' : '⚠️',
+        verification: verificationResult.success ? '✅' : '⚠️',
+      });
 
       return {
         success: true,
@@ -189,8 +243,7 @@ const registrationService = {
           restaurant,
           location: locationResult.success ? locationResult : null,
           verification: verificationResult.success ? verificationResult : null,
-          message:
-            "Restaurant registration submitted successfully. Please wait for approval.",
+          message: "Restaurant registration submitted successfully. Please wait for approval.",
         },
         error: null,
       };
@@ -204,9 +257,10 @@ const registrationService = {
     }
   },
 
-  // =========================================
-  // GET PENDING REGISTRATIONS
-  // =========================================
+  // ============================================================
+  // Other methods remain the same
+  // ============================================================
+  
   async getPendingRegistrations() {
     try {
       const result = await verificationAPI.getAll({ status: "pending" });
@@ -225,17 +279,12 @@ const registrationService = {
     }
   },
 
-  // =========================================
-  // APPROVE REGISTRATION
-  // =========================================
   async approveRegistration(restaurantId, platformAdminId) {
     try {
       const verifications = await verificationAPI.getAll({
         restaurant_id: restaurantId,
       });
-      const verification = (verifications.verifications ||
-        verifications ||
-        [])[0];
+      const verification = (verifications.verifications || verifications || [])[0];
 
       if (!verification) {
         return {
@@ -268,9 +317,6 @@ const registrationService = {
     }
   },
 
-  // =========================================
-  // REJECT REGISTRATION
-  // =========================================
   async rejectRegistration(
     restaurantId,
     platformAdminId,
@@ -280,9 +326,7 @@ const registrationService = {
       const verifications = await verificationAPI.getAll({
         restaurant_id: restaurantId,
       });
-      const verification = (verifications.verifications ||
-        verifications ||
-        [])[0];
+      const verification = (verifications.verifications || verifications || [])[0];
 
       if (!verification) {
         return {

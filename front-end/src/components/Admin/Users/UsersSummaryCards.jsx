@@ -1,4 +1,4 @@
-// src/components/Admin/Users/UsersSummaryCards.jsx
+
 
 import React from 'react';
 
@@ -22,7 +22,7 @@ const UsersSummaryCards = ({ users }) => {
     );
   }
 
-  // Calculate stats from real data
+  
   const totalUsers = users.length;
   const platformAdmins = users.filter(u => u.role === 'platform_admin').length;
   const restaurantAdmins = users.filter(u => u.role === 'restaurant_admin').length;

@@ -1,4 +1,4 @@
-// src/components/admin/orders/OrderRow.jsx
+
 import React from "react";
 import OrderStatusBadge from "./OrderStatusBadge";
 

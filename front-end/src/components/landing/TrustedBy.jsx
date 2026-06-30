@@ -26,7 +26,7 @@ const TrustedBy = () => {
   return (
     <section className="py-16 bg-white border-t border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Stats Row */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -53,7 +53,7 @@ const TrustedBy = () => {
           ))}
         </motion.div>
 
-        {/* Reviews Section */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -92,7 +92,7 @@ const TrustedBy = () => {
           </div>
         </motion.div>
 
-        {/* Awards & Recognition */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -118,7 +118,7 @@ const TrustedBy = () => {
           </div>
         </motion.div>
 
-        {/* Security Badges */}
+        {}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

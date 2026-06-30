@@ -1,4 +1,4 @@
-// src/pages/Admin/AdminDashboard.jsx
+
 
 import React, { useState, useEffect } from "react";
 import SummaryCards from "../../components/Admin/Dashboard/SummaryCards";
@@ -20,10 +20,10 @@ const AdminDashboard = () => {
         console.log('[AdminDashboard] Stats:', data);
         
         if (data.success) {
-          // ✅ Create a combined stats object with restaurantStatus
+          
           const combinedStats = {
             ...data.data,
-            // If restaurantStatus doesn't exist, calculate it from pendingRegistrations and total
+            
             restaurantStatus: data.data.restaurantStatus || {
               active: data.data.activeRestaurants || 0,
               pending: data.data.pendingRestaurants || 0,
@@ -45,7 +45,7 @@ const AdminDashboard = () => {
     fetchDashboardStats();
   }, []);
 
-  // ... rest of the component remains the same
+  
 
   return (
     <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">

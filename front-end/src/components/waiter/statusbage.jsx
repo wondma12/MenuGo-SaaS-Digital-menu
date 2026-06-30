@@ -1,4 +1,4 @@
-// components/StatusBadge.jsx
+
 
 const statusColors = {
   Pending: "bg-yellow-100 text-yellow-700",

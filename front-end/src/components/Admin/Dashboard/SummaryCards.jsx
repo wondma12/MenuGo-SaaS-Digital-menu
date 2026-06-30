@@ -1,4 +1,4 @@
-// src/components/Admin/Dashboard/SummaryCards.jsx
+
 
 import React from "react";
 import SummaryCard from "../../ui/SummaryCard";
@@ -21,11 +21,11 @@ const SummaryCards = ({ stats }) => {
 
   console.log('[SummaryCards] Stats received:', stats);
 
-  // ✅ Get values - check multiple possible locations
+  
   const totalRestaurants = stats.summary?.totalRestaurants || stats.totalRestaurants || 0;
   const totalUsers = stats.summary?.totalUsers || stats.totalUsers || 0;
   
-  // ✅ Calculate pending from pendingRegistrations if available
+  
   const pendingCount = stats.pendingRegistrations?.length || 
                        stats.restaurantStatus?.pending || 
                        stats.pendingRestaurants || 

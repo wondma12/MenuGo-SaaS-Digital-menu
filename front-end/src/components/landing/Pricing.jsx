@@ -67,7 +67,7 @@ const Pricing = () => {
   return (
     <section id="pricing" className="py-24 bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -88,7 +88,7 @@ const Pricing = () => {
             Choose the perfect plan for your restaurant. All plans include a 14-day free trial.
           </p>
 
-          {/* Toggle */}
+          {}
           <div className="flex items-center justify-center gap-4">
             <span className={`text-sm font-semibold ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
               Monthly
@@ -114,7 +114,7 @@ const Pricing = () => {
           </div>
         </motion.div>
 
-        {/* Pricing Cards */}
+        {}
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
@@ -142,13 +142,13 @@ const Pricing = () => {
                   : 'border-gray-200 hover:border-primary/30 hover:shadow-xl'
               }`}>
                 <div className="p-8">
-                  {/* Plan Header */}
+                  {}
                   <div className="mb-6">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
                     <p className="text-gray-600 text-sm">{plan.description}</p>
                   </div>
 
-                  {/* Price */}
+                  {}
                   <div className="mb-6">
                     <div className="flex items-baseline gap-1">
                       <span className="text-5xl font-bold bg-gradient-to-br text-gray-900">
@@ -163,7 +163,7 @@ const Pricing = () => {
                     )}
                   </div>
 
-                  {/* Features */}
+                  {}
                   <ul className="space-y-4 mb-8">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-3">
@@ -175,7 +175,7 @@ const Pricing = () => {
                     ))}
                   </ul>
 
-                  {/* CTA Button */}
+                  {}
                   <Link
                     to="/auth/signup"
                     className={`block w-full text-center py-4 rounded-2xl font-semibold transition-all duration-300 ${
@@ -193,7 +193,7 @@ const Pricing = () => {
           ))}
         </div>
 
-        {/* Money Back Guarantee */}
+        {}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

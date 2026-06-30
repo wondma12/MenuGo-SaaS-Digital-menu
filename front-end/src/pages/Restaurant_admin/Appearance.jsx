@@ -32,7 +32,7 @@ const Appearance = () => {
   const handleSaveAll = () => {
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
-    // In real app, save to backend
+    
     console.log("Saving settings:", settings);
   };
 
@@ -59,7 +59,7 @@ const Appearance = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {}
       <div className="flex justify-between items-center flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">

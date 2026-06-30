@@ -1,4 +1,4 @@
-// src/components/waiter/NewOrderCard.jsx
+
 import React from "react";
 
 const NewOrderCard = () => {

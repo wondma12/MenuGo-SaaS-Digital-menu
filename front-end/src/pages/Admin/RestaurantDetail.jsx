@@ -1,4 +1,4 @@
-// src/pages/Admin/RestaurantDetail.jsx
+
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -18,9 +18,9 @@ const RestaurantDetail = () => {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // ============================================================
-  // FETCH RESTAURANT DETAILS
-  // ============================================================
+  
+  
+  
 
   const fetchRestaurantDetails = useCallback(async () => {
     if (!id) return;
@@ -31,11 +31,11 @@ const RestaurantDetail = () => {
       
       console.log('[RestaurantDetail] Fetching restaurant:', id);
       
-      // Fetch restaurant details
+      
       const restaurantData = await restaurantAPI.getById(id);
       console.log('[RestaurantDetail] Restaurant data:', restaurantData);
       
-      // Fetch staff for this restaurant
+      
       let staffData = [];
       try {
         const staffResult = await staffAPI.getByRestaurant(id);
@@ -45,7 +45,7 @@ const RestaurantDetail = () => {
         console.warn("Could not fetch staff:", staffErr);
       }
       
-      // Fetch verification status
+      
       let verificationData = null;
       try {
         const verificationResult = await verificationAPI.getAll({ restaurant_id: id });
@@ -57,7 +57,7 @@ const RestaurantDetail = () => {
         console.warn("Could not fetch verification:", verificationErr);
       }
       
-      // Combine all data
+      
       const combinedData = {
         ...restaurantData,
         staff: staffData,
@@ -81,9 +81,9 @@ const RestaurantDetail = () => {
     fetchRestaurantDetails();
   }, [fetchRestaurantDetails]);
 
-  // ============================================================
-  // HANDLE ACTIONS (Approve/Suspend)
-  // ============================================================
+  
+  
+  
 
   const handleAction = async (action) => {
     if (!restaurant) return;
@@ -96,7 +96,7 @@ const RestaurantDetail = () => {
       setActionLoading(true);
 
       if (action === "approve") {
-        // Find verification record
+        
         const verifications = await verificationAPI.getAll({ restaurant_id: restaurant.id });
         const verification = verifications?.data?.[0] || 
                            verifications?.verifications?.[0];
@@ -106,7 +106,7 @@ const RestaurantDetail = () => {
           return;
         }
         
-        // Approve verification
+        
         const result = await verificationAPI.review(
           verification.id,
           'approved',
@@ -155,9 +155,9 @@ const RestaurantDetail = () => {
     }
   };
 
-  // ============================================================
-  // RENDER - LOADING
-  // ============================================================
+  
+  
+  
 
   if (loading) {
     return (
@@ -183,9 +183,9 @@ const RestaurantDetail = () => {
     );
   }
 
-  // ============================================================
-  // RENDER - ERROR
-  // ============================================================
+  
+  
+  
 
   if (error) {
     return (
@@ -216,9 +216,9 @@ const RestaurantDetail = () => {
     );
   }
 
-  // ============================================================
-  // RENDER - NOT FOUND
-  // ============================================================
+  
+  
+  
 
   if (!restaurant) {
     return (
@@ -249,9 +249,9 @@ const RestaurantDetail = () => {
     );
   }
 
-  // ============================================================
-  // RENDER - SUCCESS
-  // ============================================================
+  
+  
+  
 
   return (
     <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
@@ -265,7 +265,7 @@ const RestaurantDetail = () => {
 
       <main className=" min-h-screen bg-background">
         <div className="max-w-7xl mx-auto p-8">
-          {/* Page Header & Action Panel */}
+          {}
           <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-8 border-b border-zinc-200">
             <div className="flex items-center gap-6">
               <div className="w-20 h-20 bg-white border border-zinc-200 rounded-lg flex items-center justify-center p-2">
@@ -327,15 +327,15 @@ const RestaurantDetail = () => {
             </div>
           </section>
 
-          {/* Grid Layout */}
+          {}
           <div className="grid grid-cols-12 gap-8 mt-8">
-            {/* Left Column: Identity & Documentation */}
+            {}
             <div className="col-span-12 lg:col-span-8 space-y-8">
               <IdentitySection restaurant={restaurant} />
               <StaffOverview staff={restaurant.staff || []} />
             </div>
 
-            {/* Right Column: Location & Insights */}
+            {}
             <div className="col-span-12 lg:col-span-4 space-y-8">
               <LocationCard location={restaurant.location} />
               <QRCodeCard 

@@ -1,4 +1,4 @@
-// components/layout/AdminLayout.jsx
+
 import React from "react";
 import Sidebar from "./sidebar";
 import TopHeader from "./TopHeader";

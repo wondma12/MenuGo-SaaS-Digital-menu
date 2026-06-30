@@ -1,4 +1,4 @@
-// src/components/customer/Feedback/FeedbackSection.jsx
+
 
 import React, { useState } from 'react';
 import { Star } from 'lucide-react';

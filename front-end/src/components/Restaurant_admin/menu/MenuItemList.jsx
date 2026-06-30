@@ -1,4 +1,4 @@
-// src/components/admin/menu/MenuItemList.jsx
+
 import React from 'react';
 import MenuItemRow from './MenuItemRow';
 

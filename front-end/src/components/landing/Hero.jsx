@@ -13,26 +13,26 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-white via-primary/5 to-primary/10">
-      {/* Animated Background Elements */}
+      {}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary-light/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000" />
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-primary/5 to-transparent rounded-full" />
       </div>
 
-      {/* Grid Pattern Overlay */}
+      {}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left Content */}
+          {}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
             className="space-y-8"
           >
-            {/* Badge */}
+            {}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -48,7 +48,7 @@ const Hero = () => {
               </span>
             </motion.div>
 
-            {/* Main Heading */}
+            {}
             <div className="space-y-4">
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight">
                 <span className="text-gray-900">Run Your Restaurant</span>
@@ -59,7 +59,7 @@ const Hero = () => {
               </h1>
             </div>
 
-            {/* Description */}
+            {}
             <p className="text-lg sm:text-xl text-gray-600 leading-relaxed max-w-xl">
               Transform your restaurant operations with MenuGo's all-in-one platform. 
               Digital menus, real-time orders, analytics, and staff management — 

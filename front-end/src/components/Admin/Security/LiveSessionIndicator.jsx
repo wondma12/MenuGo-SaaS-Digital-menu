@@ -1,4 +1,4 @@
-// src/components/Admin/Security/LiveSessionIndicator.jsx
+
 
 import React, { useState, useEffect } from "react";
 import { Circle, Shield, User, Clock, LogOut } from "lucide-react";
@@ -64,7 +64,7 @@ const LiveSessionIndicator = () => {
     }
   };
 
-  // Don't show if no session
+  
   if (!session.active) {
     return null;
   }

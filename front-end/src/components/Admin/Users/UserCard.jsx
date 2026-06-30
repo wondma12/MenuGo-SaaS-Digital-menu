@@ -1,4 +1,4 @@
-// src/components/Admin/Users/UserCard.jsx
+
 
 import React from "react";
 import {
@@ -64,7 +64,7 @@ const UserCard = ({ user, onAction }) => {
   const RoleIcon = getRoleIcon(user.role);
   const isDisabled = user.is_active === false;
 
-  // Format date
+  
   const formatDate = (dateString) => {
     if (!dateString) return null;
     try {
@@ -78,7 +78,7 @@ const UserCard = ({ user, onAction }) => {
     }
   };
 
-  // Get initials for avatar
+  
   const getInitials = (name) => {
     if (!name) return "U";
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -98,7 +98,7 @@ const UserCard = ({ user, onAction }) => {
           <RoleIcon className="w-5 h-5 text-zinc-300" />
         </div>
 
-        {/* Avatar and Name */}
+        {}
         <div className="flex items-center gap-3 mb-3">
           <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
             {user.profile_image ? (
@@ -124,7 +124,7 @@ const UserCard = ({ user, onAction }) => {
           </div>
         </div>
 
-        {/* User Details */}
+        {}
         <div className="space-y-1 text-xs text-zinc-500 mt-3">
           {user.phone && (
             <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ const UserCard = ({ user, onAction }) => {
           )}
         </div>
 
-        {/* Linked Restaurant */}
+        {}
         {user.restaurant_id && (
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-zinc-50 rounded-full border border-zinc-100 mt-3">
             <span className="text-[10px] font-bold uppercase tracking-tighter text-zinc-500">
@@ -152,7 +152,7 @@ const UserCard = ({ user, onAction }) => {
           </div>
         )}
 
-        {/* Disabled Date */}
+        {}
         {isDisabled && (
           <p className="text-[10px] text-red-600 font-bold uppercase mt-2">
             Disabled on {formatDate(user.updated_at) || 'Unknown date'}
@@ -160,7 +160,7 @@ const UserCard = ({ user, onAction }) => {
         )}
       </div>
 
-      {/* Action Buttons */}
+      {}
       <div
         className={`p-4 flex flex-col gap-1 border-t ${isDisabled ? "bg-zinc-100/50 border-zinc-200" : "border-zinc-100 bg-zinc-50"}`}
       >

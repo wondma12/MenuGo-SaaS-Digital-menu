@@ -1,4 +1,4 @@
-// src/pages/Admin/Users.jsx
+
 
 import React, { useState, useEffect, useCallback } from "react";
 import Sidebar from "../../components/layout/sidebar";
@@ -14,9 +14,9 @@ const Users = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // =========================================
-  // FETCH USERS
-  // =========================================
+  
+  
+  
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -27,7 +27,7 @@ const Users = () => {
       const result = await staffAPI.getAll();
       console.log('[Users] Result:', result);
 
-      // Handle different response formats
+      
       let usersData = [];
       if (Array.isArray(result)) {
         usersData = result;
@@ -39,7 +39,7 @@ const Users = () => {
         usersData = result || [];
       }
 
-      // Transform user data to match component expectations
+      
       const transformedUsers = usersData.map(user => ({
         id: user.id,
         name: user.name || 'Unknown User',
@@ -68,9 +68,9 @@ const Users = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  // =========================================
-  // HANDLERS
-  // =========================================
+  
+  
+  
 
   const handleUserUpdate = async () => {
     await fetchUsers();
@@ -98,9 +98,9 @@ const Users = () => {
     }
   };
 
-  // =========================================
-  // LOADING STATE
-  // =========================================
+  
+  
+  
 
   if (loading) {
     return (
@@ -125,9 +125,9 @@ const Users = () => {
     );
   }
 
-  // =========================================
-  // ERROR STATE
-  // =========================================
+  
+  
+  
 
   if (error) {
     return (
@@ -157,9 +157,9 @@ const Users = () => {
     );
   }
 
-  // =========================================
-  // SUCCESS STATE
-  // =========================================
+  
+  
+  
 
   return (
     <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
@@ -172,7 +172,7 @@ const Users = () => {
 
       <main className="min-h-screen bg-background">
         <div className="max-w-[1200px] mx-auto p-12">
-          {/* Page Header */}
+          {}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-12">
             <div>
               <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
@@ -194,17 +194,17 @@ const Users = () => {
             </button>
           </div>
 
-          {/* Stats Bar */}
+          {}
           <UsersSummaryCards users={users} />
 
-          {/* Filter Tabs */}
+          {}
           <FilterTabs 
             activeTab={activeTab} 
             setActiveTab={setActiveTab} 
             users={users}
           />
 
-          {/* User Grid */}
+          {}
           <UserGrid 
             activeTab={activeTab} 
             users={users}

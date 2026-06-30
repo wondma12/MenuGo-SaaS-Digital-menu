@@ -1,4 +1,4 @@
-// src/components/admin/dashboard/InventoryAlert.jsx
+
 import React from 'react';
 
 const InventoryAlert = ({ itemCount = 3, onDismiss, onRestock }) => {

@@ -1,4 +1,4 @@
-// src/pages/Restaurant_admin/Settings.jsx
+
 
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/layout/sidebar";
@@ -19,7 +19,7 @@ const Settings = () => {
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("success");
 
-  // State for restaurant data
+  
   const [restaurant, setRestaurant] = useState(null);
   const [qrCodes, setQrCodes] = useState([]);
   const [isGeneratingQR, setIsGeneratingQR] = useState(false);
@@ -51,9 +51,9 @@ const Settings = () => {
 
   const currentYear = new Date().getFullYear();
 
-  // ============================================================
-  // LOAD SETTINGS
-  // ============================================================
+  
+  
+  
 
   useEffect(() => {
     loadSettings();
@@ -64,14 +64,14 @@ const Settings = () => {
       setLoading(true);
       setError(null);
 
-      // Get restaurant data
+      
       const restaurantResult = await restaurantService.getMyRestaurant();
       
       if (restaurantResult.success) {
         const data = restaurantResult.data;
         setRestaurant(data);
         
-        // Update form data
+        
         setFormData({
           restaurantName: data.name || "",
           phone: data.phone || "",
@@ -81,14 +81,14 @@ const Settings = () => {
           website_url: data.website_url || "",
         });
         
-        // Update visual assets
+        
         setVisualAssets({
           logo: data.logo || "",
           banner: data.banner || "",
           qr_code: data.qr_code || "",
         });
 
-        // Update location if exists
+        
         if (data.location) {
           setAddress({
             country: data.location.country || "",
@@ -101,7 +101,7 @@ const Settings = () => {
           });
         }
 
-        // Load QR codes
+        
         await loadQRCodes();
       } else {
         setError(restaurantResult.error || "Failed to load restaurant settings");
@@ -114,7 +114,7 @@ const Settings = () => {
     }
   };
 
-  // ✅ FIXED: loadQRCodes - correctly extracts qrCodes array from nested response
+  
   const loadQRCodes = async () => {
     try {
       console.log('[Settings] 🔍 Loading QR codes...');
@@ -124,8 +124,8 @@ const Settings = () => {
       let qrCodesArray = [];
       
       if (result.success) {
-        // ✅ The data structure is: { qrCodes: [...], pagination: {...} }
-        // We need to extract the qrCodes array
+        
+        
         if (result.data && result.data.qrCodes) {
           qrCodesArray = Array.isArray(result.data.qrCodes) ? result.data.qrCodes : [];
           console.log('[Settings] ✅ Extracted qrCodes from data.qrCodes:', qrCodesArray);
@@ -133,19 +133,19 @@ const Settings = () => {
           qrCodesArray = result.data;
           console.log('[Settings] ✅ result.data is array:', qrCodesArray);
         } else if (result.data && typeof result.data === 'object') {
-          // Fallback: try to find any array in the data
+          
           const possibleArray = Object.values(result.data).find(val => Array.isArray(val));
           qrCodesArray = possibleArray || [];
           console.log('[Settings] ✅ Found array in data object:', qrCodesArray);
         }
       }
       
-      // ✅ Ensure it's an array
+      
       const finalData = Array.isArray(qrCodesArray) ? qrCodesArray : [];
       console.log('[Settings] ✅ Final QR codes set:', finalData);
       setQrCodes(finalData);
       
-      // ✅ Also update visual assets if there's an active QR code
+      
       const activeQR = finalData.find(q => q.is_active !== false);
       if (activeQR && activeQR.qr_image_url) {
         setVisualAssets(prev => ({
@@ -160,9 +160,9 @@ const Settings = () => {
     }
   };
 
-  // ============================================================
-  // QR CODE HANDLERS
-  // ============================================================
+  
+  
+  
 
   const handleGenerateQR = async () => {
     if (!restaurant || !restaurant.id) {
@@ -184,10 +184,10 @@ const Settings = () => {
       if (result.success) {
         showToastMessage("QR Code generated successfully!", "success");
         
-        // ✅ Refresh QR codes list
+        
         await loadQRCodes();
         
-        // Update visual assets with new QR code
+        
         if (result.data && result.data.qr_image_url) {
           setVisualAssets(prev => ({
             ...prev,
@@ -212,7 +212,7 @@ const Settings = () => {
     }
 
     try {
-      // If it's a data URL
+      
       if (qrImageUrl.startsWith('data:image')) {
         const link = document.createElement('a');
         link.href = qrImageUrl;
@@ -224,7 +224,7 @@ const Settings = () => {
         return;
       }
 
-      // If it's a URL, fetch and download
+      
       fetch(qrImageUrl)
         .then(response => response.blob())
         .then(blob => {
@@ -282,16 +282,16 @@ const Settings = () => {
     }
   };
 
-  // ============================================================
-  // SAVE SETTINGS
-  // ============================================================
+  
+  
+  
 
   const handleSave = async () => {
     try {
       setSaving(true);
       setError(null);
 
-      // 1. Update restaurant info
+      
       const restaurantUpdateData = {
         name: formData.restaurantName,
         phone: formData.phone,
@@ -313,7 +313,7 @@ const Settings = () => {
         throw new Error(restaurantResult.error || "Failed to update restaurant info");
       }
 
-      // 2. Update location if it exists
+      
       if (address.country || address.city) {
         const locationData = {
           restaurant_id: restaurant.id,
@@ -383,9 +383,9 @@ const Settings = () => {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  // ============================================================
-  // HANDLERS FOR CHILD COMPONENTS
-  // ============================================================
+  
+  
+  
 
   const handleFormDataChange = (updates) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -399,16 +399,16 @@ const Settings = () => {
     setVisualAssets(prev => ({ ...prev, ...updates }));
   };
 
-  // ============================================================
-  // RENDER - LOADING
-  // ============================================================
+  
+  
+  
 
   if (loading) {
     return (
       <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
         <main className="min-h-screen bg-surface">
           <div className="p-8 max-w-[1200px] mx-auto">
-            {/* Skeleton Header */}
+            {}
             <div className="flex justify-between items-end mb-6">
               <div className="space-y-2">
                 <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
@@ -421,7 +421,7 @@ const Settings = () => {
               </div>
             </div>
 
-            {/* Skeleton Content */}
+            {}
             <div className="grid grid-cols-12 gap-6">
               <div className="col-span-12 lg:col-span-7 space-y-6">
                 <div className="h-64 bg-gray-200 rounded-xl animate-pulse"></div>
@@ -439,9 +439,9 @@ const Settings = () => {
     );
   }
 
-  // ============================================================
-  // RENDER - ERROR
-  // ============================================================
+  
+  
+  
 
   if (error) {
     return (
@@ -465,15 +465,15 @@ const Settings = () => {
     );
   }
 
-  // ============================================================
-  // RENDER - SUCCESS
-  // ============================================================
+  
+  
+  
 
   return (
     <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
       <main className="min-h-screen bg-surface pb-20">
         <div className="p-8 max-w-[1200px] mx-auto">
-          {/* Header Section */}
+          {}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
             <div>
               <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
@@ -511,9 +511,9 @@ const Settings = () => {
             </div>
           </div>
 
-          {/* Two-column grid */}
+          {}
           <div className="grid grid-cols-12 gap-6">
-            {/* Left column */}
+            {}
             <div className="col-span-12 lg:col-span-7 space-y-6">
               <RestaurantInfoCard 
                 formData={formData} 
@@ -527,14 +527,14 @@ const Settings = () => {
               />
             </div>
 
-            {/* Right column */}
+            {}
             <div className="col-span-12 lg:col-span-5 space-y-6">
               <VisualAssetsCard 
                 visualAssets={visualAssets}
                 onChange={handleVisualAssetsChange}
               />
               
-              {/* QR Code Management Card */}
+              {}
               <QRCodeManagementCard
                 qrCodes={qrCodes}
                 restaurantName={restaurant?.name}
@@ -551,7 +551,7 @@ const Settings = () => {
         </div>
       </main>
 
-      {/* Toast Notification */}
+      {}
       {showToast && (
         <div className={`fixed bottom-8 right-8 px-5 py-3 rounded-lg shadow-modal text-sm font-medium animate-fade-in-out z-50 ${
           toastType === "success" ? "bg-green-600 text-white" :
@@ -562,7 +562,7 @@ const Settings = () => {
         </div>
       )}
 
-      {/* Footer */}
+      {}
       <footer className="fixed bottom-0 left-64 right-0 py-4 px-6 border-t border-neutral-100 flex justify-between items-center bg-white/50 z-30">
         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
           © {currentYear} RESTAURANT OS. ALL RIGHTS RESERVED.

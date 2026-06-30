@@ -1,4 +1,4 @@
-// src/components/admin/orders/ViewOrderModal.jsx
+
 import React from "react";
 import OrderStatusBadge from "./OrderStatusBadge";
 

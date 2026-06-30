@@ -1,4 +1,4 @@
-// src/components/Admin/Security/NetworkWhitelist.jsx
+
 
 import React, { useState, useEffect } from "react";
 import { Trash2, Plus, Network, RefreshCw } from "lucide-react";

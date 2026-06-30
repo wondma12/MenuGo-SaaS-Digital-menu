@@ -1,4 +1,4 @@
-// src/components/Admin/settings/PlatformInfo.jsx
+
 
 import React from 'react';
 

@@ -66,7 +66,7 @@ const Table = ({
     );
   };
 
-  // Add Actions header if showActions is true
+  
   const tableHeaders = showActions
     ? [...headers, { label: "Actions", align: "right" }]
     : headers;
@@ -95,8 +95,8 @@ const Table = ({
         {data.length > 0 ? (
           data.map((item, index) => {
             if (showActions && renderRow) {
-              // If custom renderRow is provided, we need to modify it to include actions
-              // Clone the custom row and add action buttons as the last td
+              
+              
               const CustomRow = renderRow(item, index);
               return React.cloneElement(CustomRow, {}, [
                 ...CustomRow.props.children,
@@ -105,7 +105,7 @@ const Table = ({
             } else if (renderRow) {
               return renderRow(item, index);
             } else {
-              // Default row rendering if no renderRow provided
+              
               return (
                 <tr key={index} className="hover:bg-zinc-50 transition-colors">
                   {headers.map((header, headerIndex) => (

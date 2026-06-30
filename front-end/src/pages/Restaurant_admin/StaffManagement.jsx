@@ -1,4 +1,4 @@
-// src/pages/Restaurant_admin/StaffManagement.jsx
+
 
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/layout/sidebar";
@@ -24,33 +24,33 @@ const StaffManagement = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const itemsPerPage = 5;
 
-  // ============================================================
-  // LOAD DATA
-  // ============================================================
+  
+  
+  
 
-// src/pages/Restaurant_admin/StaffManagement.jsx - Update loadData
+
 
 const loadData = async () => {
   try {
     setLoading(true);
     setError(null);
     
-    // Get staff data
+    
     const staffResult = await staffService.getAll();
     console.log('[StaffManagement] Staff result:', staffResult);
     
-    // ✅ Extract staff data properly
+    
     let staffData = [];
     if (staffResult && staffResult.success) {
       staffData = Array.isArray(staffResult.data) ? staffResult.data : [];
     } else if (Array.isArray(staffResult)) {
       staffData = staffResult;
     } else if (staffResult && typeof staffResult === 'object') {
-      // If it's an object with data property
+      
       if (staffResult.data && Array.isArray(staffResult.data)) {
         staffData = staffResult.data;
       } else {
-        // Try to find any array in the object
+        
         const possibleArray = Object.values(staffResult).find(val => Array.isArray(val));
         staffData = possibleArray || [];
       }
@@ -59,7 +59,7 @@ const loadData = async () => {
     console.log('[StaffManagement] Extracted staff data:', staffData);
     setStaff(staffData);
     
-    // Calculate stats from real data
+    
     const total = staffData.length;
     const admins = staffData.filter(s => s.role === 'restaurant_admin' || s.role === 'admin').length;
     const waitstaff = staffData.filter(s => s.role === 'waiter').length;
@@ -74,7 +74,7 @@ const loadData = async () => {
   } catch (err) {
     console.error('[StaffManagement] Error loading staff:', err);
     setError(err.message || 'Failed to load staff data');
-    setStaff([]);  // ✅ Always set to empty array on error
+    setStaff([]);  
   } finally {
     setLoading(false);
   }
@@ -84,9 +84,9 @@ const loadData = async () => {
     loadData();
   }, []);
 
-  // ============================================================
-  // PAGINATION
-  // ============================================================
+  
+  
+  
 
   const paginatedStaff = staff.slice(
     (currentPage - 1) * itemsPerPage,
@@ -94,9 +94,9 @@ const loadData = async () => {
   );
   const totalPages = Math.ceil(staff.length / itemsPerPage);
 
-  // ============================================================
-  // HANDLERS
-  // ============================================================
+  
+  
+  
 
   const handleAddStaff = async (newStaff) => {
     setIsSubmitting(true);
@@ -163,16 +163,16 @@ const loadData = async () => {
     setIsModalOpen(true);
   };
 
-  // ============================================================
-  // RENDER - LOADING
-  // ============================================================
+  
+  
+  
 
   if (loading) {
     return (
       <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
         <main className="min-h-screen bg-surface">
           <div className="p-8 max-w-[1200px] mx-auto">
-            {/* Skeleton Header */}
+            {}
             <div className="flex justify-between items-end mb-6">
               <div className="space-y-2">
                 <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
@@ -181,14 +181,14 @@ const loadData = async () => {
               <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
             </div>
 
-            {/* Skeleton Stats */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="h-24 bg-gray-200 rounded-lg animate-pulse"></div>
               ))}
             </div>
 
-            {/* Skeleton Table */}
+            {}
             <div className="bg-white border rounded-xl overflow-hidden">
               <div className="p-6 space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -202,9 +202,9 @@ const loadData = async () => {
     );
   }
 
-  // ============================================================
-  // RENDER - ERROR
-  // ============================================================
+  
+  
+  
 
   if (error) {
     return (
@@ -228,15 +228,15 @@ const loadData = async () => {
     );
   }
 
-  // ============================================================
-  // RENDER - SUCCESS
-  // ============================================================
+  
+  
+  
 
   return (
     <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
       <main className="min-h-screen bg-surface">
         <div className="p-8 max-w-[1200px] mx-auto">
-          {/* Header Section */}
+          {}
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-6">
             <div>
               <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
@@ -259,10 +259,10 @@ const loadData = async () => {
             </button>
           </div>
 
-          {/* Stats Grid */}
+          {}
           <StaffStats stats={stats} />
 
-          {/* Staff Table */}
+          {}
           <div className="mt-6">
             <StaffTable
               staff={paginatedStaff}
@@ -274,7 +274,7 @@ const loadData = async () => {
             />
           </div>
 
-          {/* Footer Meta Info */}
+          {}
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 opacity-60">
             <div className="border-l-2 border-gray-300 pl-4">
               <p className="text-[10px] font-bold uppercase mb-2 tracking-wider text-gray-500">
@@ -299,7 +299,7 @@ const loadData = async () => {
         </div>
       </main>
 
-      {/* Add/Edit Modal */}
+      {}
       <AddStaffModal
         isOpen={isModalOpen}
         onClose={() => {

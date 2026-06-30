@@ -1,12 +1,12 @@
-// services/customerauth.js
+
 import { restaurantAPI, menuAPI, locationAPI, orderAPI } from './api.js';
 
 const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const customerAuth = {
-  // =========================================
-  // GET RESTAURANT BY ID
-  // =========================================
+  
+  
+  
   async getRestaurantById(restaurantId) {
     try {
       const restaurant = await restaurantAPI.getById(restaurantId);
@@ -25,9 +25,9 @@ const customerAuth = {
     }
   },
 
-  // =========================================
-  // GET RESTAURANT MENU
-  // =========================================
+  
+  
+  
   async getRestaurantMenu(restaurantId) {
     try {
       const menu = await menuAPI.getPublicMenu(restaurantId);
@@ -47,12 +47,12 @@ const customerAuth = {
     }
   },
 
-  // =========================================
-  // GET RESTAURANT LOCATION
-  // =========================================
+  
+  
+  
   async getRestaurantLocation(restaurantId) {
     try {
-      // First get the restaurant to get location ID
+      
       const restaurant = await restaurantAPI.getById(restaurantId);
       
       if (!restaurant || !restaurant.location) {
@@ -78,9 +78,9 @@ const customerAuth = {
     }
   },
 
-  // =========================================
-  // CHECK CUSTOMER ACCESS
-  // =========================================
+  
+  
+  
   async canAccessRestaurant(restaurantId) {
     try {
       const result = await this.getRestaurantById(restaurantId);
@@ -91,13 +91,13 @@ const customerAuth = {
     }
   },
 
-  // =========================================
-  // GET RESTAURANT SETTINGS
-  // =========================================
+  
+  
+  
   async getRestaurantSettings(restaurantId) {
     try {
-      // This would require a settings endpoint
-      // For now, return default settings
+      
+      
       return {
         success: true,
         data: {
@@ -120,9 +120,9 @@ const customerAuth = {
     }
   },
 
-  // =========================================
-  // CHECK ORDER AVAILABILITY
-  // =========================================
+  
+  
+  
   async isRestaurantAcceptingOrders(restaurantId) {
     try {
       const restaurantResult = await this.getRestaurantById(restaurantId);
@@ -131,7 +131,7 @@ const customerAuth = {
         return false;
       }
 
-      // Restaurant must be active
+      
       if (restaurantResult.data.status !== 'active') {
         return false;
       }
@@ -149,9 +149,9 @@ const customerAuth = {
     }
   },
 
-  // =========================================
-  // TRACK ORDER
-  // =========================================
+  
+  
+  
   async trackOrder(orderNumber) {
     try {
       const order = await orderAPI.trackOrder(orderNumber);

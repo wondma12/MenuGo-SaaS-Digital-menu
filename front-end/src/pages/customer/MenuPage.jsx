@@ -1,4 +1,4 @@
-// src/pages/customer/MenuPage.jsx
+
 
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -56,7 +56,7 @@ const addToCart = (item) => {
       });
       window.dispatchEvent(custom);
     } catch (e) {
-      // ignore storage errors
+      
     }
     return updated;
   });
@@ -82,23 +82,23 @@ const addToCart = (item) => {
         console.log("[MenuPage] Public Menu Result:", menuResult);
 
         if (menuResult) {
-          // ✅ Extract data from the correct structure
+          
           const data = menuResult.data || menuResult;
           
           let restaurantData = null;
           let categoriesData = [];
           let itemsData = [];
 
-          // ✅ Extract restaurant
+          
           if (data.restaurant) {
             restaurantData = data.restaurant;
           }
 
-          // ✅ Extract categories and items
+          
           if (data.categories && Array.isArray(data.categories)) {
             categoriesData = data.categories;
             
-            // ✅ Extract items from each category
+            
             data.categories.forEach(cat => {
               if (cat.menu_items && Array.isArray(cat.menu_items)) {
                 cat.menu_items.forEach(item => {
@@ -112,10 +112,10 @@ const addToCart = (item) => {
             });
           }
 
-          // ✅ Set restaurant data
+          
           setRestaurant(restaurantData || null);
 
-          // ✅ Format categories for CategoryTabs
+          
           const formattedCategories = [
             { id: "ALL", name: "ALL" },
             ...categoriesData.map(cat => ({
@@ -125,7 +125,7 @@ const addToCart = (item) => {
           ];
           setCategories(formattedCategories);
 
-          // ✅ Transform menu items
+          
           const transformedItems = itemsData.map(item => ({
             id: item.id,
             name: item.name,
@@ -160,7 +160,7 @@ const addToCart = (item) => {
       const raw = sessionStorage.getItem("menugo_cart");
       if (raw) setCart(JSON.parse(raw));
     } catch (e) {
-      // ignore
+      
     }
   }, []);
 
@@ -188,7 +188,7 @@ const addToCart = (item) => {
             raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0
           );
         } catch (err) {
-          // ignore
+          
         }
       }
     };
@@ -200,7 +200,7 @@ const addToCart = (item) => {
     };
   }, []);
 
-  // ✅ Filter items based on active category
+  
   const filteredItems = menuItems.filter((item) => {
     if (activeCategory === "ALL") return true;
     return item.categoryId === activeCategory;

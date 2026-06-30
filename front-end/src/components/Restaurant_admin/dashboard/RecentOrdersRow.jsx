@@ -1,9 +1,9 @@
-// src/components/admin/dashboard/RecentOrdersRow.jsx
+
 
 import React from 'react';
 
 const RecentOrdersRow = ({ order }) => {
-  // ✅ Get status with fallback
+  
   const status = order?.status || 'pending';
   
   const getStatusClasses = () => {
@@ -25,7 +25,7 @@ const RecentOrdersRow = ({ order }) => {
     }
   };
 
-  // ✅ Get amount with fallback
+  
   const amount = order?.total_price || order?.amount || 0;
   const orderId = order?.order_number || order?.id || 'N/A';
   const tableNumber = order?.table_number || order?.table || 'N/A';

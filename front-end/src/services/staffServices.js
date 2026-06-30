@@ -1,12 +1,9 @@
-// services/staffServices.js
+
 
 import { staffAPI } from './api.js';
 
-/*
-|--------------------------------------------------------------------------
-| Staff Service
-|--------------------------------------------------------------------------
-*/
+
+
 
 export const fetchStaff = async (restaurantId = null) => {
   try {
@@ -96,11 +93,8 @@ export const deleteStaff = async (id) => {
   }
 };
 
-/*
-|--------------------------------------------------------------------------
-| Staff Service Object
-|--------------------------------------------------------------------------
-*/
+
+
 
 export const staffService = {
   getAll: async (restaurantId = null) => {

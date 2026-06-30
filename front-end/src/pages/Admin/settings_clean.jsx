@@ -1,4 +1,4 @@
-// src/pages/Admin/settings_clean.jsx
+
 
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/layout/sidebar";
@@ -31,9 +31,9 @@ const Settings = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // =========================================
-  // FETCH SETTINGS
-  // =========================================
+  
+  
+  
 
   useEffect(() => {
     fetchSettings();
@@ -68,9 +68,9 @@ const Settings = () => {
     }
   };
 
-  // =========================================
-  // HANDLERS
-  // =========================================
+  
+  
+  
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -105,7 +105,7 @@ const Settings = () => {
       setError(null);
       setSuccessMessage("");
 
-      // ✅ ONLY include fields that exist in the Prisma schema
+      
       const payload = {
         platform_name: formData.platformName,
         support_email: formData.supportEmail,
@@ -132,9 +132,9 @@ const Settings = () => {
     }
   };
 
-  // =========================================
-  // LOADING STATE
-  // =========================================
+  
+  
+  
 
   if (loading) {
     return (
@@ -166,9 +166,9 @@ const Settings = () => {
     );
   }
 
-  // =========================================
-  // ERROR STATE
-  // =========================================
+  
+  
+  
 
   if (error) {
     return (
@@ -194,9 +194,9 @@ const Settings = () => {
     );
   }
 
-  // =========================================
-  // SUCCESS STATE
-  // =========================================
+  
+  
+  
 
   return (
     <div className="min-h-screen bg-background font-body-md text-on-surface antialiased">
@@ -205,7 +205,7 @@ const Settings = () => {
 
       <main className="min-h-screen bg-background">
         <div className="p-8 max-w-[1200px]">
-          {/* Page Header */}
+          {}
           <div className="mb-8">
             <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
               Platform Configuration
@@ -218,14 +218,14 @@ const Settings = () => {
             </p>
           </div>
 
-          {/* Success Message */}
+          {}
           {successMessage && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg">
               {successMessage}
             </div>
           )}
 
-          {/* Error Message */}
+          {}
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
               {error}

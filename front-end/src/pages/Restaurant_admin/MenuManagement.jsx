@@ -8,9 +8,9 @@ import { FolderOpen } from "lucide-react";
 const MenuManagement = () => {
   const { restaurantId } = useParams();
 
-  // ============================================================
-  // STATE
-  // ============================================================
+  
+  
+  
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,9 +25,9 @@ const MenuManagement = () => {
 
   const itemsPerPage = 3;
 
-  // ============================================================
-  // FETCH DATA
-  // ============================================================
+  
+  
+  
 
   const fetchMenuItems = async () => {
     try {
@@ -69,9 +69,9 @@ const MenuManagement = () => {
     fetchMenuItems();
   }, []);
 
-  // ============================================================
-  // FILTERS & PAGINATION
-  // ============================================================
+  
+  
+  
 
   const categories = useMemo(() => {
     const cats = ["All", ...new Set(items.map((item) => item.category))];
@@ -122,9 +122,9 @@ const MenuManagement = () => {
         )
       : null;
 
-  // ============================================================
-  // CRUD OPERATIONS
-  // ============================================================
+  
+  
+  
 
   const handleAddItem = () => {
     setEditingItem(null);
@@ -207,9 +207,9 @@ const MenuManagement = () => {
     await fetchMenuItems();
   };
 
-  // ============================================================
-  // RENDER - LOADING STATE
-  // ============================================================
+  
+  
+  
 
   if (loading) {
     return (
@@ -242,9 +242,9 @@ const MenuManagement = () => {
     );
   }
 
-  // ============================================================
-  // RENDER - ERROR STATE
-  // ============================================================
+  
+  
+  
 
   if (error) {
     return (
@@ -270,15 +270,15 @@ const MenuManagement = () => {
     );
   }
 
-  // ============================================================
-  // RENDER - SUCCESS STATE
-  // ============================================================
+  
+  
+  
 
   return (
     <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
       <main className="min-h-screen bg-surface">
         <div className="p-8 max-w-[1200px] w-full mx-auto">
-          {/* Page Header Actions */}
+          {}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
             <div>
               <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
@@ -300,7 +300,7 @@ const MenuManagement = () => {
             </button>
           </div>
 
-          {/* Stats Overview */}
+          {}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
             <div className="md:col-span-8 bg-white border border-neutral-200 p-6 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
               <div className="flex justify-between items-center mb-2">
@@ -333,7 +333,7 @@ const MenuManagement = () => {
             </div>
           </div>
 
-          {/* Search & Filters - UPDATED with Manage Categories button */}
+          {}
           <div className="mb-4 flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
             <div className="relative flex-1 w-full">
               <input
@@ -358,7 +358,7 @@ const MenuManagement = () => {
                 </option>
               ))}
             </select>
-            {/* ✅ NEW: Manage Categories Button */}
+            {}
             <button
               onClick={() => setIsCategoryModalOpen(true)}
               className="px-4 py-2 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors text-sm font-medium flex items-center gap-1.5 whitespace-nowrap"
@@ -368,14 +368,14 @@ const MenuManagement = () => {
             </button>
           </div>
 
-          {/* Table Container */}
+          {}
           <MenuItemList
             items={paginatedItems}
             onEdit={handleEditItem}
             onDelete={handleDeleteItem}
           />
 
-          {/* Pagination */}
+          {}
           {filteredItems.length > 0 && (
             <div className="px-6 py-4 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between bg-gray-50 rounded-b-xl mt-4 gap-2">
               <span className="text-sm text-gray-600">
@@ -410,7 +410,7 @@ const MenuManagement = () => {
             </div>
           )}
 
-          {/* Contextual Insight Footer */}
+          {}
           {items.length > 0 && (
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="border-l-2 border-black pl-4">
@@ -455,7 +455,7 @@ const MenuManagement = () => {
         </div>
       </main>
 
-      {/* Create/Edit Item Modal */}
+      {}
       <CreateMenuItemModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -469,8 +469,8 @@ const MenuManagement = () => {
          restaurantId={restaurantId}
       />
 
-      {/* ✅ NEW: Category Management Modal */}
-      {/* Category Management Modal */}
+      {}
+      {}
       <CategoryManagementModal
         isOpen={isCategoryModalOpen}
         onClose={() => setIsCategoryModalOpen(false)}

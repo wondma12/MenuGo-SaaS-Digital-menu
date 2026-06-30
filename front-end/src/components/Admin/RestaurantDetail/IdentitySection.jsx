@@ -1,4 +1,4 @@
-// src/components/Admin/RestaurantDetail/IdentitySection.jsx
+
 
 import React from "react";
 import { Fingerprint, FileText, ShieldCheck, Eye, Building2, User, Calendar } from "lucide-react";
@@ -11,10 +11,10 @@ const IdentitySection = ({ restaurant }) => {
     }
   };
 
-  // Get verification data safely
+  
   const verification = restaurant?.verification || {};
   
-  // Map verification data to documents format
+  
   const verificationDocuments = [];
   
   if (verification.business_license_document) {
@@ -37,10 +37,10 @@ const IdentitySection = ({ restaurant }) => {
     });
   }
 
-  // Get owner name from verification or restaurant
+  
   const ownerName = verification.owner_name || restaurant.owner?.name || restaurant.owner_name || "N/A";
 
-  // Format date
+  
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -54,7 +54,7 @@ const IdentitySection = ({ restaurant }) => {
     }
   };
 
-  // Get status styles
+  
   const getStatusStyles = (status) => {
     const statusMap = {
       active: "bg-green-100 text-green-600",

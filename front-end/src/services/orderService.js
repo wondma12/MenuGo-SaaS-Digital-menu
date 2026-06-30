@@ -1,12 +1,12 @@
-// services/orderService.js
+
 import { orderAPI } from './api.js';
 
 const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const orderService = {
-  // ==========================================
-  // GET ALL ORDERS
-  // ==========================================
+  
+  
+  
   async getAllOrders(params = {}) {
     try {
       const result = await orderAPI.getAll(params);
@@ -25,12 +25,12 @@ export const orderService = {
     }
   },
 
-  // ==========================================
-  // GET ORDERS BY RESTAURANT
-  // ==========================================
+  
+  
+  
   async getOrdersByRestaurant(restaurantId, params = {}) {
     try {
-      // The backend should filter by restaurant automatically based on user's role
+      
       const result = await orderAPI.getAll({ ...params });
       return {
         success: true,
@@ -47,9 +47,9 @@ export const orderService = {
     }
   },
 
-  // ==========================================
-  // GET ACTIVE ORDERS
-  // ==========================================
+  
+  
+  
   async getActiveOrders() {
     try {
       const result = await orderAPI.getActive();
@@ -68,9 +68,9 @@ export const orderService = {
     }
   },
 
-  // ==========================================
-  // GET KITCHEN DISPLAY
-  // ==========================================
+  
+  
+  
   async getKitchenDisplay() {
     try {
       const result = await orderAPI.getKitchenDisplay();
@@ -89,9 +89,9 @@ export const orderService = {
     }
   },
 
-  // ==========================================
-  // CREATE ORDER
-  // ==========================================
+  
+  
+  
   async createOrder(orderData) {
     try {
       const result = await orderAPI.create(orderData);
@@ -110,8 +110,8 @@ export const orderService = {
     }
   },
 
-  // ==========================================
-  // UPDATE ORDER STATUS  // ==========================================
+  
+  
   async updateOrderStatus(orderId, status) {
     try {
       const result = await orderAPI.updateStatus(orderId, status);
@@ -130,9 +130,9 @@ export const orderService = {
     }
   },
 
-  // ==========================================
-  // GET ORDER BY ID
-  // ==========================================
+  
+  
+  
   async getOrderById(orderId) {
     try {
       const result = await orderAPI.getById(orderId);
@@ -151,9 +151,9 @@ export const orderService = {
     }
   },
 
-  // ==========================================
-  // GET TODAY'S ORDERS
-  // ==========================================
+  
+  
+  
   async getTodayOrders() {
     try {
       const result = await orderAPI.getToday();
@@ -172,9 +172,9 @@ export const orderService = {
     }
   },
 
-  // ==========================================
-  // GET ORDER HISTORY
-  // ==========================================
+  
+  
+  
   async getOrderHistory(params = {}) {
     try {
       const result = await orderAPI.getHistory(params);
@@ -193,9 +193,9 @@ export const orderService = {
     }
   },
 
-  // ==========================================
-  // ASSIGN WAITER
-  // ==========================================
+  
+  
+  
   async assignWaiter(orderId, waiterId) {
     try {
       const result = await orderAPI.assignWaiter(orderId, waiterId);
@@ -214,9 +214,9 @@ export const orderService = {
     }
   },
 
-  // ==========================================
-  // TRACK ORDER (Public)
-  // ==========================================
+  
+  
+  
   async trackOrder(orderNumber) {
     try {
       const result = await orderAPI.trackOrder(orderNumber);
@@ -235,9 +235,9 @@ export const orderService = {
     }
   },
 
-  // ==========================================
-  // DASHBOARD STATS
-  // ==========================================
+  
+  
+  
   async getStats(restaurantId = null) {
     try {
       const result = await orderAPI.getAll(restaurantId ? { restaurant_id: restaurantId } : {});

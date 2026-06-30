@@ -1,4 +1,4 @@
-// src/components/layout/CustomerNav.jsx
+
 
 import React from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
@@ -7,7 +7,7 @@ const CustomerHeader = ({
   cartCount = 0,
   showMobileMenu = true,
   onMobileMenuClick,
-  restaurant = null,  // ✅ Add restaurant prop
+  restaurant = null,  
 }) => {
   const location = useLocation();
   const { restaurantId } = useParams();
@@ -16,7 +16,7 @@ const CustomerHeader = ({
     return location.pathname === path;
   };
 
-  // ✅ Get restaurant name or fallback
+  
   const restaurantName = restaurant?.name || "MenuGo";
   const restaurantLogo = restaurant?.logo || null;
 
@@ -53,7 +53,7 @@ const CustomerHeader = ({
       </div>
 
       <div className="hidden md:flex items-center gap-6">
-        {/* Menu Link */}
+        {}
         <Link
           to={restaurantId ? `/customer/${restaurantId}` : "/customer"}
           className={`relative flex items-center gap-2 text-neutral-600 hover:text-neutral-900 pb-1 transition-all after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-900 after:transition-transform after:duration-300 after:ease-in-out ${
@@ -68,7 +68,7 @@ const CustomerHeader = ({
           <span className="font-label-caps text-label-caps">Menu</span>
         </Link>
 
-        {/* Search Link */}
+        {}
         <Link
           to={restaurantId ? `/customer/${restaurantId}/search` : "/search"}
           className={`relative flex items-center gap-2 text-neutral-600 hover:text-neutral-900 pb-1 transition-all after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-neutral-900 after:transition-transform after:duration-300 after:ease-in-out ${
@@ -83,7 +83,7 @@ const CustomerHeader = ({
           <span className="font-label-caps text-label-caps">Search</span>
         </Link>
 
-        {/* Orders/Cart Link */}
+        {}
         <Link
           to={restaurantId ? `/customer/${restaurantId}/cart` : "/cart"}
           className={`relative flex items-center gap-2 text-neutral-600 hover:text-neutral-900 pb-1 transition-all ${
@@ -118,7 +118,7 @@ const CustomerHeader = ({
   );
 };
 
-// Bottom Navigation Component (mobile only)
+
 const BottomNav = ({ cartCount = 0, restaurant = null }) => {
   const location = useLocation();
   const { restaurantId } = useParams();
@@ -181,6 +181,6 @@ const BottomNav = ({ cartCount = 0, restaurant = null }) => {
   );
 };
 
-// Named exports
+
 export { CustomerHeader, BottomNav };
 export default CustomerHeader;

@@ -1,4 +1,4 @@
-// src/components/Admin/RestaurantDetail/QRCodeCard.jsx
+
 
 import React, { useState } from "react";
 import { Download, QrCode, RefreshCw } from "lucide-react";
@@ -15,7 +15,7 @@ const QRCodeCard = ({ restaurantName, restaurantId, qrCode }) => {
     }
 
     try {
-      // If it's a data URL
+      
       if (qrImage.startsWith('data:image')) {
         const link = document.createElement('a');
         link.href = qrImage;
@@ -26,7 +26,7 @@ const QRCodeCard = ({ restaurantName, restaurantId, qrCode }) => {
         return;
       }
 
-      // If it's a URL
+      
       const response = await fetch(qrImage);
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
@@ -73,7 +73,7 @@ const QRCodeCard = ({ restaurantName, restaurantId, qrCode }) => {
 
   return (
     <div className="bg-black text-white rounded-xl p-8 shadow-2xl relative overflow-hidden">
-      {/* Background decoration */}
+      {}
       <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
       

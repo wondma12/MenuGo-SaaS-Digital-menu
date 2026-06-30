@@ -1,4 +1,4 @@
-// src/components/admin/menu/MenuItemRow.jsx
+
 import React from 'react';
 
 const MenuItemRow = ({ item, onEdit, onDelete }) => {

@@ -1,4 +1,4 @@
-// src/components/Admin/Dashboard/RecentRegistrations.jsx
+
 
 import React, { useState, useEffect } from "react";
 import Table from "../../ui/Table";
@@ -16,7 +16,7 @@ const RecentRegistrations = ({ stats }) => {
         setIsLoading(true);
         setError(null);
 
-        // ✅ FIRST: Check if stats has pendingRegistrations
+        
         if (stats?.pendingRegistrations && Array.isArray(stats.pendingRegistrations) && stats.pendingRegistrations.length > 0) {
           console.log('[RecentRegistrations] Using stats from parent:', stats.pendingRegistrations);
           const registrations = stats.pendingRegistrations.slice(0, 4);
@@ -25,7 +25,7 @@ const RecentRegistrations = ({ stats }) => {
           return;
         }
 
-        // ✅ SECOND: If no data in stats, try fetching directly
+        
         console.log('[RecentRegistrations] No data in stats, fetching from API...');
         const result = await analyticsService.getPlatformDashboard();
         console.log('[RecentRegistrations] API result:', result);
@@ -34,7 +34,7 @@ const RecentRegistrations = ({ stats }) => {
           const registrations = result.data.pendingRegistrations.slice(0, 4);
           setRestaurants(registrations);
         } else if (result.data?.data?.pendingRegistrations) {
-          // Handle nested data structure
+          
           const registrations = result.data.data.pendingRegistrations.slice(0, 4);
           setRestaurants(registrations);
         } else {
@@ -45,16 +45,16 @@ const RecentRegistrations = ({ stats }) => {
         setError(error.message || "Failed to load recent registrations");
         setRestaurants([]);
       } finally {
-        setIsLoading(false);  // ✅ ALWAYS set loading to false
+        setIsLoading(false);  
       }
     };
 
     fetchPendingRegistrations();
   }, [stats]);
 
-  // =========================================
-  // LOADING STATE
-  // =========================================
+  
+  
+  
 
   if (isLoading) {
     return (
@@ -90,9 +90,9 @@ const RecentRegistrations = ({ stats }) => {
     );
   }
 
-  // =========================================
-  // ERROR STATE
-  // =========================================
+  
+  
+  
 
   if (error) {
     return (
@@ -114,9 +114,9 @@ const RecentRegistrations = ({ stats }) => {
     );
   }
 
-  // =========================================
-  // EMPTY STATE
-  // =========================================
+  
+  
+  
 
   if (restaurants.length === 0) {
     return (
@@ -139,9 +139,9 @@ const RecentRegistrations = ({ stats }) => {
     );
   }
 
-  // =========================================
-  // TABLE HEADERS
-  // =========================================
+  
+  
+  
 
   const tableHeaders = [
     { label: "Restaurant" },
@@ -151,9 +151,9 @@ const RecentRegistrations = ({ stats }) => {
     { label: "Status", align: "right" },
   ];
 
-  // =========================================
-  // FORMAT DATE
-  // =========================================
+  
+  
+  
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
@@ -168,9 +168,9 @@ const RecentRegistrations = ({ stats }) => {
     }
   };
 
-  // =========================================
-  // STATUS STYLE
-  // =========================================
+  
+  
+  
 
   const getStatusStyle = (status) => {
     switch (status?.toLowerCase()) {
@@ -198,9 +198,9 @@ const RecentRegistrations = ({ stats }) => {
     }
   };
 
-  // =========================================
-  // TABLE ROW
-  // =========================================
+  
+  
+  
 
   const renderTableRow = (restaurant, index) => (
     <tr key={restaurant.id || index} className="border-b border-zinc-100 hover:bg-zinc-50 transition-colors">
@@ -239,13 +239,13 @@ const RecentRegistrations = ({ stats }) => {
     </tr>
   );
 
-  // =========================================
-  // RENDER
-  // =========================================
+  
+  
+  
 
   return (
     <section className="w-full">
-      {/* HEADER */}
+      {}
       <div className="flex items-end justify-between mb-8">
         <div>
           <h3 className="text-2xl font-bold tracking-tight text-zinc-900">
@@ -260,7 +260,7 @@ const RecentRegistrations = ({ stats }) => {
         </button>
       </div>
 
-      {/* TABLE */}
+      {}
       <Table
         headers={tableHeaders}
         data={restaurants}

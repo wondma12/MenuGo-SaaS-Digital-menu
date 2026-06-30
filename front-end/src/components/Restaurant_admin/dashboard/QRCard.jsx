@@ -1,13 +1,13 @@
-// src/components/Restaurant_admin/dashboard/QRCard.jsx
+
 
 import React from 'react';
 import { Download, QrCode } from 'lucide-react';
 
 const QRCard = ({ onDownload, restaurantId, qrCodes = [], restaurant }) => {
-  // ✅ Check multiple sources for QR code
+  
   let qrImageUrl = null;
   
-  // 1. Check from qrCodes array
+  
   if (qrCodes && Array.isArray(qrCodes) && qrCodes.length > 0) {
     const activeQr = qrCodes.find(q => q.is_active !== false);
     if (activeQr && activeQr.qr_image_url) {
@@ -15,7 +15,7 @@ const QRCard = ({ onDownload, restaurantId, qrCodes = [], restaurant }) => {
     }
   }
   
-  // 2. If not found, check from restaurant data
+  
   if (!qrImageUrl && restaurant && restaurant.qr_code) {
     qrImageUrl = restaurant.qr_code;
   }

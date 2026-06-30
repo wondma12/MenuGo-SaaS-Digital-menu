@@ -1,4 +1,4 @@
-// src/components/layout/Sidebar.jsx
+
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -15,7 +15,7 @@ import {
   ChevronUp,
   User,
 } from "lucide-react";
-import { authAPI, staffAPI } from "../../services/api"; // Updated import
+import { authAPI, staffAPI } from "../../services/api"; 
 import { memo } from 'react';
 
 const Sidebar = ({ role = "Restaurant_admin" }) => {
@@ -33,11 +33,11 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
   });
   const [loading, setLoading] = useState(true);
 
-  // Fetch user data from API
+  
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Get user from authAPI (which uses localStorage)
+        
         const user = authAPI.getUser();
         
         if (user) {
@@ -56,7 +56,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
           return;
         }
 
-        // If no user in localStorage, try to fetch from API
+        
         const token = authAPI.getToken();
         if (token) {
           try {
@@ -82,7 +82,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
           }
         }
 
-        // Fallback: Use role-based defaults
+        
         console.warn("No user data found, using default values");
         setUserData({
           id: null,
@@ -114,14 +114,14 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
 
   const restaurantId = userData.restaurantId;
 
-  // Handle logout
+  
   const handleLogout = () => {
-    authAPI.logout(); // This now handles clearing localStorage
+    authAPI.logout(); 
     setIsProfileOpen(false);
     navigate("/auth/login");
   };
 
-  // Get user info based on role
+  
   const getUserInfo = () => {
     switch (role) {
       case "Platform_admin":
@@ -169,7 +169,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
 
   const userInfo = getUserInfo();
 
-  // Get status color based on role
+  
   const getStatusColor = () => {
     switch (role) {
       case "Platform_admin":
@@ -183,7 +183,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
     }
   };
 
-  // Dynamic platform name based on role
+  
   const getPlatformName = () => {
     switch (role) {
       case "Platform_admin":
@@ -210,7 +210,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
     }
   };
 
-  // Navigation links
+  
   const adminLinks = [
     {
       name: "Dashboard",
@@ -301,7 +301,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
       break;
   }
 
-  // Loading state
+  
   if (loading) {
     return (
       <aside className="fixed left-0 top-0 h-screen w-64 border-r border-zinc-200 bg-white dark:bg-zinc-950 flex flex-col py-6">
@@ -319,7 +319,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 border-r border-zinc-200 bg-white dark:bg-zinc-950 flex flex-col py-6 font-inter antialiased z-50">
-      {/* Logo Section */}
+      {}
       <div className="px-8 mb-10">
         <h1 className="text-xl font-black tracking-tight text-black dark:text-white uppercase">
           {getPlatformName()}
@@ -329,7 +329,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
         </p>
       </div>
 
-      {/* Navigation Links */}
+      {}
       <nav className="flex-grow space-y-2 px-4">
         {links.map((link) => {
           const Icon = link.icon;
@@ -351,15 +351,15 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
         })}
       </nav>
 
-      {/* User Profile Section with Logout */}
+      {}
       <div className="px-4 mt-auto pt-4 border-t border-zinc-100 dark:border-zinc-900">
         <div className="relative">
-          {/* Profile Button */}
+          {}
           <button
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all duration-200"
           >
-            {/* Avatar - FIXED: Always has a valid src, never empty string */}
+            {}
             <div className="relative">
               {userInfo.avatar && userInfo.avatar !== "" ? (
                 <img
@@ -367,12 +367,12 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
                   className="w-10 h-10 rounded-xl object-cover border-2 border-white dark:border-zinc-800 shadow-sm"
                   src={userInfo.avatar}
                   onError={(e) => {
-                    // Fallback if image fails to load
+                    
                     e.target.src = `https://ui-avatars.com/api/?name=${userInfo.name.charAt(0)}&background=000000&color=fff`;
                   }}
                 />
               ) : (
-                // Fallback when no avatar
+                
                 <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center border-2 border-white dark:border-zinc-800 shadow-sm">
                   <span className="text-white text-sm font-bold">
                     {userInfo.name?.charAt(0) || "U"}
@@ -382,7 +382,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
               <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${getStatusColor()} rounded-full border-2 border-white dark:border-zinc-800`} />
             </div>
             
-            {/* User Info */}
+            {}
             <div className="flex-1 text-left">
               <p className="text-sm font-semibold text-black dark:text-white truncate">
                 {userInfo.name}
@@ -392,7 +392,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
               </p>
             </div>
             
-            {/* Chevron Icon */}
+            {}
             <ChevronUp 
               className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${
                 isProfileOpen ? "rotate-0" : "rotate-180"
@@ -400,17 +400,17 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
             />
           </button>
 
-          {/* Dropdown Menu */}
+          {}
           {isProfileOpen && (
             <>
-              {/* Backdrop */}
+              {}
               <div 
                 className="fixed inset-0 z-40" 
                 onClick={() => setIsProfileOpen(false)}
               />
               
               <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-zinc-950 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden z-50">
-                {/* User Details */}
+                {}
                 <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-900">
                   <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                     Signed in as
@@ -428,7 +428,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
                   </div>
                 </div>
                 
-                {/* Menu Items */}
+                {}
                 <div className="py-2">
                   <button
                     onClick={() => {
@@ -443,7 +443,7 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
                   
                   <div className="border-t border-zinc-100 dark:border-zinc-900 my-1" />
                   
-                  {/* Logout Button */}
+                  {}
                   <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"

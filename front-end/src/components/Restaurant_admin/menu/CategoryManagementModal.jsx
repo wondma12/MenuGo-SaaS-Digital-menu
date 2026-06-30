@@ -1,4 +1,4 @@
-// src/components/Restaurant_admin/menu/CategoryManagementModal.jsx
+
 
 import React, { useState, useEffect } from "react";
 import { X, Plus, Edit2, Trash2, FolderOpen } from "lucide-react";
@@ -18,9 +18,9 @@ const CategoryManagementModal = ({
   const [newCategoryName, setNewCategoryName] = useState("");
   const [editingName, setEditingName] = useState("");
 
-  // ============================================================
-  // FETCH CATEGORIES
-  // ============================================================
+  
+  
+  
 
   const fetchCategories = async () => {
     try {
@@ -47,9 +47,9 @@ const CategoryManagementModal = ({
     }
   }, [isOpen]);
 
-  // ============================================================
-  // HANDLERS
-  // ============================================================
+  
+  
+  
 
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) {
@@ -147,16 +147,16 @@ const CategoryManagementModal = ({
     setEditingName("");
   };
 
-  // ============================================================
-  // RENDER
-  // ============================================================
+  
+  
+  
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between p-6 border-b border-zinc-200">
           <div className="flex items-center gap-3">
             <FolderOpen className="w-5 h-5 text-zinc-600" />
@@ -173,9 +173,9 @@ const CategoryManagementModal = ({
           </button>
         </div>
 
-        {/* Content */}
+        {}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {/* Add New Category */}
+          {}
           <div className="flex gap-2">
             <input
               type="text"
@@ -197,14 +197,14 @@ const CategoryManagementModal = ({
             </button>
           </div>
 
-          {/* Error State */}
+          {}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
 
-          {/* Loading State */}
+          {}
           {loading && (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
@@ -216,7 +216,7 @@ const CategoryManagementModal = ({
             </div>
           )}
 
-          {/* Category List */}
+          {}
           {!loading && categories.length === 0 && (
             <div className="text-center py-8 text-zinc-400">
               <FolderOpen className="w-12 h-12 mx-auto mb-3 text-zinc-300" />
@@ -309,7 +309,7 @@ const CategoryManagementModal = ({
           )}
         </div>
 
-        {/* Footer */}
+        {}
         <div className="p-4 border-t border-zinc-200 bg-zinc-50/50 rounded-b-xl">
           <p className="text-xs text-zinc-400">
             💡 Categories help organize your menu. Items in a category with no

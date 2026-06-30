@@ -1,4 +1,4 @@
-// src/components/auth/AuthLayout.jsx
+
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -46,24 +46,24 @@ const AuthLayout = ({ children, title, subtitle }) => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Left Side - Branding with Light Grey/White Theme */}
+      {}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100">
-        {/* Subtle Background Pattern */}
+        {}
         <div className="absolute inset-0">
-          {/* Grid Pattern */}
+          {}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
           
-          {/* Soft Gradient Orbs */}
+          {}
           <div className="absolute top-20 left-10 w-72 h-72 bg-gray-100/50 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-gray-200/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-full" />
           
-          {/* Decorative Elements */}
+          {}
           <div className="absolute top-10 right-10 w-32 h-32 border border-gray-200 rounded-full opacity-50" />
           <div className="absolute bottom-10 left-10 w-48 h-48 border border-gray-200 rounded-full opacity-30" />
         </div>
 
-        {/* Content */}
+        {}
         <div className="relative z-10 flex items-center justify-center w-full p-12">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -71,7 +71,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
             transition={{ duration: 0.8 }}
             className="max-w-lg w-full"
           >
-            {/* Logo & Brand */}
+            {}
             <div className="text-center mb-12">
               <motion.div
                 initial={{ scale: 0 }}

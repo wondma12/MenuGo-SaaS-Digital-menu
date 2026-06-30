@@ -1,4 +1,4 @@
-// src/components/admin/orders/OrderStatusBadge.jsx
+
 import React from "react";
 
 const statusConfig = {

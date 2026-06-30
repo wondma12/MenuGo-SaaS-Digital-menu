@@ -1,4 +1,4 @@
-// Update CategoryTabs.js to properly handle the active category:
+
 
 import React from "react";
 import { Utensils, Coffee, Cake, Grid3X3 } from "lucide-react";
@@ -28,7 +28,7 @@ const CategoryTabs = ({
   return (
     <nav className="sticky top-[55px] z-40 bg-background/80 backdrop-blur-md py-4 px-4 mb-lg flex gap-8 overflow-x-auto hide-scrollbar border-b border-outline-variant/30">
       {categories.map((cat) => {
-        // Handle both string and object categories
+        
         const categoryId = cat.id || cat;
         const categoryName = cat.name || cat;
         const isActive = activeCategory === categoryId;

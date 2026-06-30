@@ -1,4 +1,4 @@
-// src/components/Admin/Security/SecurityPolicy.jsx
+
 
 import React, { useState, useEffect } from "react";
 import { UserKey, ShieldCheck, Lock, Fingerprint, Check, X, RefreshCw } from "lucide-react";
@@ -53,7 +53,7 @@ const SecurityPolicy = () => {
       const result = await settingsAPI.get();
       
       if (result && result.security_policies) {
-        // Merge with defaults
+        
         const savedPolicies = result.security_policies;
         setPolicies(defaultPolicies.map(policy => ({
           ...policy,

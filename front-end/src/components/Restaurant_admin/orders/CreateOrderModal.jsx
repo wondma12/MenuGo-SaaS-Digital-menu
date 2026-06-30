@@ -1,4 +1,4 @@
-// src/components/admin/orders/CreateOrderModal.jsx
+
 import React, { useState } from "react";
 
 const CreateOrderModal = ({ isOpen, onClose, onCreate }) => {
@@ -8,7 +8,7 @@ const CreateOrderModal = ({ isOpen, onClose, onCreate }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Simple parsing: itemsText as "Item Name, quantity, price" per line
+    
     const items = itemsText.split("\n").filter((line) => line.trim()).map((line) => {
       const parts = line.split(",");
       return {

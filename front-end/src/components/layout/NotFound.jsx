@@ -1,4 +1,4 @@
-// src/pages/NotFound.jsx
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NotFoundSkeleton } from '@/components/layout/DashboardSkeleton';
@@ -22,7 +22,7 @@ export default function NotFound() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
       <div className="w-full max-w-md space-y-6">
-        {/* Sad Lost Chef Avatar */}
+        {}
         <div className="flex justify-center">
           <div className="bg-gray-100 rounded-full p-4">
             <svg
@@ -32,35 +32,35 @@ export default function NotFound() {
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* Chef Hat */}
+              {}
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={1.5}
                 d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454"
               />
-              {/* Sad Face - Downward curved mouth */}
+              {}
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={1.5}
                 d="M8.5 14.5c.5-.5 1.5-1 3.5-1s3 .5 3.5 1"
               />
-              {/* Sad Eyes */}
+              {}
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={1.5}
                 d="M9 10.5h.01M15 10.5h.01"
               />
-              {/* Lost/Confused question mark */}
+              {}
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={1.5}
                 d="M12 7v.01M12 4v.01"
               />
-              {/* Map/Location pointer (lost) */}
+              {}
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -77,7 +77,7 @@ export default function NotFound() {
           </div>
         </div>
 
-        {/* 404 Text with Bounce */}
+        {}
         <div className="space-y-2 text-center">
           <h1 className="text-7xl font-bold text-gray-900 animate-bounce">
             404

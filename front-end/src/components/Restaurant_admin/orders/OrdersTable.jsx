@@ -1,4 +1,4 @@
-// src/components/admin/orders/OrderTable.jsx
+
 import React from "react";
 import OrderRow from "./OrderRow";
 

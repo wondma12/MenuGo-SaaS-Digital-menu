@@ -1,4 +1,4 @@
-// src/components/Admin/settings/AppearanceSettings.jsx
+
 
 import React, { useState } from 'react';
 import FileUpload from '../../ui/FileUpload';
@@ -9,7 +9,7 @@ const AppearanceSettings = ({ handleFileSelect }) => {
   const [faviconPreview, setFaviconPreview] = useState(null);
 
   const handleFileChange = (type) => (file) => {
-    // Create preview URL
+    
     if (file) {
       const url = URL.createObjectURL(file);
       if (type === 'logo') {

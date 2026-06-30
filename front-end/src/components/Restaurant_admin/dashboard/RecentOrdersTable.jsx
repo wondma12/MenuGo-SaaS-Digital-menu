@@ -1,10 +1,10 @@
-// src/components/admin/dashboard/RecentOrdersTable.jsx
+
 
 import React from 'react';
 import RecentOrdersRow from './RecentOrdersRow';
 
 const RecentOrdersTable = ({ orders = [], onViewAll }) => {
-  // ✅ Ensure orders is an array
+  
   const ordersArray = Array.isArray(orders) ? orders : [];
 
   return (

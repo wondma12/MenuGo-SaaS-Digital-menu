@@ -1,4 +1,4 @@
-// src/components/waiter/OrderCard.jsx
+
 import React from "react";
 import { Utensils } from "lucide-react";
 import { Timer } from "lucide-react";
@@ -63,7 +63,7 @@ const OrderCard = ({ order, onApprove, onReject, onNotifyWaiter }) => {
         order.status === "PREPARING" ? "opacity-90" : ""
       }`}
     >
-      {/* Header */}
+      {}
       <div className="flex justify-between items-start">
         <div>
           <span className="text-[42px] font-black leading-none">
@@ -83,7 +83,7 @@ const OrderCard = ({ order, onApprove, onReject, onNotifyWaiter }) => {
         </div>
       </div>
 
-      {/* Order Info */}
+      {}
       <div className="flex justify-even gap-10 py-2 border-y border-gray-200 text-gray-500">
         <div className="flex items-center gap-2">
           <Utensils className="w-6 h-6" />
@@ -107,7 +107,7 @@ const OrderCard = ({ order, onApprove, onReject, onNotifyWaiter }) => {
         </div>
       </div>
 
-      {/* Items List */}
+      {}
       <div className="space-y-4 flex-grow">
         {order.items.map((item, index) => (
           <div key={index} className="flex items-center gap-4">
@@ -129,7 +129,7 @@ const OrderCard = ({ order, onApprove, onReject, onNotifyWaiter }) => {
         ))}
       </div>
 
-      {/* Action Buttons */}
+      {}
       {getActionButtons()}
     </div>
   );

@@ -1,4 +1,4 @@
-// src/pages/customer/SearchPage.jsx
+
 
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -50,7 +50,7 @@ const SearchPage = () => {
             raw ? JSON.parse(raw).reduce((s, i) => s + i.quantity, 0) : 0
           );
         } catch (err) {
-          // ignore
+          
         }
       }
     };
@@ -74,7 +74,7 @@ const SearchPage = () => {
         setLoading(true);
         setError(null);
 
-        // ✅ Use menuAPI.getPublicMenu (same as MenuPage)
+        
         const menuResult = await menuAPI.getPublicMenu(restaurantId);
         console.log("[SearchPage] Public Menu Result:", menuResult);
 
@@ -84,19 +84,19 @@ const SearchPage = () => {
           return;
         }
 
-        // ✅ Extract data using same structure as MenuPage
+        
         const data = menuResult.data || menuResult;
         
         let restaurantData = null;
         let itemsData = [];
 
-        // ✅ Extract restaurant
+        
         if (data.restaurant) {
           restaurantData = data.restaurant;
           setRestaurant(restaurantData);
         }
 
-        // ✅ Extract items from categories
+        
         if (data.categories && Array.isArray(data.categories)) {
           data.categories.forEach(cat => {
             if (cat.menu_items && Array.isArray(cat.menu_items)) {
@@ -111,7 +111,7 @@ const SearchPage = () => {
           });
         }
 
-        // ✅ Transform menu items
+        
         const transformedItems = itemsData.map(item => ({
           id: item.id,
           name: item.name,
@@ -168,7 +168,7 @@ const SearchPage = () => {
     });
   };
 
-  // ✅ Filter items based on search query
+  
   const filtered = query.trim()
     ? items.filter((it) =>
         (it.name + " " + (it.description || ""))

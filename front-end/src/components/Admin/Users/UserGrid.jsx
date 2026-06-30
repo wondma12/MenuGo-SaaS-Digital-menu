@@ -1,4 +1,4 @@
-// src/components/Admin/Users/UserGrid.jsx
+
 
 import React, { useState, useEffect } from "react";
 import UserCard from "./UserCard";
@@ -15,7 +15,7 @@ const UserGrid = ({
   const [localUsers, setLocalUsers] = useState([]);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Sync users prop with local state
+  
   useEffect(() => {
     setLocalUsers(users || []);
   }, [users]);
@@ -49,7 +49,7 @@ const UserGrid = ({
     try {
       switch (action) {
         case "resetPassword":
-          // Handle password reset - would send email
+          
           if (window.confirm(`Send password reset email to ${user.name}?`)) {
             alert(`Password reset email sent to ${user.email}`);
           }
@@ -98,7 +98,7 @@ const UserGrid = ({
     }
   };
 
-  // No users found
+  
   if (filteredUsers.length === 0) {
     return (
       <div className="text-center py-12">
@@ -115,7 +115,7 @@ const UserGrid = ({
 
   return (
     <div>
-      {/* User Grid */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {currentUsers.map((user) => (
           <UserCard 
@@ -126,7 +126,7 @@ const UserGrid = ({
         ))}
       </div>
 
-      {/* Pagination */}
+      {}
       {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 py-6 border-t border-zinc-200">
           <p className="text-sm text-zinc-500">

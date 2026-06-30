@@ -1,4 +1,4 @@
-// src/components/Admin/Security/SecurityAccessLogs.jsx
+
 
 import React, { useState, useEffect } from "react";
 import { RefreshCw, Download, Search } from "lucide-react";

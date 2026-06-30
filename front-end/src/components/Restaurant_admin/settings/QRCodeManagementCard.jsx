@@ -1,4 +1,4 @@
-// src/components/Restaurant_admin/settings/QRCodeManagementCard.jsx
+
 
 import React, { useState } from "react";
 import { Download, Eye, EyeOff, Trash2, RefreshCw, QrCode } from "lucide-react";
@@ -14,18 +14,18 @@ const QRCodeManagementCard = ({
 }) => {
   const [expanded, setExpanded] = useState(true);
 
-  // Ensure qrCodes is always an array
+  
   const qrCodesArray = Array.isArray(qrCodes) ? qrCodes : [];
   const activeQrCode = qrCodesArray.find((q) => q.is_active !== false);
   const inactiveQrCodes = qrCodesArray.filter((q) => q.is_active === false);
 
-  // Check if QR code exists
+  
   const hasQrCode = qrCodesArray.length > 0;
   const hasActiveQrCode = !!activeQrCode;
 
   return (
     <div className="bg-white border border-neutral-200 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.04)] overflow-hidden">
-      {/* Header */}
+      {}
       <div
         className="p-6 border-b border-neutral-100 flex items-center justify-between cursor-pointer hover:bg-neutral-50 transition-colors"
         onClick={() => setExpanded(!expanded)}
@@ -49,7 +49,7 @@ const QRCodeManagementCard = ({
 
       {expanded && (
         <div className="p-6 space-y-4">
-          {/* ✅ ONLY SHOW GENERATE SECTION WHEN NO QR CODE EXISTS */}
+          {}
           {!hasQrCode && (
             <div className="bg-neutral-50 rounded-lg p-4">
               <div className="flex items-center justify-between">
@@ -84,7 +84,7 @@ const QRCodeManagementCard = ({
             </div>
           )}
 
-          {/* ✅ SHOW QR CODE WHEN EXISTS */}
+          {}
           {hasActiveQrCode ? (
             <div className="border border-green-200 bg-green-50 rounded-lg p-4">
               <div className="flex items-start justify-between">
@@ -139,7 +139,7 @@ const QRCodeManagementCard = ({
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
-                  {/* ✅ Download Button */}
+                  {}
                   <button
                     onClick={() =>
                       onDownload(
@@ -152,7 +152,7 @@ const QRCodeManagementCard = ({
                   >
                     <Download className="w-4 h-4 text-gray-600" />
                   </button>
-                  {/* ✅ Delete Button (Trash) - REMOVED Eye/EyeOff completely */}
+                  {}
                   <button
                     onClick={() => onDelete(activeQrCode.id)}
                     className="p-2 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
@@ -164,7 +164,7 @@ const QRCodeManagementCard = ({
               </div>
             </div>
           ) : (
-            // ✅ ONLY SHOW THIS WHEN NO QR CODE EXISTS
+            
             !hasQrCode && (
               <div className="border border-yellow-200 bg-yellow-50 rounded-lg p-4 text-center">
                 <div className="flex flex-col items-center gap-2">
@@ -187,7 +187,7 @@ const QRCodeManagementCard = ({
             )
           )}
 
-          {/* Inactive QR Codes - Only show if there are inactive codes */}
+          {}
           {inactiveQrCodes.length > 0 && (
             <div className="space-y-2">
               <p className="text-xs font-medium text-gray-500 uppercase tracking-widest">
@@ -227,7 +227,7 @@ const QRCodeManagementCard = ({
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    {/* ✅ Activate Button (Eye) - to reactivate inactive codes */}
+                    {}
                     <button
                       onClick={() => onToggleStatus(qr.id, true)}
                       className="p-1.5 bg-white border border-gray-200 rounded hover:bg-gray-50 transition-colors"
@@ -235,7 +235,7 @@ const QRCodeManagementCard = ({
                     >
                       <Eye className="w-4 h-4 text-gray-600" />
                     </button>
-                    {/* ✅ Delete Button */}
+                    {}
                     <button
                       onClick={() => onDelete(qr.id)}
                       className="p-1.5 bg-white border border-red-200 rounded hover:bg-red-50 transition-colors"
@@ -249,7 +249,7 @@ const QRCodeManagementCard = ({
             </div>
           )}
 
-          {/* Help Text */}
+          {}
           <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
             <p className="text-xs text-blue-600">
               💡 QR codes allow customers to view your menu and place orders

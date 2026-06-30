@@ -1,4 +1,4 @@
-// src/components/Admin/Restaurants/RestaurantsTable.jsx
+
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -34,12 +34,12 @@ const RestaurantsTable = ({
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 5;
 
-  // ============================================================
-  // FETCH RESTAURANTS
-  // ============================================================
+  
+  
+  
 
   useEffect(() => {
-    // If restaurants are passed as props, use them
+    
     if (propRestaurants) {
       setRestaurants(propRestaurants);
       setLoading(propLoading || false);
@@ -54,7 +54,7 @@ const RestaurantsTable = ({
           limit: itemsPerPage,
         });
         
-        // Handle different response formats
+        
         let restaurantsData = [];
         let totalCount = 0;
         
@@ -86,9 +86,9 @@ const RestaurantsTable = ({
     fetchRestaurants();
   }, [propRestaurants, propLoading, currentPage]);
 
-  // ============================================================
-  // FILTERS
-  // ============================================================
+  
+  
+  
 
   const filteredRestaurants = restaurants.filter((restaurant) => {
     const searchLower = searchTerm.toLowerCase();
@@ -104,9 +104,9 @@ const RestaurantsTable = ({
     return matchesSearch && matchesStatus;
   });
 
-  // ============================================================
-  // TABLE CONFIG
-  // ============================================================
+  
+  
+  
 
   const tableHeaders = [
     { label: "Restaurant" },
@@ -115,9 +115,9 @@ const RestaurantsTable = ({
     { label: "Created Date" },
   ];
 
-  // ============================================================
-  // HELPERS
-  // ============================================================
+  
+  
+  
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -156,9 +156,9 @@ const RestaurantsTable = ({
     return statusMap[status?.toLowerCase()] || statusMap.pending;
   };
 
-  // ============================================================
-  // RENDER ROW
-  // ============================================================
+  
+  
+  
 
   const renderTableRow = (restaurant, index) => {
     const statusStyle = getStatusStyles(restaurant.status);
@@ -210,9 +210,9 @@ const RestaurantsTable = ({
     );
   };
 
-  // ============================================================
-  // HANDLERS
-  // ============================================================
+  
+  
+  
 
   const handleAction = (action, restaurant) => {
     console.log(`Action: ${action} on restaurant:`, restaurant);
@@ -248,9 +248,9 @@ const RestaurantsTable = ({
     }
   };
 
-  // ============================================================
-  // RENDER - LOADING
-  // ============================================================
+  
+  
+  
 
   if (loading) {
     return (
@@ -265,9 +265,9 @@ const RestaurantsTable = ({
     );
   }
 
-  // ============================================================
-  // RENDER - ERROR
-  // ============================================================
+  
+  
+  
 
   if (error) {
     return (
@@ -286,9 +286,9 @@ const RestaurantsTable = ({
     );
   }
 
-  // ============================================================
-  // RENDER - EMPTY
-  // ============================================================
+  
+  
+  
 
   if (filteredRestaurants.length === 0) {
     return (
@@ -306,13 +306,13 @@ const RestaurantsTable = ({
     );
   }
 
-  // ============================================================
-  // RENDER - SUCCESS
-  // ============================================================
+  
+  
+  
 
   return (
     <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
-      {/* Table Filters */}
+      {}
       <div className="p-4 border-b border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 w-5 h-5" />
@@ -341,7 +341,7 @@ const RestaurantsTable = ({
         </div>
       </div>
 
-      {/* Table */}
+      {}
       <Table
         headers={tableHeaders}
         data={filteredRestaurants}
@@ -353,7 +353,7 @@ const RestaurantsTable = ({
         theadClassName="border-b border-zinc-100 bg-zinc-50/50"
       />
 
-      {/* Pagination */}
+      {}
       {filteredRestaurants.length > 0 && (
         <div className="p-8 border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-zinc-50/30">
           <p className="text-xs text-zinc-500 font-medium">

@@ -51,7 +51,7 @@ const MultiStepRegistration = () => {
     businessLicenseDocument: null,
   });
 
-  // Preview URLs for uploaded files
+  //Store preview URLs for file uploads
   const [previewUrls, setPreviewUrls] = useState({
     logo: null,
     banner: null,
@@ -77,11 +77,10 @@ const MultiStepRegistration = () => {
 
   const handleFileChange = (field, file) => {
     if (file) {
-      // Store the file
+      //Store file and create preview
       setFormData((prev) => ({ ...prev, [field]: file }));
       setErrors((prev) => ({ ...prev, [field]: undefined }));
 
-      // Create preview URL for images
       if (file.type.startsWith('image/')) {
         const url = URL.createObjectURL(file);
         setPreviewUrls((prev) => ({ ...prev, [field]: url }));
@@ -91,14 +90,14 @@ const MultiStepRegistration = () => {
 
   const removeFile = (field) => {
     setFormData((prev) => ({ ...prev, [field]: null }));
-    // Revoke preview URL if exists
+    //Clean up object URL
     if (previewUrls[field]) {
       URL.revokeObjectURL(previewUrls[field]);
       setPreviewUrls((prev) => ({ ...prev, [field]: null }));
     }
   };
 
-  // Cleanup preview URLs on unmount
+  
   React.useEffect(() => {
     return () => {
       Object.values(previewUrls).forEach(url => {
@@ -214,7 +213,7 @@ const MultiStepRegistration = () => {
     }
   };
 
-  // File Upload Component
+  
   const FileUpload = ({ field, label, accept, maxSize, icon: Icon, description }) => {
     const hasFile = formData[field];
     const previewUrl = previewUrls[field];
@@ -632,7 +631,7 @@ const MultiStepRegistration = () => {
               Please review all information before submitting. You can go back to edit any section.
             </p>
 
-            {/* Account Section */}
+            {}
             <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -665,7 +664,7 @@ const MultiStepRegistration = () => {
               </div>
             </div>
 
-            {/* Restaurant Section */}
+            {}
             <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -697,7 +696,7 @@ const MultiStepRegistration = () => {
                 </div>
               </div>
 
-              {/* Uploaded Files Preview */}
+              {}
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <p className="text-xs text-gray-500 mb-3">Uploaded Files</p>
                 <div className="grid grid-cols-2 gap-3">
@@ -735,7 +734,7 @@ const MultiStepRegistration = () => {
               </div>
             </div>
 
-            {/* Location Section */}
+            {}
             <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -776,7 +775,7 @@ const MultiStepRegistration = () => {
               </div>
             </div>
 
-            {/* Verification Section */}
+            {}
             <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -812,7 +811,7 @@ const MultiStepRegistration = () => {
                 </div>
               </div>
 
-              {/* License Document */}
+              {}
               {formData.businessLicenseDocument && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <p className="text-xs text-gray-500 mb-3">Uploaded Document</p>
@@ -834,7 +833,7 @@ const MultiStepRegistration = () => {
               )}
             </div>
 
-            {/* Terms Agreement */}
+            {}
             <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
               <div className="flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
@@ -848,7 +847,7 @@ const MultiStepRegistration = () => {
               </div>
             </div>
 
-            {/* Submit Error Message */}
+            {}
             {submitError && (
               <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                 <div className="flex items-start gap-3">
@@ -870,7 +869,7 @@ const MultiStepRegistration = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Progress Steps */}
+      {}
       <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between overflow-x-auto">
@@ -923,12 +922,12 @@ const MultiStepRegistration = () => {
         </div>
       </div>
 
-      {/* Form Content */}
+      {}
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
           {renderStepContent()}
 
-          {/* Navigation Buttons */}
+          {}
           <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
             <Button
               type="button"

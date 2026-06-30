@@ -1,4 +1,4 @@
-// src/components/admin/Staff/AddStaffModal.jsx
+
 import React, { useState, useEffect } from 'react'
 
 const AddStaffModal = ({ isOpen, onClose, onSubmit, editingStaff }) => {
@@ -12,7 +12,7 @@ const AddStaffModal = ({ isOpen, onClose, onSubmit, editingStaff }) => {
 
   useEffect(() => {
     if (editingStaff) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      
       setFormData({
         name: editingStaff.name,
         email: editingStaff.email,

@@ -1,4 +1,4 @@
-// src/components/Admin/menu/CreateMenuItemModal.jsx
+
 
 import React, { useState, useEffect } from 'react';
 import menuService from '../../../services/menuService';
@@ -8,7 +8,7 @@ const CreateMenuItemModal = ({
   onClose, 
   onSave, 
   initialData,
-  restaurantId  // ✅ Add restaurantId prop
+  restaurantId  
 }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -23,7 +23,7 @@ const CreateMenuItemModal = ({
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [categoryError, setCategoryError] = useState(null);
 
-  // ✅ Fetch categories from database when modal opens
+  
   useEffect(() => {
     const fetchCategories = async () => {
       if (!isOpen) return;
@@ -38,7 +38,7 @@ const CreateMenuItemModal = ({
           setCategories(result.data || []);
         } else {
           setCategoryError(result.error || 'Failed to load categories');
-          // ✅ Fallback to empty array
+          
           setCategories([]);
         }
       } catch (error) {
@@ -53,7 +53,7 @@ const CreateMenuItemModal = ({
     fetchCategories();
   }, [isOpen]);
 
-  // ✅ Reset form when modal opens or initialData changes
+  
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -87,7 +87,7 @@ const CreateMenuItemModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // ✅ Validation
+    
     if (!formData.name.trim()) {
       return;
     }
@@ -105,7 +105,7 @@ const CreateMenuItemModal = ({
       ...formData,
       price: parseFloat(formData.price),
       imageUrl: formData.imageUrl || 'https://via.placeholder.com/48x48?text=New+Item',
-      // ✅ Ensure category_id is sent correctly
+      
       category_id: formData.category_id
     };
 
@@ -116,13 +116,13 @@ const CreateMenuItemModal = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
+      {}
       <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={onClose}></div>
       
-      {/* Modal */}
+      {}
       <div className="relative min-h-screen flex items-center justify-center p-4">
         <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full transform transition-all">
-          {/* Header */}
+          {}
           <div className="flex items-center justify-between p-6 border-b border-neutral-200">
             <h2 className="font-h2 text-h2 text-black">
               {initialData ? 'Edit Menu Item' : 'Create New Menu Item'}
@@ -135,7 +135,7 @@ const CreateMenuItemModal = ({
             </button>
           </div>
 
-          {/* Form */}
+          {}
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             <div>
               <label className="block font-label-caps text-label-caps text-secondary mb-2">
@@ -244,7 +244,7 @@ const CreateMenuItemModal = ({
               </label>
             </div>
 
-            {/* Actions */}
+            {}
             <div className="flex space-x-3 pt-4 border-t border-neutral-200">
               <button
                 type="button"

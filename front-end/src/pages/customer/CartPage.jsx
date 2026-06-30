@@ -1,4 +1,4 @@
-// src/pages/customer/CartPage.jsx
+
 
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -28,14 +28,14 @@ const CartPage = () => {
     }
   });
 
-  // ✅ Load cart items from sessionStorage
+  
   useEffect(() => {
     const loadCart = () => {
       try {
         const raw = sessionStorage.getItem("menugo_cart");
         if (raw) {
           const allItems = JSON.parse(raw);
-          // Filter items for this restaurant
+          
           const filtered = restaurantId 
             ? allItems.filter(item => item.restaurantId === restaurantId || item.restaurant_id === restaurantId)
             : allItems;
@@ -50,7 +50,7 @@ const CartPage = () => {
     loadCart();
   }, [restaurantId]);
 
-  // ✅ Cart count management
+  
   useEffect(() => {
     const onStorage = (e) => {
       if (e.key === "menugo_cart") {
@@ -97,7 +97,7 @@ const CartPage = () => {
     };
   }, [restaurantId]);
 
-  // ✅ Load cart from location state if available
+  
   useEffect(() => {
     if (location.state?.cart) {
       setCartItems(location.state.cart);
@@ -125,21 +125,21 @@ const CartPage = () => {
 
   const updateSessionStorage = (items) => {
     try {
-      // Merge with other restaurant items
+      
       const raw = sessionStorage.getItem("menugo_cart");
       let allItems = raw ? JSON.parse(raw) : [];
       
-      // Remove items from this restaurant
+      
       allItems = allItems.filter(item => 
         item.restaurantId !== restaurantId && item.restaurant_id !== restaurantId
       );
       
-      // Add updated items
+      
       allItems = [...allItems, ...items];
       
       sessionStorage.setItem("menugo_cart", JSON.stringify(allItems));
       
-      // Dispatch event
+      
       const custom = new CustomEvent("menugo_cart_updated", {
         detail: allItems,
       });
@@ -158,7 +158,7 @@ const handlePlaceOrder = async () => {
     return;
   }
 
-  // ✅ Validate table number for dine-in
+  
   if (orderType === "dine_in" && !tableNumber.trim()) {
     alert("Please enter a table number");
     return;
@@ -168,11 +168,11 @@ const handlePlaceOrder = async () => {
   setOrderError(null);
 
   try {
-    // ✅ Build order data with correct values
+    
     const orderData = {
       restaurant_id: restaurantId,
       table_number: orderType === "dine_in" ? tableNumber.trim() : null,
-      order_type: orderType, // ✅ Already "dine_in" or "takeaway"
+      order_type: orderType, 
       customer_notes: "",
       items: cartItems.map(item => ({
         menu_item_id: item.id,
@@ -186,7 +186,7 @@ const handlePlaceOrder = async () => {
     console.log("[CartPage] Order result:", result);
 
     if (result && result.id) {
-      // Clear cart
+      
       setCartItems([]);
       updateSessionStorage([]);
       

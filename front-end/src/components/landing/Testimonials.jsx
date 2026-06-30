@@ -91,14 +91,14 @@ const Testimonials = () => {
 
   return (
     <section id="testimonials" className="py-24 bg-white relative overflow-hidden">
-      {/* Background Decorations */}
+      {}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
         <div className="absolute top-10 left-10 w-64 h-64 bg-primary/5 rounded-full filter blur-3xl" />
         <div className="absolute bottom-10 right-10 w-64 h-64 bg-primary/5 rounded-full filter blur-3xl" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -119,7 +119,7 @@ const Testimonials = () => {
           </p>
         </motion.div>
 
-        {/* Testimonial Carousel */}
+        {}
         <div className="max-w-4xl mx-auto relative">
           <div className="relative overflow-hidden" style={{ minHeight: '400px' }}>
             <AnimatePresence initial={false} custom={direction}>
@@ -137,25 +137,25 @@ const Testimonials = () => {
                 className="absolute w-full"
               >
                 <div className="bg-white rounded-3xl p-8 md:p-12 shadow-2xl border border-gray-100 relative">
-                  {/* Quote Icon */}
+                  {}
                   <div className="absolute top-6 right-6 text-primary/10">
                     <Quote className="w-16 h-16" />
                   </div>
 
                   <div className="relative">
-                    {/* Stars */}
+                    {}
                     <div className="flex gap-1 mb-6">
                       {[...Array(testimonials[currentIndex].rating)].map((_, i) => (
                         <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                       ))}
                     </div>
 
-                    {/* Testimonial Text */}
+                    {}
                     <p className="text-xl md:text-2xl text-gray-700 leading-relaxed mb-8 font-light">
                       "{testimonials[currentIndex].text}"
                     </p>
 
-                    {/* Author Info & Metrics */}
+                    {}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                       <div className="flex items-center gap-4">
                         <img
@@ -173,7 +173,7 @@ const Testimonials = () => {
                         </div>
                       </div>
 
-                      {/* Metric Badge */}
+                      {}
                       <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl px-6 py-3 border border-primary/20">
                         <p className="text-sm text-gray-600">
                           {testimonials[currentIndex].metrics.label}
@@ -189,7 +189,7 @@ const Testimonials = () => {
             </AnimatePresence>
           </div>
 
-          {/* Navigation Buttons */}
+          {}
           <div className="flex justify-center items-center gap-4 mt-8">
             <button
               onClick={handlePrevious}
@@ -198,7 +198,7 @@ const Testimonials = () => {
               <ChevronLeft className="w-5 h-5 text-gray-600 group-hover:text-primary transition-colors" />
             </button>
 
-            {/* Dots */}
+            {}
             <div className="flex gap-2">
               {testimonials.map((_, index) => (
                 <button
@@ -225,7 +225,7 @@ const Testimonials = () => {
           </div>
         </div>
 
-        {/* Trusted By Logos */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

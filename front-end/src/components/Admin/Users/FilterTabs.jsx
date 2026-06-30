@@ -1,9 +1,9 @@
-// src/components/Admin/Users/FilterTabs.jsx
+
 
 import React from 'react';
 
 const FilterTabs = ({ activeTab, setActiveTab, users = [] }) => {
-  // Calculate counts for each tab
+  
   const counts = {
     'All Accounts': users.length,
     'Platform Admins': users.filter(u => u.role === 'platform_admin').length,

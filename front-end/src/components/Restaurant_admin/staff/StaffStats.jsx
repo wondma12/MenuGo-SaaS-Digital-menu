@@ -1,4 +1,4 @@
-// src/components/admin/Staff/StaffStats.jsx
+
 import React from 'react';
 
 const StaffStats = ({ stats }) => {

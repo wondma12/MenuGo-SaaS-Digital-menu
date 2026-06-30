@@ -1,4 +1,4 @@
-// components/OrdersList.jsx
+
 
 import OrderCard from "./ordercard";
 import { Clipboard } from "lucide-react";

@@ -1,4 +1,4 @@
-// skeleton/index.jsx or skeleton.jsx
+
 import { cn } from "@/lib/utils"
 
 function Skeleton({ className, ...props }) {
@@ -7,4 +7,4 @@ function Skeleton({ className, ...props }) {
   )
 }
 
-export default Skeleton   // <-- default export
+export default Skeleton   

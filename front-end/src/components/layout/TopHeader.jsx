@@ -1,4 +1,4 @@
-// components/layout/TopHeader.jsx
+
 
 import React from "react";
 import { Bell } from "lucide-react";
@@ -9,14 +9,14 @@ const TopHeader = ({
   showNotification = true,
   showPageInfo = true,
 }) => {
-  // Role-specific titles
+  
   const roleTitles = {
     Restaurant_admin: "Command Center",
     Platform_admin: "Admin Dashboard",
     waiter: "Waiter Panel",
   };
 
-  // Page-specific info
+  
   const pageInfo = {
     Dashboard: "Dashboard Overview",
     Menu: "Menu Management",

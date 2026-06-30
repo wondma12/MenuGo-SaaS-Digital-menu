@@ -1,4 +1,4 @@
-// src/components/Admin/RestaurantDetail/LocationCard.jsx
+
 
 import React from "react";
 import { MapPin, Phone, Mail, Globe, Home } from "lucide-react";
@@ -12,7 +12,7 @@ const LocationCard = ({ location }) => {
     }
   };
 
-  // Handle null/undefined location
+  
   if (!location) {
     return (
       <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
@@ -26,7 +26,7 @@ const LocationCard = ({ location }) => {
     );
   }
 
-  // Build full address
+  
   const fullAddress = [
     location.street_address || location.streetAddress,
     location.sub_city || location.subCity,

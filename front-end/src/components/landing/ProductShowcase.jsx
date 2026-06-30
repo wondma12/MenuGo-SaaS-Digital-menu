@@ -155,7 +155,7 @@ const ProductShowcase = () => {
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        {}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -176,7 +176,7 @@ const ProductShowcase = () => {
           </p>
         </motion.div>
 
-        {/* Tabs */}
+        {}
         <div className="flex flex-wrap justify-center gap-3 mb-12">
           {tabs.map((tab) => (
             <button
@@ -194,9 +194,9 @@ const ProductShowcase = () => {
           ))}
         </div>
 
-        {/* Content */}
+        {}
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left - Device Preview */}
+          {}
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -210,7 +210,7 @@ const ProductShowcase = () => {
             </motion.div>
           </AnimatePresence>
 
-          {/* Right - Content */}
+          {}
           <div>
             <AnimatePresence mode="wait">
               <motion.div

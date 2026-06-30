@@ -1,10 +1,9 @@
-// src/hooks/cartStorage.js
+
 
 const STORAGE_KEY = "menugo_cart";
 
-/**
- * Get the entire cart from sessionStorage
- */
+
+
 export const getCart = () => {
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
@@ -15,9 +14,8 @@ export const getCart = () => {
   }
 };
 
-/**
- * Save cart to sessionStorage
- */
+
+
 export const saveCart = (cart) => {
   try {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
@@ -32,18 +30,16 @@ export const saveCart = (cart) => {
   }
 };
 
-/**
- * Get only one restaurant's cart
- */
+
+
 export const getRestaurantCart = (restaurantId) => {
   return getCart().filter(
     (item) => String(item.restaurant_id) === String(restaurantId)
   );
 };
 
-/**
- * Add item to cart
- */
+
+
 export const addItem = (restaurantId, item) => {
   const cart = getCart();
 
@@ -72,9 +68,8 @@ export const addItem = (restaurantId, item) => {
   return cart;
 };
 
-/**
- * Update quantity
- */
+
+
 export const updateQuantity = (
   restaurantId,
   menuItemId,
@@ -111,9 +106,8 @@ export const updateQuantity = (
   return cart;
 };
 
-/**
- * Remove one item
- */
+
+
 export const removeItem = (
   restaurantId,
   menuItemId
@@ -131,9 +125,8 @@ export const removeItem = (
   return cart;
 };
 
-/**
- * Clear one restaurant's cart
- */
+
+
 export const clearRestaurantCart = (restaurantId) => {
   const cart = getCart().filter(
     (item) => String(item.restaurant_id) !== String(restaurantId)
@@ -144,9 +137,8 @@ export const clearRestaurantCart = (restaurantId) => {
   return cart;
 };
 
-/**
- * Total quantity
- */
+
+
 export const getCartCount = (restaurantId = null) => {
   const cart = restaurantId
     ? getRestaurantCart(restaurantId)
@@ -155,9 +147,8 @@ export const getCartCount = (restaurantId = null) => {
   return cart.reduce((sum, item) => sum + item.quantity, 0);
 };
 
-/**
- * Total price
- */
+
+
 export const getSubtotal = (restaurantId) => {
   return getRestaurantCart(restaurantId).reduce(
     (sum, item) => sum + item.price * item.quantity,

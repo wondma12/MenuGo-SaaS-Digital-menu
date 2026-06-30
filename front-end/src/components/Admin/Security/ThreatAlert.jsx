@@ -1,4 +1,4 @@
-// src/components/Admin/Security/ThreatAlert.jsx
+
 
 import React, { useState, useEffect } from "react";
 import { ShieldAlert, AlertTriangle, Check, RefreshCw } from "lucide-react";

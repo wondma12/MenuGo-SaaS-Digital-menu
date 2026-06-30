@@ -1,4 +1,4 @@
-// src/pages/Admin/Security.jsx
+
 
 import React, { useState } from "react";
 import Sidebar from "../../components/layout/sidebar";
@@ -22,7 +22,7 @@ const Security = () => {
 
       <main className=" min-h-screen bg-background">
         <div className="p-8 max-w-[1200px]">
-          {/* Page Header */}
+          {}
           <div className="mb-8">
             <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
               Platform Security
@@ -35,14 +35,14 @@ const Security = () => {
             </p>
           </div>
 
-          {/* Bento Grid Section */}
+          {}
           <div className="grid grid-cols-12 gap-6">
-            {/* Security Logs Table (8 cols) */}
+            {}
             <div className="col-span-12 lg:col-span-8">
               <SecurityAccessLogs />
             </div>
 
-            {/* Platform Config (4 cols) */}
+            {}
             <div className="col-span-12 lg:col-span-4 space-y-6">
               <PlatformConfig
                 environment={environment}
@@ -53,23 +53,23 @@ const Security = () => {
               <AdminProfileCard />
             </div>
 
-            {/* Advanced Threat Analysis (12 cols) */}
+            {}
             <div className="col-span-12">
               <ThreatAlert />
             </div>
 
-            {/* Security Policy (6 cols) */}
+            {}
             <div className="col-span-12 lg:col-span-6">
               <SecurityPolicy />
             </div>
 
-            {/* Network Whitelist (6 cols) */}
+            {}
             <div className="col-span-12 lg:col-span-6">
               <NetworkWhitelist />
             </div>
           </div>
 
-          {/* Live Session Active Floating Indicator */}
+          {}
           <LiveSessionIndicator />
         </div>
       </main>

@@ -1,4 +1,4 @@
-// src/pages/auth/Login.jsx
+
 
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,9 +11,9 @@ import authService from "../../../services/authservice";
 const Login = () => {
   const navigate = useNavigate();
 
-  // ============================================================
-  // STATE
-  // ============================================================
+  
+  
+  
 
   const [formData, setFormData] = useState({
     email: "",
@@ -25,21 +25,21 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
 
-  // ============================================================
-  // VALIDATION
-  // ============================================================
+  
+  
+  
 
   const validateForm = () => {
     const validationErrors = {};
 
-    // Email validation
+    
     if (!formData.email.trim()) {
       validationErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       validationErrors.email = "Invalid email format";
     }
 
-    // Password validation
+    
     if (!formData.password) {
       validationErrors.password = "Password is required";
     }
@@ -48,25 +48,25 @@ const Login = () => {
     return Object.keys(validationErrors).length === 0;
   };
 
-  // ============================================================
-  // HANDLERS
-  // ============================================================
+  
+  
+  
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error for this field when user types
+    
     setErrors((prev) => ({ ...prev, [field]: undefined }));
-    // Clear general login error when user types
+    
     if (loginError) setLoginError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Reset error states
+    
     setLoginError("");
 
-    // Validate form
+    
     if (!validateForm()) {
       return;
     }
@@ -76,21 +76,21 @@ const Login = () => {
     try {
       const result = await authService.login(formData.email, formData.password);
 
-      // Handle login response
+      
       if (result.success) {
-        // Extract data
+        
         const { token, user } = result.data;
 
-        // Store auth data
+        
         localStorage.setItem("authToken", token);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("userId", user.id);
 
-        // Redirect based on role
+        
         redirectUser(user);
       } else {
-        // Show error message from service
+        
         setLoginError(result.error || "Invalid email or password");
       }
     } catch (error) {
@@ -101,9 +101,9 @@ const Login = () => {
     }
   };
 
-  // ============================================================
-  // NAVIGATION HELPERS
-  // ============================================================
+  
+  
+  
 
   const redirectUser = (user) => {
     const redirectPath = authService.getRestaurantRedirectPath(user);
@@ -115,9 +115,9 @@ const Login = () => {
     }
   };
 
-  // ============================================================
-  // RENDER
-  // ============================================================
+  
+  
+  
 
   return (
     <AuthLayout
@@ -126,14 +126,14 @@ const Login = () => {
       className="animate-scale-in"
     >
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-        {/* ===== ERROR MESSAGE ===== */}
+        {}
         {loginError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm animate-shake">
             {loginError}
           </div>
         )}
 
-        {/* ===== EMAIL FIELD ===== */}
+        {}
         <div className="animate-slide-in-staggered stagger-1">
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
             Email Address
@@ -162,7 +162,7 @@ const Login = () => {
           )}
         </div>
 
-        {/* ===== PASSWORD FIELD ===== */}
+        {}
         <div className="animate-slide-in-staggered stagger-2">
           <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
             Password
@@ -203,7 +203,7 @@ const Login = () => {
           )}
         </div>
 
-        {/* ===== REMEMBER ME & FORGOT PASSWORD ===== */}
+        {}
         <div className="flex items-center justify-between animate-slide-in-staggered stagger-3">
           <label className="flex items-center gap-2 cursor-pointer group">
             <input
@@ -222,7 +222,7 @@ const Login = () => {
           </Link>
         </div>
 
-        {/* ===== SUBMIT BUTTON ===== */}
+        {}
         <Button
           type="submit"
           className="w-full rounded-xl bg-black text-white hover:bg-gray-800 hover-lift btn-micro animate-slide-in-staggered stagger-4 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
@@ -238,7 +238,7 @@ const Login = () => {
           )}
         </Button>
 
-        {/* ===== DIVIDER ===== */}
+        {}
         <div className="relative my-6 animate-slide-in-staggered stagger-5">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-200" />
@@ -248,7 +248,7 @@ const Login = () => {
           </div>
         </div>
 
-        {/* ===== SIGN UP LINK ===== */}
+        {}
         <p className="text-center text-gray-600 text-sm animate-slide-in-staggered stagger-6">
           Don't have an account?{" "}
           <Link

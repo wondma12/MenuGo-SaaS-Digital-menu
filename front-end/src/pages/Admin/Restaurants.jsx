@@ -1,4 +1,4 @@
-// src/pages/Admin/Restaurants.jsx
+
 
 import React, { useState, useEffect, useCallback } from "react";
 import Sidebar from "../../components/layout/sidebar";
@@ -19,9 +19,9 @@ const Restaurants = () => {
     suspended: 0,
   });
 
-  // ============================================================
-  // FETCH RESTAURANTS
-  // ============================================================
+  
+  
+  
 
   const fetchRestaurants = useCallback(async () => {
     try {
@@ -33,7 +33,7 @@ const Restaurants = () => {
       const result = await restaurantAPI.getAll({ page: 1, limit: 100 });
       console.log('[Restaurants] Raw result:', result);
 
-      // Handle different response formats
+      
       let restaurantsData = [];
       if (result) {
         if (Array.isArray(result)) {
@@ -50,7 +50,7 @@ const Restaurants = () => {
       console.log('[Restaurants] Processed restaurants:', restaurantsData);
       setRestaurants(restaurantsData);
 
-      // Calculate stats
+      
       const total = restaurantsData.length;
       const active = restaurantsData.filter(r => r.status === 'active').length;
       const pending = restaurantsData.filter(r => r.status === 'pending').length;
@@ -70,9 +70,9 @@ const Restaurants = () => {
     fetchRestaurants();
   }, [fetchRestaurants]);
 
-  // ============================================================
-  // HANDLERS
-  // ============================================================
+  
+  
+  
 
   const handleViewRestaurant = (id) => {
     console.log('[Restaurants] View restaurant:', id);
@@ -81,7 +81,7 @@ const Restaurants = () => {
 
   const handleEditRestaurant = (id) => {
     console.log('[Restaurants] Edit restaurant:', id);
-    // Open edit modal or navigate
+    
   };
 
   const handleDeleteRestaurant = async (id) => {
@@ -116,9 +116,9 @@ const Restaurants = () => {
     }
   };
 
-  // ============================================================
-  // RENDER
-  // ============================================================
+  
+  
+  
 
   if (loading) {
     return (
@@ -191,7 +191,7 @@ const Restaurants = () => {
 
       <main className="min-h-screen bg-background">
         <div className="max-w-[1200px] mx-auto p-12">
-          {/* Page Header */}
+          {}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-12">
             <div>
               <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
@@ -218,10 +218,10 @@ const Restaurants = () => {
             </div>
           </div>
 
-          {/* Stats Bar */}
+          {}
           <RestaurantsSummaryCards stats={stats} />
 
-          {/* Table Section */}
+          {}
           <RestaurantsTable
             restaurants={restaurants}
             onView={handleViewRestaurant}
@@ -231,7 +231,7 @@ const Restaurants = () => {
             loading={loading}
           />
 
-          {/* Support Grid */}
+          {}
           <SupportGrid />
         </div>
       </main>

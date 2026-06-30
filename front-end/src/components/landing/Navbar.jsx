@@ -42,7 +42,7 @@ const Navbar = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo */}
+          {}
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-all duration-300">
               <QrCode className="w-5 h-5 text-white" strokeWidth={2} />
@@ -53,7 +53,7 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               <button
@@ -67,7 +67,7 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* CTA Buttons */}
+          {}
           <div className="hidden lg:flex items-center gap-3">
             <button
               onClick={() => navigate("/auth/login")}
@@ -83,7 +83,7 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
+          {}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="lg:hidden relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
@@ -97,7 +97,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div

@@ -1,4 +1,4 @@
-// src/components/admin/Staff/StaffTable.jsx
+
 import React from 'react';
 import StaffRow from './StaffRow';
 
@@ -33,7 +33,7 @@ const StaffTable = ({ staff = [], onEdit, onDelete, currentPage, totalPages, onP
         </tbody>
       </table>
 
-      {/* Pagination */}
+      {}
       <div className="px-6 py-4 border-t border-neutral-100 bg-neutral-50/50 flex items-center justify-between">
           <p className="font-body-sm text-neutral-500">
           Showing 1 to {rows.length} of {rows.length} staff members

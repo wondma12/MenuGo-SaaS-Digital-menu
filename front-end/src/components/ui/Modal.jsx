@@ -17,7 +17,7 @@ const Modal = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden flex flex-col">
-        {/* Header */}
+        {}
         <div className="flex justify-between items-center p-5 border-b border-slate-200 flex-shrink-0">
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
           <button
@@ -28,10 +28,10 @@ const Modal = ({
           </button>
         </div>
 
-        {/* Content */}
+        {}
         <div className="p-5 overflow-y-auto flex-1">{children}</div>
 
-        {/* Footer */}
+        {}
         {footer ? (
           <div className="flex-shrink-0 border-t border-slate-200 p-5 bg-slate-50">
             {footer}

@@ -1,4 +1,4 @@
-// src/pages/Restaurant_admin/Dashboard.jsx
+
 
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -18,14 +18,14 @@ const Dashboard = () => {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
 
-  // ============================================================
-  // STATE
-  // ============================================================
+  
+  
+  
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Data states
+  
   const [stats, setStats] = useState({
     totalMenuItems: 0,
     totalOrders: 0,
@@ -39,9 +39,9 @@ const Dashboard = () => {
   const [qrCodes, setQrCodes] = useState([]);
   const [inventoryAlerts, setInventoryAlerts] = useState([]);
 
-  // ============================================================
-  // FETCH DATA
-  // ============================================================
+  
+  
+  
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -51,7 +51,7 @@ const Dashboard = () => {
 
         const currentRestaurantId = getRestaurantId();
 
-        // Fetch all data in parallel
+        
         const [
           menuItemsResult,
           ordersResult,
@@ -70,11 +70,11 @@ const Dashboard = () => {
 
         console.log("[Dashboard] Staff result:", staffResult);
 
-        // ✅ Process menu items
+        
         const menuItems = menuItemsResult.success ? menuItemsResult.data : [];
         const totalMenuItems = menuItems.length || 0;
 
-        // ✅ Process orders
+        
         const ordersData = ordersResult.success ? ordersResult.data : [];
         const totalOrders = ordersData.length || 0;
         const todayOrders =
@@ -84,7 +84,7 @@ const Dashboard = () => {
             return orderDate === today;
           }).length || 0;
 
-        // ✅ Process staff - FIXED
+        
         let staffData = [];
         if (staffResult && staffResult.success) {
           staffData = Array.isArray(staffResult.data) ? staffResult.data : [];
@@ -98,17 +98,17 @@ const Dashboard = () => {
         console.log("[Dashboard] Staff data:", staffData);
         const totalStaff = staffData.length || 0;
 
-        // ✅ Process restaurant
+        
         const restaurantData = restaurantResult.success
           ? restaurantResult.data
           : null;
 
-        // ✅ Process analytics
+        
         const analyticsData = analyticsResult.success
           ? analyticsResult.data
           : null;
 
-        // ✅ Process QR codes
+        
   let qrData = [];
 
 if (Array.isArray(qrResult)) {
@@ -132,7 +132,7 @@ else if (qrResult?.success) {
 
 console.log("QR DATA:", qrData);
 
-        // ✅ Update stats
+        
         setStats({
           totalMenuItems,
           totalOrders,
@@ -141,19 +141,19 @@ console.log("QR DATA:", qrData);
           revenue: analyticsData?.overview?.today_revenue || 0,
         });
 
-        // ✅ Set orders (limit to recent 5)
+        
         setOrders(ordersData.slice(0, 5));
 
-        // ✅ Set staff (limit to recent/on-duty staff)
+        
         setStaff(staffData.slice(0, 3));
 
-        // ✅ Set restaurant
+        
         setRestaurant(restaurantData);
 
-        // ✅ Set QR codes
+        
         setQrCodes(qrData);
 
-        // ✅ Set inventory alerts (mock for now - will be replaced when inventory API is ready)
+        
         setInventoryAlerts([
           { id: 1, item: "Chicken Breast", quantity: 5, threshold: 10 },
           { id: 2, item: "Tomatoes", quantity: 3, threshold: 8 },
@@ -170,9 +170,9 @@ console.log("QR DATA:", qrData);
     fetchDashboardData();
   }, [restaurantId]);
 
-  // ============================================================
-  // HELPERS
-  // ============================================================
+  
+  
+  
 
   const getRestaurantId = () => {
     if (restaurantId) return restaurantId;
@@ -181,9 +181,9 @@ console.log("QR DATA:", qrData);
     return null;
   };
 
-  // ============================================================
-  // QR CODE HANDLERS
-  // ============================================================
+  
+  
+  
 
   const handleDownloadQR = async () => {
     try {
@@ -251,9 +251,9 @@ console.log("QR DATA:", qrData);
     }
   };
 
-  // ============================================================
-  // OTHER HANDLERS
-  // ============================================================
+  
+  
+  
 
   const handleViewAllOrders = () => {
     const id = getRestaurantId();
@@ -285,9 +285,9 @@ console.log("QR DATA:", qrData);
     console.log("Navigate to restock page for:", item);
   };
 
-  // ============================================================
-  // RENDER - LOADING STATE
-  // ============================================================
+  
+  
+  
 
   if (loading) {
     return (
@@ -344,9 +344,9 @@ console.log("QR DATA:", qrData);
     );
   }
 
-  // ============================================================
-  // RENDER - ERROR STATE
-  // ============================================================
+  
+  
+  
 
   if (error) {
     return (
@@ -372,15 +372,15 @@ console.log("QR DATA:", qrData);
     );
   }
 
-  // ============================================================
-  // RENDER - SUCCESS STATE
-  // ============================================================
+  
+  
+  
 
   return (
     <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
       <main className="min-h-screen bg-surface">
         <div className="p-8 space-y-6 max-w-[1200px]">
-          {/* Page Header */}
+          {}
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
             <div className="space-y-1">
               <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
@@ -407,7 +407,7 @@ console.log("QR DATA:", qrData);
             </div>
           </div>
 
-          {/* Bento Grid Summary Cards */}
+          {}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <StatsCard
               title="Total Menu Items"
@@ -432,7 +432,7 @@ console.log("QR DATA:", qrData);
             />
           </div>
 
-          {/* Main Section: Recent Orders & Performance */}
+          {}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               <RecentOrdersTable
@@ -451,7 +451,7 @@ console.log("QR DATA:", qrData);
             </div>
           </div>
 
-          {/* Inventory Alerts Section */}
+          {}
           {inventoryAlerts.length > 0 && (
             <InventoryAlert
               itemCount={inventoryAlerts.length}

@@ -1,4 +1,4 @@
-// src/components/Admin/settings/SystemRules.jsx
+
 
 import React from 'react';
 import ToggleSwitch from '../../ui/ToggleSwitch';

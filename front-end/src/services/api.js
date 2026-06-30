@@ -1,10 +1,10 @@
-// services/api.js
+
 import axios from "axios";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
 
-// Create axios instance
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -13,7 +13,7 @@ const api = axios.create({
   timeout: 30000,
 });
 
-// Request interceptor - Add token to every request
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -25,7 +25,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// Response interceptor - Handle errors
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -43,16 +43,10 @@ api.interceptors.response.use(
   },
 );
 
-// ============================================================
-// HELPER FUNCTIONS
-// ============================================================
 
-/**
- * Standard response handler - extracts data from API response
- * @param {Object} response - Axios response object
- * @returns {*} - The data from the response
- * @throws {Error} - If the response indicates failure
- */
+
+
+
 const handleResponse = (response) => {
   console.log('[API] handleResponse - Response:', response);
   
@@ -68,30 +62,27 @@ const handleResponse = (response) => {
   
   console.log('[API] response.data:', response.data);
   
-  // If the response has success: true, return the data
+  
   if (response.data.success === true) {
     return response.data.data;
   }
   
-  // If the response has success: false, throw the error
+  
   if (response.data.success === false) {
     throw new Error(response.data.message || 'Request failed');
   }
   
-  // If success is not provided but there's data, return it
+  
   if (response.data.data) {
     return response.data.data;
   }
   
-  // Fallback: return the whole response data
+  
   return response.data;
 };
 
-/**
- * Standard error handler - extracts error message from API error
- * @param {Error} error - Axios error object
- * @throws {Error} - Re-throws the error with a consistent message
- */
+
+
 const handleError = (error) => {
   console.error('[API] handleError - Error:', error);
   console.error('[API] Error response:', error.response);
@@ -103,11 +94,8 @@ const handleError = (error) => {
   throw new Error(message);
 };
 
-/**
- * Wrapper for API calls that returns { success, data, error } format
- * @param {Function} apiCall - The API call function
- * @returns {Promise<Object>} - { success, data, error }
- */
+
+
 const wrapApiCall = async (apiCall) => {
   try {
     const result = await apiCall();
@@ -126,9 +114,7 @@ const wrapApiCall = async (apiCall) => {
   }
 };
 
-// ===============================
-// AUTH API
-// ===============================
+
 
 export const authAPI = {
   login: async (email, password) => {
@@ -199,9 +185,7 @@ export const authAPI = {
   },
 };
 
-// ===============================
-// RESTAURANT API
-// ===============================
+
 
 export const restaurantAPI = {
   getAll: async (params = {}) => {
@@ -241,7 +225,7 @@ export const restaurantAPI = {
         throw new Error('No response from server');
       }
       
-      // Handle success response
+      
       if (response.data.success === true) {
         return {
           success: true,
@@ -249,7 +233,7 @@ export const restaurantAPI = {
         };
       }
       
-      // If there's data but no success flag, assume success
+      
       if (response.data.data) {
         return {
           success: true,
@@ -257,7 +241,7 @@ export const restaurantAPI = {
         };
       }
       
-      // If the response itself is the data (has id)
+      
       if (response.data.id) {
         return {
           success: true,
@@ -265,7 +249,7 @@ export const restaurantAPI = {
         };
       }
       
-      // Handle error response
+      
       if (response.data.success === false) {
         return {
           success: false,
@@ -274,7 +258,7 @@ export const restaurantAPI = {
         };
       }
       
-      // Fallback
+      
       return {
         success: true,
         data: response.data,
@@ -309,9 +293,7 @@ export const restaurantAPI = {
   },
 };
 
-// ===============================
-// STAFF API
-// ===============================
+
 
 export const staffAPI = {
   getAll: async (params = {}) => {
@@ -360,12 +342,10 @@ export const staffAPI = {
   },
 };
 
-// ===============================
-// MENU API
-// ===============================
+
 
 export const menuAPI = {
-  // Categories
+  
   getCategories: async () => {
     try {
       const response = await api.get("/menu/categories");
@@ -411,7 +391,7 @@ export const menuAPI = {
     }
   },
 
-  // Menu Items
+  
   getMenuItems: async (params = {}) => {
     try {
       const response = await api.get("/menu/items", { params });
@@ -484,7 +464,7 @@ export const menuAPI = {
     }
   },
 
-  // ✅ PUBLIC MENU - NO AUTHENTICATION REQUIRED
+  
   getPublicMenu: async (restaurantId) => {
     try {
       console.log('[menuAPI] Fetching public menu for restaurant:', restaurantId);
@@ -498,9 +478,7 @@ export const menuAPI = {
   },
 };
 
-// ===============================
-// ORDER API
-// ===============================
+
 
 export const orderAPI = {
   getAll: async (params = {}) => {
@@ -594,9 +572,7 @@ export const orderAPI = {
   },
 };
 
-// ===============================
-// QR CODE API - FIXED
-// ===============================
+
 
 export const qrCodeAPI = {
   generate: async (data) => {
@@ -613,7 +589,7 @@ export const qrCodeAPI = {
         };
       }
       
-      // Handle success response
+      
       if (response.data.success === true) {
         return {
           success: true,
@@ -621,7 +597,7 @@ export const qrCodeAPI = {
         };
       }
       
-      // If there's data but no success flag, assume success
+      
       if (response.data.data) {
         return {
           success: true,
@@ -629,7 +605,7 @@ export const qrCodeAPI = {
         };
       }
       
-      // If the response has an id, assume success
+      
       if (response.data.id) {
         return {
           success: true,
@@ -637,7 +613,7 @@ export const qrCodeAPI = {
         };
       }
       
-      // Handle error response
+      
       if (response.data.success === false) {
         return {
           success: false,
@@ -646,7 +622,7 @@ export const qrCodeAPI = {
         };
       }
       
-      // Fallback
+      
       return {
         success: true,
         data: response.data,
@@ -684,7 +660,7 @@ export const qrCodeAPI = {
         };
       }
       
-      // Handle success response
+      
       if (response.data.success === true) {
         return {
           success: true,
@@ -692,7 +668,7 @@ export const qrCodeAPI = {
         };
       }
       
-      // If there's data but no success flag
+      
       if (response.data.data) {
         return {
           success: true,
@@ -700,7 +676,7 @@ export const qrCodeAPI = {
         };
       }
       
-      // If the response is an array
+      
       if (Array.isArray(response.data)) {
         return {
           success: true,
@@ -708,7 +684,7 @@ export const qrCodeAPI = {
         };
       }
       
-      // Fallback
+      
       return {
         success: true,
         data: response.data || [],
@@ -743,9 +719,7 @@ export const qrCodeAPI = {
   },
 };
 
-// ===============================
-// FEEDBACK API
-// ===============================
+
 
 export const feedbackAPI = {
   getAll: async (params = {}) => {
@@ -776,16 +750,14 @@ export const feedbackAPI = {
   },
 };
 
-// ===============================
-// ANALYTICS API
-// ===============================
+
 
 export const analyticsAPI = {
   getDashboard: async () => {
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       
-      // ✅ Platform admin uses admin endpoint
+      
       let endpoint = '/analytics/dashboard';
       if (user.role === 'platform_admin') {
         endpoint = '/admin/dashboard';
@@ -832,9 +804,7 @@ export const analyticsAPI = {
   },
 };
 
-// ===============================
-// VERIFICATION API
-// ===============================
+
 
 export const verificationAPI = {
   submit: async (data) => {
@@ -874,9 +844,7 @@ export const verificationAPI = {
   },
 };
 
-// ===============================
-// LOCATION API
-// ===============================
+
 
 export const locationAPI = {
   add: async (data) => {
@@ -916,9 +884,7 @@ export const locationAPI = {
   },
 };
 
-// ===============================
-// SETTINGS API
-// ===============================
+
 
 export const settingsAPI = {
   get: async () => {
@@ -940,8 +906,6 @@ export const settingsAPI = {
   },
 };
 
-// ===============================
-// DEFAULT EXPORT
-// ===============================
+
 
 export default api;

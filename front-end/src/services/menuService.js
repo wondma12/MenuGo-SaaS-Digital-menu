@@ -1,12 +1,12 @@
-// services/menuService.js
+
 import { menuAPI } from './api.js';
 
 const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const menuService = {
-  // ==========================================
-  // MENU ITEMS
-  // ==========================================
+  
+  
+  
 
   async getMenuItems(params = {}) {
     try {
@@ -44,9 +44,9 @@ const menuService = {
     }
   },
 
-// services/menuService.js
 
-// services/menuService.js
+
+
 
 async createMenuItem(itemData) {
   try {
@@ -63,7 +63,7 @@ async createMenuItem(itemData) {
 
     console.log('[menuService] createMenuItem result:', result);
 
-    // ✅ Check if result exists
+    
     if (!result) {
       return {
         success: false,
@@ -72,7 +72,7 @@ async createMenuItem(itemData) {
       };
     }
 
-    // ✅ If result has id (successful creation)
+    
     if (result.id) {
       return {
         success: true,
@@ -80,7 +80,7 @@ async createMenuItem(itemData) {
       };
     }
 
-    // ✅ If result has success property
+    
     if (result.success === true) {
       return {
         success: true,
@@ -88,7 +88,7 @@ async createMenuItem(itemData) {
       };
     }
 
-    // ✅ If result has data property
+    
     if (result.data) {
       return {
         success: true,
@@ -96,7 +96,7 @@ async createMenuItem(itemData) {
       };
     }
 
-    // ✅ Fallback - if we got here, assume success
+    
     return {
       success: true,
       data: result,
@@ -174,7 +174,7 @@ async deleteMenuItem(id) {
       };
     }
 
-    // If we got here, assume success
+    
     return {
       success: true,
       data: { id },
@@ -208,9 +208,9 @@ async deleteMenuItem(id) {
     }
   },
 
-  // ==========================================
-  // CATEGORIES
-  // ==========================================
+  
+  
+  
 
   async getCategories() {
     try {
@@ -232,10 +232,10 @@ async deleteMenuItem(id) {
 
   async getCategoriesByRestaurant(restaurantId) {
     try {
-      // This would need a filter by restaurant
+      
       const result = await menuAPI.getCategories();
       const categories = result.categories || result;
-      // Filter by restaurant - this would be better handled server-side
+      
       return {
         success: true,
         data: categories,
@@ -305,9 +305,9 @@ async deleteMenuItem(id) {
     }
   },
 
-  // ==========================================
-  // FEATURED & ORGANIZED MENU
-  // ==========================================
+  
+  
+  
 
   async getFeaturedItems(limit = 10) {
     try {
@@ -345,9 +345,9 @@ async deleteMenuItem(id) {
     }
   },
 
-  // ==========================================
-  // PUBLIC MENU
-  // ==========================================
+  
+  
+  
 
   async getPublicMenu(restaurantId) {
     try {
