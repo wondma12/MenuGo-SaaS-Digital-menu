@@ -1,9 +1,14 @@
+// src/components/Restaurant_admin/staff/StaffTable.jsx
 
 import React from 'react';
 import StaffRow from './StaffRow';
 
-const StaffTable = ({ staff = [], onEdit, onDelete, currentPage, totalPages, onPageChange }) => {
+const StaffTable = ({ staff = [], onEdit, onDelete, currentPage = 1, totalPages = 1, onPageChange }) => {
+  // ✅ Ensure staff is an array
   const rows = Array.isArray(staff) ? staff : [];
+  
+  console.log('[StaffTable] Rendering rows:', rows.length);
+
   return (
     <div className="bg-white mt-10 border border-neutral-200 rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
       <table className="w-full text-left border-collapse">
@@ -27,34 +32,48 @@ const StaffTable = ({ staff = [], onEdit, onDelete, currentPage, totalPages, onP
           </tr>
         </thead>
         <tbody className="divide-y divide-neutral-100">
-          {rows.map((member) => (
-            <StaffRow key={member.id} staff={member} onEdit={onEdit} onDelete={onDelete} />
-          ))}
+          {rows.length > 0 ? (
+            rows.map((member) => (
+              <StaffRow 
+                key={member.id || member._id} 
+                staff={member} 
+                onEdit={onEdit} 
+                onDelete={onDelete} 
+              />
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5" className="px-6 py-8 text-center text-gray-400">
+                No staff members found
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
 
-      {}
-      <div className="px-6 py-4 border-t border-neutral-100 bg-neutral-50/50 flex items-center justify-between">
+      {rows.length > 0 && (
+        <div className="px-6 py-4 border-t border-neutral-100 bg-neutral-50/50 flex items-center justify-between">
           <p className="font-body-sm text-neutral-500">
-          Showing 1 to {rows.length} of {rows.length} staff members
-        </p>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="w-8 h-8 flex items-center justify-center border border-neutral-200 rounded bg-white hover:bg-neutral-100 transition-colors disabled:opacity-50"
-          >
-            <span className="material-symbols-outlined text-sm"></span>
-          </button>
-          <button
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="w-8 h-8 flex items-center justify-center border border-neutral-200 rounded bg-white hover:bg-neutral-100 transition-colors disabled:opacity-50"
-          >
-            <span className="material-symbols-outlined text-sm"></span>
-          </button>
+            Showing 1 to {rows.length} of {rows.length} staff members
+          </p>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => onPageChange && onPageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="w-8 h-8 flex items-center justify-center border border-neutral-200 rounded bg-white hover:bg-neutral-100 transition-colors disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-sm">←</span>
+            </button>
+            <button
+              onClick={() => onPageChange && onPageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="w-8 h-8 flex items-center justify-center border border-neutral-200 rounded bg-white hover:bg-neutral-100 transition-colors disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-sm">→</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

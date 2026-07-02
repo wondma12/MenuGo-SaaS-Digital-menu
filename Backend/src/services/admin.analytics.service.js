@@ -8,6 +8,45 @@ import prisma from '../config/prisma.js';
  */
 
 // ============================================================
+// HELPER FUNCTIONS
+// ============================================================
+
+/**
+ * Convert BigInt to Number for JSON serialization
+ */
+const convertBigInt = (value) => {
+  if (typeof value === 'bigint') {
+    return Number(value);
+  }
+  return value;
+};
+
+/**
+ * Recursively convert all BigInts in an object/array to Numbers
+ */
+const convertBigInts = (obj) => {
+  if (obj === null || obj === undefined) return obj;
+  
+  if (typeof obj === 'bigint') {
+    return Number(obj);
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => convertBigInts(item));
+  }
+  
+  if (typeof obj === 'object') {
+    const result = {};
+    for (const [key, value] of Object.entries(obj)) {
+      result[key] = convertBigInts(value);
+    }
+    return result;
+  }
+  
+  return obj;
+};
+
+// ============================================================
 // PLATFORM DASHBOARD STATS
 // ============================================================
 
@@ -82,22 +121,40 @@ export const getPlatformDashboardStats = async () => {
     take: 10,
   });
 
-  return {
+  // ✅ Convert BigInts to Numbers
+  const revenueValue = totalRevenue._sum.total_price || 0;
+  const totalRevenueNumber = convertBigInt(revenueValue);
+
+  // ✅ Convert dailyRevenue BigInts
+  const convertedDailyRevenue = dailyRevenue.map(row => ({
+    date: row.date,
+    order_count: convertBigInt(row.order_count),
+    revenue: convertBigInt(row.revenue),
+  }));
+
+  // ✅ Convert topItems BigInts
+  const convertedTopItems = topItems.map(item => ({
+    name: item.item_name || `Item ${item.menu_item_id}`,
+    quantity: convertBigInt(item._sum.quantity || 0),
+    menu_item_id: item.menu_item_id,
+  }));
+
+  const result = {
     summary: {
-      totalRestaurants,
-      totalUsers,
-      totalOrders,
-      totalRevenue: totalRevenue._sum.total_price || 0,
+      totalRestaurants: convertBigInt(totalRestaurants),
+      totalUsers: convertBigInt(totalUsers),
+      totalOrders: convertBigInt(totalOrders),
+      totalRevenue: totalRevenueNumber,
     },
     restaurantStatus: {
-      active: activeRestaurants,
-      pending: pendingRestaurants,
-      suspended: suspendedRestaurants,
+      active: convertBigInt(activeRestaurants),
+      pending: convertBigInt(pendingRestaurants),
+      suspended: convertBigInt(suspendedRestaurants),
     },
     userRoles: {
-      platformAdmins,
-      restaurantAdmins,
-      waiters,
+      platformAdmins: convertBigInt(platformAdmins),
+      restaurantAdmins: convertBigInt(restaurantAdmins),
+      waiters: convertBigInt(waiters),
     },
     pendingRegistrations: pendingRegistrations.map(restaurant => ({
       id: restaurant.id,
@@ -109,12 +166,12 @@ export const getPlatformDashboardStats = async () => {
       verificationStatus: restaurant.restaurant_verification?.[0]?.verification_status || 'pending',
       created_at: restaurant.created_at,
     })),
-    dailyRevenue,
-    topItems: topItems.map(item => ({
-      name: item.item_name || `Item ${item.menu_item_id}`,
-      quantity: item._sum.quantity || 0,
-    })),
+    dailyRevenue: convertedDailyRevenue,
+    topItems: convertedTopItems,
   };
+
+  // ✅ Final safety check - convert any remaining BigInts
+  return convertBigInts(result);
 };
 
 // ============================================================
@@ -133,7 +190,14 @@ export const getPlatformRevenueChart = async (days = 30) => {
     ORDER BY date ASC
   `;
 
-  return revenueData;
+  // ✅ Convert BigInts in revenueData
+  const convertedData = revenueData.map(row => ({
+    date: row.date,
+    order_count: convertBigInt(row.order_count),
+    revenue: convertBigInt(row.revenue),
+  }));
+
+  return convertedData;
 };
 
 // ============================================================
@@ -146,15 +210,20 @@ export const getPlatformOrderDistribution = async () => {
     _count: true,
   });
 
-  return distribution;
+  // ✅ Convert BigInts in distribution
+  const convertedDistribution = distribution.map(item => ({
+    status: item.status,
+    _count: convertBigInt(item._count),
+  }));
+
+  return convertedDistribution;
 };
 
 // ============================================================
-// ALL RESTAURANTS ANALYTICS - FIXED
+// ALL RESTAURANTS ANALYTICS
 // ============================================================
 
 export const getAllRestaurantsAnalytics = async () => {
-  // ✅ Get restaurants with available _count fields
   const restaurants = await prisma.restaurants.findMany({
     select: {
       id: true,
@@ -170,7 +239,6 @@ export const getAllRestaurantsAnalytics = async () => {
           orders: true,
           qr_codes: true,
           feedbacks: true,
-          // ✅ menu_items is NOT available here - we'll count it separately
         },
       },
       users_restaurants_owner_idTousers: {
@@ -212,7 +280,7 @@ export const getAllRestaurantsAnalytics = async () => {
         ...restaurant,
         _count: {
           ...restaurant._count,
-          menu_items: menuItemsCount,
+          menu_items: convertBigInt(menuItemsCount),
         },
       };
     })
@@ -226,14 +294,24 @@ export const getAllRestaurantsAnalytics = async () => {
         _sum: { total_price: true },
       });
       
+      const revenueValue = revenue._sum.total_price || 0;
+      
       return {
         ...restaurant,
-        totalRevenue: revenue._sum.total_price || 0,
+        _count: {
+          ...restaurant._count,
+          orders: convertBigInt(restaurant._count.orders),
+          categories: convertBigInt(restaurant._count.categories),
+          qr_codes: convertBigInt(restaurant._count.qr_codes),
+          feedbacks: convertBigInt(restaurant._count.feedbacks),
+        },
+        totalRevenue: convertBigInt(revenueValue),
       };
     })
   );
 
-  return restaurantsWithRevenue;
+  // ✅ Final safety check
+  return convertBigInts(restaurantsWithRevenue);
 };
 
 // ============================================================
@@ -257,5 +335,15 @@ export const getTopRestaurants = async (limit = 10) => {
     LIMIT ${limit}
   `;
 
-  return topRestaurants;
+  // ✅ Convert BigInts in topRestaurants
+  const convertedData = topRestaurants.map(row => ({
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    status: row.status,
+    order_count: convertBigInt(row.order_count),
+    total_revenue: convertBigInt(row.total_revenue),
+  }));
+
+  return convertedData;
 };

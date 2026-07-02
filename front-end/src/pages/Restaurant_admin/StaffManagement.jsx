@@ -1,4 +1,4 @@
-
+// src/pages/Restaurant_admin/StaffManagement.jsx
 
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/layout/sidebar";
@@ -7,8 +7,10 @@ import StaffStats from "../../components/Restaurant_admin/staff/StaffStats";
 import StaffTable from "../../components/Restaurant_admin/staff/StaffTable";
 import AddStaffModal from "../../components/Restaurant_admin/staff/AddStaffModal";
 import staffService from "../../services/staffServices";
+import { useParams } from "react-router-dom";  
 
 const StaffManagement = () => {
+  const { restaurantId } = useParams();  
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,47 +26,66 @@ const StaffManagement = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const itemsPerPage = 5;
 
-  
-  
-  
-
-
+  // ✅ Helper function to get restaurant ID
+  const getRestaurantId = () => {
+    // Try from URL params first
+    if (restaurantId) return restaurantId;
+    
+    // Try from localStorage
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (user.restaurant_id) return user.restaurant_id;
+    } catch (e) {
+      console.error('Error getting restaurant ID from localStorage:', e);
+    }
+    
+    return null;
+  };
 
 const loadData = async () => {
   try {
     setLoading(true);
     setError(null);
-    
-    
-    const staffResult = await staffService.getAll();
-    console.log('[StaffManagement] Staff result:', staffResult);
-    
-    
+
+    const currentRestaurantId = getRestaurantId();
+    console.log("[StaffManagement] Current restaurant ID:", currentRestaurantId);
+
+    const staffResult = await staffService.getAll(currentRestaurantId);
+    console.log("[StaffManagement] Staff result:", staffResult);
+
     let staffData = [];
+    
     if (staffResult && staffResult.success) {
-      staffData = Array.isArray(staffResult.data) ? staffResult.data : [];
+      // ✅ Check if data has 'users' property (from paginated response)
+      if (staffResult.data && staffResult.data.users && Array.isArray(staffResult.data.users)) {
+        staffData = staffResult.data.users;
+      } 
+      // ✅ Check if data is direct array
+      else if (Array.isArray(staffResult.data)) {
+        staffData = staffResult.data;
+      } 
+      // ✅ Check if data has data property (nested)
+      else if (staffResult.data && staffResult.data.data && Array.isArray(staffResult.data.data)) {
+        staffData = staffResult.data.data;
+      }
+      // ✅ Check if result itself is array
+      else if (Array.isArray(staffResult)) {
+        staffData = staffResult;
+      }
     } else if (Array.isArray(staffResult)) {
       staffData = staffResult;
-    } else if (staffResult && typeof staffResult === 'object') {
-      
-      if (staffResult.data && Array.isArray(staffResult.data)) {
-        staffData = staffResult.data;
-      } else {
-        
-        const possibleArray = Object.values(staffResult).find(val => Array.isArray(val));
-        staffData = possibleArray || [];
-      }
     }
-    
-    console.log('[StaffManagement] Extracted staff data:', staffData);
+
+    console.log("[StaffManagement] Extracted staff data:", staffData);
     setStaff(staffData);
-    
-    
+
     const total = staffData.length;
-    const admins = staffData.filter(s => s.role === 'restaurant_admin' || s.role === 'admin').length;
-    const waitstaff = staffData.filter(s => s.role === 'waiter').length;
-    const activeNow = staffData.filter(s => s.is_active !== false).length;
-    
+    const admins = staffData.filter(
+      (s) => s.role === "restaurant_admin" || s.role === "admin",
+    ).length;
+    const waitstaff = staffData.filter((s) => s.role === "waiter").length;
+    const activeNow = staffData.filter((s) => s.is_active !== false).length;
+
     setStats({
       totalStaff: total,
       activeNow,
@@ -72,45 +93,43 @@ const loadData = async () => {
       waitstaff,
     });
   } catch (err) {
-    console.error('[StaffManagement] Error loading staff:', err);
-    setError(err.message || 'Failed to load staff data');
-    setStaff([]);  
+    console.error("[StaffManagement] Error loading staff:", err);
+    setError(err.message || "Failed to load staff data");
+    setStaff([]);
   } finally {
     setLoading(false);
   }
 };
-
   useEffect(() => {
     loadData();
   }, []);
 
-  
-  
-  
-
   const paginatedStaff = staff.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
   const totalPages = Math.ceil(staff.length / itemsPerPage);
-
-  
-  
-  
 
   const handleAddStaff = async (newStaff) => {
     setIsSubmitting(true);
     try {
-      const result = await staffService.add(newStaff);
+      // ✅ Ensure restaurant_id is included
+      const currentRestaurantId = getRestaurantId();
+      const staffData = {
+        ...newStaff,
+        restaurant_id: currentRestaurantId,
+      };
+      
+      const result = await staffService.add(staffData);
       if (result.success) {
         await loadData();
         setIsModalOpen(false);
       } else {
-        alert(result.error || 'Failed to add staff member');
+        alert(result.error || "Failed to add staff member");
       }
     } catch (error) {
-      console.error('[StaffManagement] Error adding staff:', error);
-      alert('Failed to add staff member. Please try again.');
+      console.error("[StaffManagement] Error adding staff:", error);
+      alert("Failed to add staff member. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -125,11 +144,11 @@ const loadData = async () => {
         await loadData();
         setIsModalOpen(false);
       } else {
-        alert(result.error || 'Failed to update staff member');
+        alert(result.error || "Failed to update staff member");
       }
     } catch (error) {
-      console.error('[StaffManagement] Error updating staff:', error);
-      alert('Failed to update staff member. Please try again.');
+      console.error("[StaffManagement] Error updating staff:", error);
+      alert("Failed to update staff member. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -145,11 +164,11 @@ const loadData = async () => {
       if (result.success) {
         await loadData();
       } else {
-        alert(result.error || 'Failed to delete staff member');
+        alert(result.error || "Failed to delete staff member");
       }
     } catch (error) {
-      console.error('[StaffManagement] Error deleting staff:', error);
-      alert('Failed to delete staff member. Please try again.');
+      console.error("[StaffManagement] Error deleting staff:", error);
+      alert("Failed to delete staff member. Please try again.");
     }
   };
 
@@ -163,16 +182,11 @@ const loadData = async () => {
     setIsModalOpen(true);
   };
 
-  
-  
-  
-
   if (loading) {
     return (
       <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
         <main className="min-h-screen bg-surface">
           <div className="p-8 max-w-[1200px] mx-auto">
-            {}
             <div className="flex justify-between items-end mb-6">
               <div className="space-y-2">
                 <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
@@ -180,19 +194,21 @@ const loadData = async () => {
               </div>
               <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
             </div>
-
-            {}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-24 bg-gray-200 rounded-lg animate-pulse"></div>
+                <div
+                  key={i}
+                  className="h-24 bg-gray-200 rounded-lg animate-pulse"
+                ></div>
               ))}
             </div>
-
-            {}
             <div className="bg-white border rounded-xl overflow-hidden">
               <div className="p-6 space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="h-16 bg-gray-100 rounded animate-pulse"></div>
+                  <div
+                    key={i}
+                    className="h-16 bg-gray-100 rounded animate-pulse"
+                  ></div>
                 ))}
               </div>
             </div>
@@ -202,10 +218,6 @@ const loadData = async () => {
     );
   }
 
-  
-  
-  
-
   if (error) {
     return (
       <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
@@ -213,7 +225,9 @@ const loadData = async () => {
           <div className="p-8 max-w-[1200px] mx-auto">
             <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
               <div className="text-red-500 text-6xl mb-4">⚠️</div>
-              <h3 className="text-xl font-semibold text-red-700 mb-2">Unable to Load Staff</h3>
+              <h3 className="text-xl font-semibold text-red-700 mb-2">
+                Unable to Load Staff
+              </h3>
               <p className="text-red-600 mb-4">{error}</p>
               <button
                 onClick={loadData}
@@ -228,15 +242,10 @@ const loadData = async () => {
     );
   }
 
-  
-  
-  
-
   return (
     <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
       <main className="min-h-screen bg-surface">
         <div className="p-8 max-w-[1200px] mx-auto">
-          {}
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-6">
             <div>
               <p className="text-gray-500 text-sm font-bold mb-2 uppercase tracking-widest">
@@ -259,10 +268,8 @@ const loadData = async () => {
             </button>
           </div>
 
-          {}
           <StaffStats stats={stats} />
 
-          {}
           <div className="mt-6">
             <StaffTable
               staff={paginatedStaff}
@@ -274,7 +281,6 @@ const loadData = async () => {
             />
           </div>
 
-          {}
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 opacity-60">
             <div className="border-l-2 border-gray-300 pl-4">
               <p className="text-[10px] font-bold uppercase mb-2 tracking-wider text-gray-500">
@@ -299,7 +305,6 @@ const loadData = async () => {
         </div>
       </main>
 
-      {}
       <AddStaffModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -309,6 +314,7 @@ const loadData = async () => {
         onSubmit={editingStaff ? handleEditStaff : handleAddStaff}
         editingStaff={editingStaff}
         isSubmitting={isSubmitting}
+        restaurantId={getRestaurantId()}  
       />
     </div>
   );

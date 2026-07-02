@@ -32,7 +32,6 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.href = "/auth/login";
     }
 
     const errorMessage =
@@ -194,6 +193,23 @@ export const restaurantAPI = {
       return handleResponse(response);
     } catch (error) {
       return handleError(error);
+    }
+  },
+
+  getPublicRestaurant: async (id) => {
+    try {
+      // If you have a public endpoint, use it
+      const response = await api.get(`/public/restaurants/${id}`);
+      return handleResponse(response);
+    } catch (error) {
+      // Fallback: try regular endpoint (might fail if no auth)
+      try {
+        const response = await api.get(`/restaurants/${id}`);
+        return handleResponse(response);
+      } catch (fallbackError) {
+        console.error('[restaurantAPI] Failed to get restaurant:', fallbackError);
+        return null;
+      }
     }
   },
 

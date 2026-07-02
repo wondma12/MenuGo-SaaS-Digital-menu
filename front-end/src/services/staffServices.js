@@ -1,9 +1,12 @@
-
+// services/staffServices.js
 
 import { staffAPI } from './api.js';
 
-
-
+/*
+|--------------------------------------------------------------------------
+| Staff Service
+|--------------------------------------------------------------------------
+*/
 
 export const fetchStaff = async (restaurantId = null) => {
   try {
@@ -13,9 +16,44 @@ export const fetchStaff = async (restaurantId = null) => {
     }
     
     const result = await staffAPI.getAll(params);
+    console.log('[StaffService] Raw API result:', result);
+    
+    let staffData = [];
+    
+    // ✅ The API returns { users: [...], pagination: {...} } directly
+    if (result) {
+      // Case 1: { users: [...], pagination: {...} }
+      if (result.users && Array.isArray(result.users)) {
+        staffData = result.users;
+        console.log('[StaffService] Extracted from result.users');
+      }
+      // Case 2: { data: { users: [...] } }
+      else if (result.data && result.data.users && Array.isArray(result.data.users)) {
+        staffData = result.data.users;
+        console.log('[StaffService] Extracted from data.users');
+      }
+      // Case 3: { data: [...] }
+      else if (result.data && Array.isArray(result.data)) {
+        staffData = result.data;
+        console.log('[StaffService] Extracted from data');
+      }
+      // Case 4: result is an array
+      else if (Array.isArray(result)) {
+        staffData = result;
+        console.log('[StaffService] Result is array');
+      }
+      // Case 5: { success: true, data: { users: [...] } }
+      else if (result.success && result.data && result.data.users && Array.isArray(result.data.users)) {
+        staffData = result.data.users;
+        console.log('[StaffService] Extracted from success.data.users');
+      }
+    }
+    
+    console.log('[StaffService] Final staff data:', staffData);
+    
     return {
       success: true,
-      data: result || [],
+      data: staffData,
     };
   } catch (error) {
     console.error('[StaffService] Error fetching staff:', error);
@@ -93,8 +131,11 @@ export const deleteStaff = async (id) => {
   }
 };
 
-
-
+/*
+|--------------------------------------------------------------------------
+| Staff Service Object
+|--------------------------------------------------------------------------
+*/
 
 export const staffService = {
   getAll: async (restaurantId = null) => {

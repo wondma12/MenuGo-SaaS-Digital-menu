@@ -1,6 +1,7 @@
 // Backend/src/services/users.service.js
 
 import prisma from '../config/prisma.js';
+import bcrypt from 'bcryptjs';  // ✅ Add this import
 
 /**
  * Users Service
@@ -15,7 +16,6 @@ export const getAllUsers = async (params = {}) => {
   const { role, restaurant_id, is_active, search, page = 1, limit = 100 } = params;
   const skip = (parseInt(page) - 1) * parseInt(limit);
 
-  // Build where clause
   const where = {};
 
   if (role) {
@@ -38,7 +38,6 @@ export const getAllUsers = async (params = {}) => {
     ];
   }
 
-  // Get users with pagination
   const [users, total] = await Promise.all([
     prisma.users.findMany({
       where,
@@ -178,7 +177,7 @@ export const getUsersByRestaurant = async (restaurantId, params = {}) => {
 };
 
 // ============================================================
-// CREATE USER
+// CREATE USER - ✅ FIXED
 // ============================================================
 
 export const createUser = async (userData) => {
@@ -193,15 +192,19 @@ export const createUser = async (userData) => {
     throw new Error('User with this email already exists');
   }
 
-  // Hash password (you should hash this, but we'll assume it's already hashed)
-  // In real implementation, use bcrypt here
+  // ✅ Hash the password before saving
+  let hashedPassword = password;
+  if (password) {
+    const salt = await bcrypt.genSalt(10);
+    hashedPassword = await bcrypt.hash(password, salt);
+  }
 
   const user = await prisma.users.create({
     data: {
       name,
       email,
       phone,
-      password, // Should be hashed
+      password: hashedPassword, // ✅ Store hashed password
       role: role || 'waiter',
       restaurant_id: restaurant_id || null,
       profile_image: profile_image || null,
@@ -335,7 +338,7 @@ export const permanentlyDeleteUser = async (id) => {
 };
 
 // ============================================================
-// UPDATE USER PASSWORD
+// UPDATE USER PASSWORD - ✅ FIXED
 // ============================================================
 
 export const updateUserPassword = async (id, newPassword) => {
@@ -348,10 +351,13 @@ export const updateUserPassword = async (id, newPassword) => {
     throw new Error('User not found');
   }
 
-  // In real implementation, hash the password here
+  // ✅ Hash the new password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+
   const user = await prisma.users.update({
     where: { id },
-    data: { password: newPassword },
+    data: { password: hashedPassword },
     select: {
       id: true,
       name: true,

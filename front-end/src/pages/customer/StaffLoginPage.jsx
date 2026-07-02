@@ -1,4 +1,4 @@
-
+// src/pages/customer/StaffLoginPage.jsx
 
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -22,11 +22,9 @@ const StaffLoginPage = () => {
   const [loginError, setLoginError] = useState("");
   const [restaurant, setRestaurant] = useState(null);
 
-  
   useEffect(() => {
     const loadRestaurant = async () => {
       if (!restaurantId) {
-        
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         if (user.restaurant_id) {
           try {
@@ -40,13 +38,8 @@ const StaffLoginPage = () => {
       }
 
       try {
-        
-        let result;
-        try {
-          result = await restaurantAPI.getPublicRestaurant?.(restaurantId);
-        } catch {
-          result = await restaurantAPI.getById(restaurantId);
-        }
+        // ✅ Use public endpoint for restaurant info
+        const result = await restaurantAPI.getById(restaurantId);
         if (result) {
           setRestaurant(result);
         }
@@ -94,7 +87,6 @@ const StaffLoginPage = () => {
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
 
-        
         if (user.role === "restaurant_admin" || user.role === "waiter") {
           const redirectPath = authService.getRestaurantRedirectPath(user);
           if (redirectPath) {
@@ -116,8 +108,8 @@ const StaffLoginPage = () => {
     }
   };
 
-  
-  const restaurantName = restaurant?.name || "LUMIÈRE DINING";
+  const restaurantName = restaurant?.name || "MenuGo";
+  console.log("the name of the ressturant wil be "+ restaurantName);
 
   return (
     <div className="min-h-screen bg-white animate-slide-in-right">
@@ -136,14 +128,12 @@ const StaffLoginPage = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            {}
             {loginError && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                 {loginError}
               </div>
             )}
             
-            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
@@ -168,7 +158,6 @@ const StaffLoginPage = () => {
               )}
             </div>
 
-            {}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -204,7 +193,6 @@ const StaffLoginPage = () => {
               )}
             </div>
 
-            {}
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -221,7 +209,6 @@ const StaffLoginPage = () => {
               </Link>
             </div>
 
-            {}
             <Button
               type="submit"
               className="w-full rounded-xl bg-black text-white hover:bg-gray-800 hover-lift"
@@ -231,7 +218,6 @@ const StaffLoginPage = () => {
             </Button>
           </form>
 
-          {}
           <div className="text-center pt-6 border-t border-gray-200">
             <Link
               to={restaurantId ? `/customer/${restaurantId}` : "/customer"}
