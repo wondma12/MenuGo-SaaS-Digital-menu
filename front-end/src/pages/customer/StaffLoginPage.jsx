@@ -1,0 +1,237 @@
+// src/pages/customer/StaffLoginPage.jsx
+
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import Input from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import Footer from "../../components/layout/Footer";
+import authService from "../../services/authservice";
+import { restaurantAPI } from "../../services/api";
+
+const StaffLoginPage = () => {
+  const navigate = useNavigate();
+  const { restaurantId } = useParams();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const [restaurant, setRestaurant] = useState(null);
+
+  useEffect(() => {
+    const loadRestaurant = async () => {
+      if (!restaurantId) {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.restaurant_id) {
+          try {
+            const result = await restaurantAPI.getById(user.restaurant_id);
+            if (result) setRestaurant(result);
+          } catch (e) {
+            console.error("Error loading restaurant:", e);
+          }
+        }
+        return;
+      }
+
+      try {
+        // ✅ Use public endpoint for restaurant info
+        const result = await restaurantAPI.getById(restaurantId);
+        if (result) {
+          setRestaurant(result);
+        }
+      } catch (error) {
+        console.error("Error loading restaurant:", error);
+      }
+    };
+
+    loadRestaurant();
+  }, [restaurantId]);
+
+  const validate = () => {
+    const validationErrors = {};
+    if (!formData.email.trim()) {
+      validationErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      validationErrors.email = "Invalid email format";
+    }
+    if (!formData.password) {
+      validationErrors.password = "Password is required";
+    }
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
+  };
+
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    setIsLoading(true);
+    setLoginError("");
+
+    try {
+      const result = await authService.login(formData.email, formData.password);
+
+      if (result.success) {
+        const { user, token } = result.data;
+        
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        if (user.role === "restaurant_admin" || user.role === "waiter") {
+          const redirectPath = authService.getRestaurantRedirectPath(user);
+          if (redirectPath) {
+            navigate(redirectPath);
+          } else {
+            setLoginError("Unable to determine redirect path");
+          }
+        } else {
+          setLoginError("Access denied. Staff accounts only.");
+        }
+      } else {
+        setLoginError(result.error || "Invalid credentials");
+      }
+    } catch (error) {
+      console.error("[StaffLogin] Error:", error);
+      setLoginError("Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const restaurantName = restaurant?.name || "MenuGo";
+  console.log("the name of the ressturant wil be "+ restaurantName);
+
+  return (
+    <div className="min-h-screen bg-white animate-slide-in-right">
+      <main className="min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 animate-scale-in">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {restaurantName}
+            </h1>
+            <h2 className="text-2xl font-semibold text-gray-900">
+              Staff Login
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Authorized personnel only
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+            {loginError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {loginError}
+              </div>
+            )}
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <div
+                className={`flex items-center border rounded-xl focus-within:ring-2 focus-within:ring-black ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                }`}
+              >
+                <Mail className="text-gray-400 w-5 h-5 ml-3 shrink-0" />
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  className="border-0! rounded-none! ring-0! outline-none! flex-1"
+                  error={errors.email}
+                />
+              </div>
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <div
+                className={`flex items-center border rounded-xl focus-within:ring-2 focus-within:ring-black ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                }`}
+              >
+                <Lock className="text-gray-400 w-5 h-5 ml-3 shrink-0" />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={(e) => handleChange("password", e.target.value)}
+                  className="border-0! rounded-none! ring-0! outline-none! flex-1"
+                  error={errors.password}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors mr-3 shrink-0"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                />
+                <span className="text-sm text-gray-600">Remember me</span>
+              </label>
+              <Link
+                to="/auth/forgot-password"
+                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full rounded-xl bg-black text-white hover:bg-gray-800 hover-lift"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+
+          <div className="text-center pt-6 border-t border-gray-200">
+            <Link
+              to={restaurantId ? `/customer/${restaurantId}` : "/customer"}
+              className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Menu
+            </Link>
+          </div>
+        </div>
+      </main>
+      <Footer restaurant={restaurant} />
+    </div>
+  );
+};
+
+export default StaffLoginPage;

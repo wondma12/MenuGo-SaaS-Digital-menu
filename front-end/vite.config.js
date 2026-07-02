@@ -1,8 +1,15 @@
+
+import path from "path"; 
+import { fileURLToPath } from "url"; 
 import { defineConfig } from "vite";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import babel from "@rolldown/plugin-babel";
 import tailwind from "@tailwindcss/postcss";
 import autoprefixer from "autoprefixer";
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,6 +17,11 @@ export default defineConfig({
   css: {
     postcss: {
       plugins: [tailwind, autoprefixer],
+    },
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 });

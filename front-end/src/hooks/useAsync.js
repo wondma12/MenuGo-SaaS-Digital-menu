@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-// Custom hook for handling async operations
+
 export const useAsync = (asyncFunction, dependencies = []) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ export const useAsync = (asyncFunction, dependencies = []) => {
     }
   }, dependencies);
 
-  // Reset function
+  
   const reset = useCallback(() => {
     setData(null);
     setLoading(false);
