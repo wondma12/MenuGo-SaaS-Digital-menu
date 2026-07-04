@@ -22,7 +22,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Button } from "../ui/button";
-import Input from "../ui/Input";
+import Input from "../ui/input";
 import registrationService from "../../services/registration";
 
 const MultiStepRegistration = () => {
