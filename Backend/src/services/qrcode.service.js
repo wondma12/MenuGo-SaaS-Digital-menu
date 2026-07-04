@@ -19,7 +19,7 @@ export const generateQRCode = async (restaurantId, tableNumber = null, qrType = 
   const qrIdentifier = `${restaurantId}-${tableNumber || 'menu'}-${Date.now()}`;
   
   // Create QR code data URL (for restaurant menu)
-  const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  const baseUrl = process.env.CORS_ORIGIN || 'https://menu-go-digital-menu.vercel.app';
   const qrData = tableNumber 
     ? `${baseUrl}/customer/${restaurantId}?table=${tableNumber}`
     : `${baseUrl}/customer/${restaurantId}`;
