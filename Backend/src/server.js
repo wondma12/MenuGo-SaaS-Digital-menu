@@ -30,7 +30,7 @@ app.use(helmet());
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://your-frontend.vercel.app",
+  "https://menu-go-digital-menu.vercel.app",
 ];
 
 app.use(
