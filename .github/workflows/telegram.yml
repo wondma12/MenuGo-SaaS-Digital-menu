@@ -12,7 +12,13 @@ jobs:
     steps:
       - name: Send Telegram notification
         run: |
-          MESSAGE="🚀 MenuGo Deployment\n\n✅ New commit pushed\n\n👤 Author: ${{ github.actor }}\n🌿 Branch: ${{ github.ref_name }}\n\n📝 Commit:\n${{ github.event.head_commit.message }}\n\n🔗 https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+
+          if [ -z "$COMMIT_MSG" ]; then
+            COMMIT_MSG="Manual update / push"
+          fi
+
+          MESSAGE="🚀 MenuGo Deployment Successful\n\n✅ Status: SUCCESS\n👤 Author: ${{ github.actor }}\n🌿 Branch: ${{ github.ref_name }}\n\n📝 Commit Message:\n${COMMIT_MSG}\n\n🔗 Commit:\nhttps://github.com/${{ github.repository }}/commit/${{ github.sha }}"
 
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
