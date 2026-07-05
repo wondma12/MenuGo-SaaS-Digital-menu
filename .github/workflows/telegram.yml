@@ -11,27 +11,9 @@ jobs:
 
     steps:
       - name: Send Telegram notification
-        env:
-          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-          AUTHOR: ${{ github.actor }}
-          BRANCH: ${{ github.ref_name }}
-          REPO: ${{ github.repository }}
-          SHA: ${{ github.sha }}
         run: |
-          MESSAGE="🚀 MenuGo Deployment
+          MESSAGE="🚀 MenuGo Deployment\n\n✅ New commit pushed\n\n👤 Author: ${{ github.actor }}\n🌿 Branch: ${{ github.ref_name }}\n\n📝 Commit:\n${{ github.event.head_commit.message }}\n\n🔗 https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
 
-          ✅ New commit pushed
-
-          👤 Author: ${AUTHOR}
-          🌿 Branch: ${BRANCH}
-
-          📝 Commit:
-          ${COMMIT_MESSAGE}
-
-          🔗 https://github.com/${REPO}/commit/${SHA}"
-
-          curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
-            -d chat_id="${CHAT_ID}" \
-            --data-urlencode text="$MESSAGE"   
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            --data-urlencode "text=${MESSAGE}"
