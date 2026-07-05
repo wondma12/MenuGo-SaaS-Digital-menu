@@ -18,8 +18,10 @@ jobs:
             COMMIT_MSG="Manual update / push"
           fi
 
-          MESSAGE="🚀 MenuGo Deployment Successful\n\n✅ Status: SUCCESS\n👤 Author: ${{ github.actor }}\n🌿 Branch: ${{ github.ref_name }}\n\n📝 Commit Message:\n${COMMIT_MSG}\n\n🔗 Commit:\nhttps://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+          MESSAGE="🎯 <b>MenuGo Deployment</b>\n\n✅ <b>Status:</b> SUCCESS\n\n━━━━━━━━━━━━━━━━━━━\n\n👤 <b>Author:</b> ${{ github.actor }}\n🌿 <b>Branch:</b> ${{ github.ref_name }}\n\n📝 <b>Commit:</b>\n<code>${COMMIT_MSG}</code>\n\n━━━━━━━━━━━━━━━━━━━\n\n🔗 <a href='https://github.com/${{ github.repository }}/commit/${{ github.sha }}'>View Commit Details</a>"
 
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d "parse_mode=HTML" \
+            -d "disable_web_page_preview=true" \
             --data-urlencode "text=${MESSAGE}"
