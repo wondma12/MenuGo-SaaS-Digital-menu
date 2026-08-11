@@ -34,6 +34,25 @@ export const authenticate = async (req, res, next) => {
       return errorResponse(res, 'User not found or inactive', null, 401);
     }
 
+    // If the user is a restaurant owner/admin and the restaurant_id is missing,
+    // fall back to the restaurant they own so restaurant-specific endpoints still work.
+    if (!user.restaurant_id && user.role !== 'platform_admin') {
+      const ownedRestaurant = await prisma.restaurants.findFirst({
+        where: { owner_id: user.id },
+        select: { id: true }
+      });
+
+      if (ownedRestaurant) {
+        user.restaurant_id = ownedRestaurant.id;
+
+        // Persist the association so future requests work without extra lookup.
+        await prisma.users.update({
+          where: { id: user.id },
+          data: { restaurant_id: ownedRestaurant.id }
+        });
+      }
+    }
+
     req.user = user;
     next();
   } catch (error) {

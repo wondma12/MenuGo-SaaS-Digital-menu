@@ -1,5 +1,6 @@
 // src/services/registration.js
 import { authAPI, restaurantAPI, verificationAPI, locationAPI } from "./api.js";
+import { API_BASE_URL } from "../env.js";
 
 const registrationService = {
   
@@ -27,9 +28,7 @@ const registrationService = {
       }
       // IMPORTANT: Do NOT set Content-Type, browser sets it with boundary
 
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
-      
-      const response = await fetch(`${API_BASE_URL}/api/upload`, {
+      const response = await fetch(`${API_BASE_URL}/upload`, {
         method: 'POST',
         headers: headers,
         body: formData,
@@ -95,10 +94,13 @@ const registrationService = {
         console.warn("[Registration] ⚠️ Auto-login failed, continuing without token");
       } else {
         console.log("[Registration] ✅ Auto-login successful");
-        // Store token for subsequent API calls
-        if (loginResult.data?.token) {
-          localStorage.setItem('authToken', loginResult.data.token);
-          localStorage.setItem('token', loginResult.data.token);
+        const authToken = loginResult.token;
+        if (authToken) {
+          localStorage.setItem('authToken', authToken);
+          localStorage.setItem('token', authToken);
+          if (loginResult.user) {
+            localStorage.setItem('user', JSON.stringify(loginResult.user));
+          }
         }
       }
 

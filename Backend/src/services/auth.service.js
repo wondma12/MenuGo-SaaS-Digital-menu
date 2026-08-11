@@ -65,6 +65,22 @@ export const loginUser = async (email, password) => {
     throw new Error('Invalid credentials');
   }
 
+  // Resolve restaurant association for owners who may not have restaurant_id set yet
+  if (!user.restaurant_id && user.role !== 'platform_admin') {
+    const ownedRestaurant = await prisma.restaurants.findFirst({
+      where: { owner_id: user.id },
+      select: { id: true }
+    });
+
+    if (ownedRestaurant) {
+      user.restaurant_id = ownedRestaurant.id;
+      await prisma.users.update({
+        where: { id: user.id },
+        data: { restaurant_id: ownedRestaurant.id }
+      });
+    }
+  }
+
   // Update last login
   await prisma.users.update({
     where: { id: user.id },
@@ -75,8 +91,24 @@ export const loginUser = async (email, password) => {
   const token = generateToken(user.id, user.email, user.role, user.restaurant_id);
 
   const { password: _, ...userWithoutPassword } = user;
+  let restaurantName = null;
 
-  return { user: userWithoutPassword, token };
+  if (user.restaurant_id) {
+    const restaurant = await prisma.restaurants.findUnique({
+      where: { id: user.restaurant_id },
+      select: { name: true }
+    });
+    restaurantName = restaurant?.name || null;
+  }
+
+  return {
+    user: {
+      ...userWithoutPassword,
+      restaurant_name: restaurantName,
+      avatar: user.profile_image || null,
+    },
+    token,
+  };
 };
 
 export const getCurrentUser = async (userId) => {
@@ -109,5 +141,11 @@ export const getCurrentUser = async (userId) => {
     throw new Error('User not found');
   }
 
-  return user;
+  const restaurantName = user.restaurants_users_restaurant_idTorestaurants?.name || null;
+
+  return {
+    ...user,
+    restaurant_name: restaurantName,
+    avatar: user.profile_image || null,
+  };
 };

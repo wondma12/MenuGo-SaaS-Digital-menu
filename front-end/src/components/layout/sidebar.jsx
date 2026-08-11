@@ -37,27 +37,26 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        
-        const user = authAPI.getUser();
-        
-        if (user) {
+        const token = authAPI.getToken();
+        const cachedUser = token ? authAPI.getUser() : null;
+        const shouldRefresh = !cachedUser || !cachedUser.restaurant_name || !cachedUser.role;
+
+        if (cachedUser && !shouldRefresh) {
           setUserData({
-            id: user.id,
-            name: user.name || (role === "Platform_admin" ? "Platform Admin" : "Restaurant Admin"),
-            email: user.email || "admin@example.com",
-            role: user.role || role,
-            restaurantId: user.restaurant_id || null,
-            restaurantName: user.restaurant_name || "",
-            avatar: user.avatar && user.avatar !== "" 
-              ? user.avatar 
-              : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || "User")}&background=000000&color=fff`,
+            id: cachedUser.id,
+            name: cachedUser.name || (role === "Platform_admin" ? "Platform Admin" : "Restaurant Admin"),
+            email: cachedUser.email || "admin@example.com",
+            role: cachedUser.role || role,
+            restaurantId: cachedUser.restaurant_id || null,
+            restaurantName: cachedUser.restaurant_name || cachedUser.restaurants_users_restaurant_idTorestaurants?.name || "",
+            avatar: cachedUser.avatar && cachedUser.avatar !== "" 
+              ? cachedUser.avatar 
+              : `https://ui-avatars.com/api/?name=${encodeURIComponent(cachedUser.name || "User")}&background=000000&color=fff`,
           });
           setLoading(false);
           return;
         }
 
-        
-        const token = authAPI.getToken();
         if (token) {
           try {
             const result = await authAPI.getCurrentUser();
@@ -69,13 +68,17 @@ const Sidebar = ({ role = "Restaurant_admin" }) => {
                 email: userData.email || "admin@example.com",
                 role: userData.role || role,
                 restaurantId: userData.restaurant_id || null,
-                restaurantName: userData.restaurant_name || "",
+                restaurantName: userData.restaurant_name || userData.restaurants_users_restaurant_idTorestaurants?.name || "",
                 avatar: userData.avatar && userData.avatar !== "" 
                   ? userData.avatar 
                   : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || "User")}&background=000000&color=fff`,
               });
               setLoading(false);
               return;
+            }
+
+            if (result.error) {
+              console.warn("Sidebar current user failed:", result.error);
             }
           } catch (apiError) {
             console.error("API fetch failed:", apiError);

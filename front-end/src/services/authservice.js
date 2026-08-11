@@ -1,5 +1,6 @@
 
 import { authAPI } from './api.js';
+import { API_BASE_URL } from '../env.js';
 
 
 
@@ -64,6 +65,9 @@ const authService = {
   async getCurrentUser() {
     try {
       const result = await authAPI.getCurrentUser();
+      if (result.success && result.user) {
+        localStorage.setItem("user", JSON.stringify(result.user));
+      }
       return result;
     } catch (error) {
       console.error('[AuthService] Get current user error:', error);
@@ -170,7 +174,7 @@ const authService = {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/restaurants/${user.restaurant_id}`
+        `${API_BASE_URL}/restaurants/${user.restaurant_id}`
       );
 
       if (!response.ok) {

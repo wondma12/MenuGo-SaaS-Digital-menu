@@ -58,7 +58,7 @@ const restaurantService = {
       const response = await api.get('/restaurants/my-restaurant');
       return {
         success: true,
-        data: response.data.data,
+        data: response.data?.data || null,
         error: null,
       };
     } catch (error) {
@@ -66,7 +66,7 @@ const restaurantService = {
       return {
         success: false,
         data: null,
-        error: error.response?.data?.message || 'Failed to fetch your restaurant',
+        error: error.response?.data?.message || error.message || 'Failed to fetch your restaurant',
       };
     }
   },

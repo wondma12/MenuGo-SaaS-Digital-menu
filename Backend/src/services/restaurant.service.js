@@ -161,29 +161,49 @@ export const updateRestaurantStatus = async (restaurantId, status, reviewedBy) =
 export const getMyRestaurant = async (userId) => {
   const user = await prisma.users.findUnique({
     where: { id: userId },
-    include: {
-      restaurants_users_restaurant_idTorestaurants: {
-        include: {
-          categories: {
-            orderBy: { display_order: 'asc' },
-            include: {
-              menu_items: {
-                where: { status: 'available' }
-              }
-            }
-          },
-          restaurant_location: true,
-          qr_codes: {
-            where: { is_active: true }
-          }
-        }
-      }
+    select: {
+      restaurant_id: true
     }
   });
 
-  if (!user.restaurants_users_restaurant_idTorestaurants) {
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  const include = {
+    categories: {
+      orderBy: { display_order: 'asc' },
+      include: {
+        menu_items: {
+          where: { status: 'available' }
+        }
+      }
+    },
+    restaurant_location: true,
+    qr_codes: {
+      where: { is_active: true }
+    }
+  };
+
+  let restaurant = null;
+
+  if (user.restaurant_id) {
+    restaurant = await prisma.restaurants.findUnique({
+      where: { id: user.restaurant_id },
+      include
+    });
+  }
+
+  if (!restaurant) {
+    restaurant = await prisma.restaurants.findFirst({
+      where: { owner_id: userId },
+      include
+    });
+  }
+
+  if (!restaurant) {
     throw new Error('No restaurant found for this user');
   }
 
-  return user.restaurants_users_restaurant_idTorestaurants;
+  return restaurant;
 };

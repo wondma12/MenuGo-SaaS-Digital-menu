@@ -109,7 +109,7 @@ export const getPlatformDashboardStats = async () => {
       COUNT(*) as order_count,
       SUM(total_price) as revenue
     FROM orders
-    WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+    WHERE created_at >= NOW() - INTERVAL '30 days'
     GROUP BY DATE(created_at)
     ORDER BY date ASC
   `;
@@ -185,7 +185,7 @@ export const getPlatformRevenueChart = async (days = 30) => {
       COUNT(*) as order_count,
       SUM(total_price) as revenue
     FROM orders
-    WHERE created_at >= DATE_SUB(NOW(), INTERVAL ${days} DAY)
+    WHERE created_at >= NOW() - (${days} * INTERVAL '1 day')
     GROUP BY DATE(created_at)
     ORDER BY date ASC
   `;
@@ -329,7 +329,7 @@ export const getTopRestaurants = async (limit = 10) => {
       SUM(o.total_price) as total_revenue
     FROM restaurants r
     LEFT JOIN orders o ON o.restaurant_id = r.id
-    WHERE o.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+    WHERE o.created_at >= NOW() - INTERVAL '30 days'
     GROUP BY r.id
     ORDER BY total_revenue DESC
     LIMIT ${limit}

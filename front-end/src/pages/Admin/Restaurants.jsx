@@ -1,12 +1,14 @@
 
 
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/layout/sidebar";
 import TopHeader from "../../components/layout/TopHeader";
 import RestaurantsSummaryCards from "../../components/Admin/Restaurants/RestaurantsSummaryCards";
 import RestaurantsTable from "../../components/Admin/Restaurants/RestaurantsTable";
 import SupportGrid from "../../components/Admin/Restaurants/SupportGrid";
 import { restaurantAPI } from "../../services/api";
+import authService from "../../services/authservice";
 
 const Restaurants = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -23,8 +25,17 @@ const Restaurants = () => {
   
   
 
+  const navigate = useNavigate();
+
   const fetchRestaurants = useCallback(async () => {
     try {
+      const user = authService.getCurrentUserFromStorage();
+      if (!user || user.role !== 'platform_admin') {
+        console.error('[Restaurants] Access denied: current user is not platform_admin', user);
+        navigate('/auth/login');
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
@@ -42,6 +53,8 @@ const Restaurants = () => {
           restaurantsData = result.data;
         } else if (result.restaurants && Array.isArray(result.restaurants)) {
           restaurantsData = result.restaurants;
+        } else if (result.success === true && Array.isArray(result.data)) {
+          restaurantsData = result.data;
         } else {
           restaurantsData = result;
         }

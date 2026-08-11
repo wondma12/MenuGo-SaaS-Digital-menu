@@ -71,7 +71,11 @@ const Dashboard = () => {
         console.log("[Dashboard] Staff result:", staffResult);
 
         
-        const menuItems = menuItemsResult.success ? menuItemsResult.data : [];
+        const menuItems = menuItemsResult.success
+          ? Array.isArray(menuItemsResult.data)
+            ? menuItemsResult.data
+            : menuItemsResult.data?.menuItems || []
+          : [];
         const totalMenuItems = menuItems.length || 0;
 
         

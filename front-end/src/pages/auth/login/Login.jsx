@@ -146,6 +146,8 @@ const Login = () => {
             <Mail className="text-gray-400 w-5 h-5 ml-3 flex-shrink-0" />
             <Input
               id="email"
+              name="email"
+              autoComplete="email"
               type="email"
               placeholder="Enter your email"
               value={formData.email}
@@ -175,6 +177,8 @@ const Login = () => {
             <Lock className="text-gray-400 w-5 h-5 ml-3 flex-shrink-0" />
             <Input
               id="password"
+              name="password"
+              autoComplete="current-password"
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
               value={formData.password}

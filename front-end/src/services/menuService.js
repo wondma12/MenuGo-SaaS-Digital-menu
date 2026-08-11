@@ -11,9 +11,10 @@ const menuService = {
   async getMenuItems(params = {}) {
     try {
       const result = await menuAPI.getMenuItems(params);
+      const data = result?.menuItems || result?.data || result || [];
       return {
         success: true,
-        data: result.menuItems || result,
+        data,
         error: null,
       };
     } catch (error) {
@@ -29,9 +30,10 @@ const menuService = {
   async getMenuItemsByCategory(categoryId) {
     try {
       const result = await menuAPI.getMenuItems({ category_id: categoryId });
+      const data = result?.menuItems || result?.data || result || [];
       return {
         success: true,
-        data: result.menuItems || result,
+        data,
         error: null,
       };
     } catch (error) {

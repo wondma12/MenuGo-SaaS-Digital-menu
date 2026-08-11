@@ -35,14 +35,17 @@ const MenuManagement = () => {
       setError(null);
 
       const result = await menuService.getMenuItems();
+      const rawItems = Array.isArray(result.data)
+        ? result.data
+        : result.data?.menuItems || result.data?.data || [];
 
       if (result.success) {
-        const transformedItems = result.data.map((item) => ({
+        const transformedItems = rawItems.map((item) => ({
           id: item.id,
           name: item.name,
           description: item.description || "",
           category: item.categories?.name || "Uncategorized",
-          price: parseFloat(item.price),
+          price: parseFloat(item.price) || 0,
           available: item.status === "available",
           imageUrl:
             item.image ||

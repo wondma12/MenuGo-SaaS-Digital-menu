@@ -1,10 +1,6 @@
 
 import axios from "axios";
-
-const API_BASE_URL =  import.meta.env.VITE_API_URL || "https://menugo-digital-menu.onrender.com/api/v1";
-
-  // import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
-
+import { API_BASE_URL } from "../env.js";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -17,7 +13,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -32,6 +28,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
+      localStorage.removeItem("authToken");
       localStorage.removeItem("user");
     }
 
@@ -123,6 +120,7 @@ export const authAPI = {
       if (response.data.success) {
         const { token, user } = response.data.data;
         localStorage.setItem("token", token);
+        localStorage.setItem("authToken", token);
         localStorage.setItem("user", JSON.stringify(user));
         return { success: true, user, token };
       }
@@ -151,13 +149,25 @@ export const authAPI = {
   },
 
   getCurrentUser: async () => {
+    const token = localStorage.getItem("token") || localStorage.getItem("authToken");
+    if (!token) {
+      return { success: false, error: "No authentication token found" };
+    }
+
     try {
       const response = await api.get("/auth/me");
       if (response.data.success) {
-        return { success: true, user: response.data.data };
+        const user = response.data.data;
+        localStorage.setItem("user", JSON.stringify(user));
+        return { success: true, user };
       }
       return { success: false, error: response.data.message };
     } catch (error) {
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+      }
       return {
         success: false,
         error: error.response?.data?.message || "Failed to get user",
@@ -167,25 +177,38 @@ export const authAPI = {
 
   logout: () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("authToken");
     localStorage.removeItem("user");
     return { success: true };
   },
 
   isAuthenticated: () => {
-    return !!localStorage.getItem("token");
+    return !!localStorage.getItem("token") || !!localStorage.getItem("authToken");
   },
 
   getUser: () => {
+    const token = localStorage.getItem("token") || localStorage.getItem("authToken");
+    if (!token) {
+      return null;
+    }
+
     const user = localStorage.getItem("user");
-    return user ? JSON.parse(user) : null;
+    if (!user) {
+      return null;
+    }
+    try {
+      return JSON.parse(user);
+    } catch (error) {
+      console.error("[authAPI] Failed to parse stored user:", error);
+      localStorage.removeItem("user");
+      return null;
+    }
   },
 
   getToken: () => {
-    return localStorage.getItem("token");
+    return localStorage.getItem("token") || localStorage.getItem("authToken");
   },
 };
-
-
 
 export const restaurantAPI = {
   getAll: async (params = {}) => {

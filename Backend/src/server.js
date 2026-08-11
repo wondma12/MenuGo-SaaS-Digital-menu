@@ -17,9 +17,7 @@ import routes from "./routes/index.js";
 
 
 
-// Prefer this project's local configuration over a stale DATABASE_URL inherited
-// from another shell, editor task, or deployment tool.
-dotenv.config({ override: true });
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;

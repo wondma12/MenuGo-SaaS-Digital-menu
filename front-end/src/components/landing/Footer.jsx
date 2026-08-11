@@ -148,22 +148,18 @@ const Footer = () => {
             {}
             <div className="flex items-center gap-4">
               {[
-                { icon: FaTwitter, href: "#", isReactIcon: true },
-                { icon: FaLinkedin, href: "#", isReactIcon: true },
-                { icon: FaGithub, href: "#", isReactIcon: true },
-                { icon: FaInstagram, href: "#", isReactIcon: true },
-                { icon: FaYoutube, href: "#", isReactIcon: true }
-              ].map((social, index) => (
+                { icon: FaTwitter, href: "#", name: "twitter" },
+                { icon: FaLinkedin, href: "#", name: "linkedin" },
+                { icon: FaGithub, href: "#", name: "github" },
+                { icon: FaInstagram, href: "#", name: "instagram" },
+                { icon: FaYoutube, href: "#", name: "youtube" }
+              ].map((social) => (
                 <a
-                  key={social.isReactIcon ? 'github' : social.icon.name}
+                  key={social.name}
                   href={social.href}
                   className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition-all duration-300"
                 >
-                  {social.isReactIcon ? (
-                    <social.icon className="w-5 h-5" />
-                  ) : (
-                    <social.icon className="w-4 h-4" />
-                  )}
+                  <social.icon className="w-5 h-5" />
                 </a>
               ))}
             </div>
